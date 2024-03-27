@@ -30,7 +30,7 @@ const TambahSiswa = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold capitalize">tambah siswa</h1>
+            <h1 className="text-2xl font-bold capitalize">kembali</h1>
           </button>
         </Link>
 

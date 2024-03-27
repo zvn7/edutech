@@ -111,40 +111,6 @@ const Navigation = () => {
 						label={
 							<div className="relative inline-flex bg-slate-100 rounded-full p-2">
 								<svg
-									className="w-6 h-6 text-[#1294f2]"
-									aria-hidden="true"
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke="currentColor"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth="2"
-										d="M11 9H5a1 1 0 0 0-1 1v4c0 .6.4 1 1 1h6m0-6v6m0-6 5.4-3.9A1 1 0 0 1 18 6v12.2a1 1 0 0 1-1.6.8L11 15m7 0a3 3 0 0 0 0-6M6 15h3v5H6v-5Z"
-									/>
-								</svg>
-								<div className="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-500 rounded-full -top-1 -end-1.5">
-									0
-								</div>
-							</div>
-						}
-					>
-						<DropdownHeader>
-							<span className="block text-sm">Pengumuman</span>
-						</DropdownHeader>
-						<DropdownItem className="w-72">
-							Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-							Consectetur, aliquam!
-						</DropdownItem>
-					</Dropdown>
-					<Dropdown
-						arrowIcon={false}
-						inline
-						label={
-							<div className="relative inline-flex bg-slate-100 rounded-full p-2">
-								<svg
 									className="w-6  h-6 text-[#1294f2] "
 									aria-hidden="true"
 									xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +159,7 @@ const Navigation = () => {
 				</div>
 			</Navbar>
 			<div
-				className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform mt-6 ${
+				className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform mt-6 overflow-y-auto ${
 					sidebarOpen ? "translate-x-0" : "-translate-x-full"
 				} bg-white border-r border-gray-200 sm:translate-x-0`}
 			>
@@ -385,7 +351,7 @@ const Navigation = () => {
 										: "text-dark"
 								}`}
 							>
-								User Menu
+								Pengguna
 							</span>
 							<FaAngleUp
 								className={`ml-auto w-6 h-6 ${

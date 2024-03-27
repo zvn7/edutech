@@ -59,6 +59,20 @@ const MateriSiswa = () => {
 		setSelectedCard(null);
 	};
 
+	const handleFileDownload = (fileName) => {
+		// Buat tautan untuk mengunduh file
+		const downloadLink = document.createElement("a");
+		downloadLink.href = `/path/to/your/files/${fileName}`;
+		downloadLink.download = fileName;
+
+		// Sisipkan tautan ke dalam dokumen dan klik secara otomatis
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+
+		// Hapus tautan setelah pengunduhan selesai
+		document.body.removeChild(downloadLink);
+	};
+
 	return (
 		<div>
 			<Navigation />
@@ -84,7 +98,7 @@ const MateriSiswa = () => {
 									className="cursor-pointer"
 									onClick={() => handleCardClick(card.id)}
 								>
-									<div className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-white">
+									<div className="flex items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
 										<div className="flex gap-3">
 											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 												<svg
@@ -96,17 +110,21 @@ const MateriSiswa = () => {
 												>
 													<path
 														fillRule="evenodd"
-														d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+														d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
 														clipRule="evenodd"
 													/>
 												</svg>
 											</div>
 											<div className="flex flex-col">
-												<p className="text-lg font-semibold">{card.title}</p>
-												<div className="flex flex-wrap gap-2 ">
+												<p className="text-sm capitalize text-gray-500">
+													sumitro, S.Pd
+												</p>
+												<p className="text-md font-medium">Basic Programing</p>
+
+												<div className="flex flex-wrap gap-2 text-gray-500">
 													<div className="flex gap-1">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-500 dark:text-white"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															fill="none"
@@ -124,7 +142,7 @@ const MateriSiswa = () => {
 													</div>
 													<div className="flex gap-1">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-500 dark:text-white"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															fill="none"
@@ -138,7 +156,9 @@ const MateriSiswa = () => {
 																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
 															/>
 														</svg>
-														<span className="text-sm">07:30 - 10:00</span>
+														<span className="text-sm uppercase">
+															07:30 - 10:00 wib
+														</span>
 													</div>
 												</div>
 											</div>
@@ -179,7 +199,15 @@ const MateriSiswa = () => {
 											<p>{detailedCardInfo[selectedCard - 1].description}</p>
 										</Tabs.Item>
 										<Tabs.Item title="File">
-											<div className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]">
+											<div
+												className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+												onClick={() =>
+													handleFileDownload(
+														detailedCardInfo[selectedCard - 1].file
+													)
+												}
+												style={{ cursor: "pointer" }}
+											>
 												<div className="flex gap-3">
 													<div className="bg-white rounded-lg h-14 flex items-center">
 														<svg
@@ -196,7 +224,7 @@ const MateriSiswa = () => {
 															/>
 														</svg>
 													</div>
-													<div className="flex flex-col justify-center">
+													<div className="flex flex-col justify-center hover:text-blue-700">
 														<p className="text-lg font-semibold">
 															{detailedCardInfo[selectedCard - 1].file}
 														</p>
@@ -236,7 +264,15 @@ const MateriSiswa = () => {
 											<p>{detailedCardInfo[selectedCard - 1].description}</p>
 										</Tabs.Item>
 										<Tabs.Item title="File">
-											<div className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]">
+											<div
+												className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+												onClick={() =>
+													handleFileDownload(
+														detailedCardInfo[selectedCard - 1].file
+													)
+												}
+												style={{ cursor: "pointer" }}
+											>
 												<div className="flex gap-3">
 													<div className="bg-white rounded-lg h-14 flex items-center">
 														<svg
@@ -253,7 +289,7 @@ const MateriSiswa = () => {
 															/>
 														</svg>
 													</div>
-													<div className="flex flex-col justify-center">
+													<div className="flex flex-col justify-center hover:text-blue-700">
 														<p className="text-lg font-semibold">
 															{detailedCardInfo[selectedCard - 1].file}
 														</p>

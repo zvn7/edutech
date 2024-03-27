@@ -30,7 +30,7 @@ const EditSiswa = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold capitalize">edit siswa</h1>
+            <h1 className="text-2xl font-bold capitalize">kembali</h1>
           </button>
         </Link>
 

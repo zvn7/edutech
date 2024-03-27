@@ -90,7 +90,7 @@ const Mapel = () => {
 						</div>
 						<div className="w-full mt-6">
 							<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-								Tambah
+								Simpan
 							</button>
 							<button
 								className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded w-full mt-2"
