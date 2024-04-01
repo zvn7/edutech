@@ -25,7 +25,7 @@ const TambahJadwalAdmin = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold capitalize">tambah jadwal</h1>
+            <h1 className="text-2xl font-bold capitalize">kembali</h1>
           </button>
         </Link>
 
@@ -125,7 +125,7 @@ const TambahJadwalAdmin = () => {
                   <div className="flex gap-2 items-center">
                     <button
                       type="submit"
-                      className="flex w-20 items-center text-center justify-center  px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+                      className="flex w-20 items-center text-center justify-center  px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white capitalize"
                     >
                       simpan
                     </button>
