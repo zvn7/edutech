@@ -21,95 +21,110 @@ import TambahGuru from "./pages/Pengguna/Guru/TambahGuru/TambahGuru";
 import EditGuru from "./pages/Pengguna/Guru/EditGuru/EditGuru";
 import ProfilSiswa from "./pages/Profile/ProfilSiswa/ProfilSiswa";
 import ProfilGuru from "./pages/Profile/ProfilGuru/ProfilGuru";
+import BerandaAdmin from "./pages/Beranda/BerandaAdmin/BerandaAdmin";
+import BerandaGuru from "./pages/Beranda/BerandaGuru/BerandaGuru";
+import JadwalSiswa from "./pages/Jadwal/JadwalSiswa/JadwalSiswa";
 
 const router = createBrowserRouter([
-	{
-		path: "/login",
-		element: <Login />,
-	},
-	{
-		path: "/",
-		element: <BerandaSiswa />,
-	},
-	{
-		path: "/tugas-siswa",
-		element: <TugasSiswa />,
-	},
-	{
-		path: "/tugas-guru",
-		element: <TugasGuru />,
-	},
-	{
-		path: "/materi-siswa",
-		element: <MateriSiswa />,
-	},
-	{
-		path: "/materi-guru",
-		element: <MateriGuru />,
-	},
-	{
-		path: "/penilaian",
-		element: <Penilaian />,
-	},
-	{
-		path: "/penilaian/koreksi",
-		element: <Koreksi />,
-	},
-	{
-		path: "/mapel",
-		element: <Mapel />,
-	},
-	{
-		path: "/rekap-absensi",
-		element: <AbsensiAdmin />,
-	},
-	{
-		path: "/data-absensi",
-		element: <HasilAbsensiAdmin />,
-	},
-	{
-		path: "/jadwal",
-		element: <JadwalAdmin />,
-	},
-	{
-		path: "/jadwal/tambah-jadwal",
-		element: <TambahJadwalAdmin />,
-	},
-	{
-		path: "/jadwal/edit-jadwal",
-		element: <EditJadwalAdmin />,
-	},
-	{
-		path: "/pengguna-guru",
-		element: <Guru />,
-	},
-	{
-		path: "/pengguna-guru/tambah-guru",
-		element: <TambahGuru />,
-	},
-	{
-		path: "/pengguna-guru/edit-guru",
-		element: <EditGuru />,
-	},
-	{
-		path: "/pengguna-siswa",
-		element: <Siswa />,
-	},
-	{
-		path: "/pengguna-siswa/tambah-siswa",
-		element: <TambahSiswa />,
-	},
-	{
-		path: "/pengguna-siswa/edit-siswa",
-		element: <EditSiswa />,
-	},
-	{
-		path: "/profile",
-		element: <ProfilSiswa />,
-	},
-	{
-		path: "/profile",
-		element: <ProfilGuru />,
-	},
+  {
+    path: "/",
+    element: <Login />,
+  },
+  {
+    path: "/beranda-siswa",
+    element: <BerandaSiswa />,
+  },
+  {
+    path: "/beranda-guru",
+    element: <BerandaGuru />,
+  },
+  {
+    path: "/beranda-admin",
+    element: <BerandaAdmin />,
+  },
+  {
+    path: "/tugas-siswa",
+    element: <TugasSiswa />,
+  },
+  {
+    path: "/tugas-guru",
+    element: <TugasGuru />,
+  },
+  {
+    path: "/materi-siswa",
+    element: <MateriSiswa />,
+  },
+  {
+    path: "/materi-guru",
+    element: <MateriGuru />,
+  },
+  {
+    path: "/penilaian",
+    element: <Penilaian />,
+  },
+  {
+    path: "/penilaian/koreksi",
+    element: <Koreksi />,
+  },
+  {
+    path: "/mapel",
+    element: <Mapel />,
+  },
+  {
+    path: "/rekap-absensi",
+    element: <AbsensiAdmin />,
+  },
+  {
+    path: "/data-absensi",
+    element: <HasilAbsensiAdmin />,
+  },
+  {
+    path: "/jadwal-admin",
+    element: <JadwalAdmin />,
+  },
+  {
+    path: "/jadwal-siswa",
+    element: <JadwalSiswa/>,
+  },
+  {
+    path: "/jadwal/tambah-jadwal",
+    element: <TambahJadwalAdmin />,
+  },
+  {
+    path: "/jadwal/edit-jadwal",
+    element: <EditJadwalAdmin />,
+  },
+  {
+    path: "/pengguna-guru",
+    element: <Guru />,
+  },
+  {
+    path: "/pengguna-guru/tambah-guru",
+    element: <TambahGuru />,
+  },
+  {
+    path: "/pengguna-guru/edit-guru",
+    element: <EditGuru />,
+  },
+  {
+    path: "/pengguna-siswa",
+    element: <Siswa />,
+  },
+  {
+    path: "/pengguna-siswa/tambah-siswa",
+    element: <TambahSiswa />,
+  },
+  {
+    path: "/pengguna-siswa/edit-siswa",
+    element: <EditSiswa />,
+  },
+  {
+    path: "/profile-siswa",
+    element: <ProfilSiswa />,
+  },
+  {
+    path: "/profile-guru",
+    element: <ProfilGuru />,
+  },
 ]);
 export default router;
