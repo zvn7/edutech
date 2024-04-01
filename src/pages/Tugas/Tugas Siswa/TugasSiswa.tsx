@@ -84,7 +84,7 @@ const TugasSiswa = () => {
 									onClick={() => handleCardClick(card.id)}
 									className="cursor-pointer flex flex-col gap-3"
 								>
-									<div className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-white">
+									<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
 										<div className="flex gap-3">
 											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 												<svg
@@ -102,12 +102,16 @@ const TugasSiswa = () => {
 												</svg>
 											</div>
 											<div className="flex flex-col">
-												<p className="text-sm">{card.modul}</p>
-												<h2 className="text">{card.tugas}</h2>
+												<p className="text-sm font-normal text-gray-500">
+													Basic Programing
+												</p>
+												<h2 className="text-md font-medium">
+													Membuat Flowchart
+												</h2>
 												<div className="flex flex-wrap gap-2 ">
 													<div className="flex gap-1">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-500"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															fill="none"
@@ -121,11 +125,13 @@ const TugasSiswa = () => {
 																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
 															/>
 														</svg>
-														<span className="text-sm">01 Januari 2024</span>
+														<span className="text-sm text-gray-500">
+															01 Januari 2024
+														</span>
 													</div>
 													<div className="flex gap-1">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-500"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															fill="none"
@@ -139,16 +145,16 @@ const TugasSiswa = () => {
 																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
 															/>
 														</svg>
-														<span className="text-sm">07:30 - 10:00</span>
+														<span className="text-sm text-gray-500 uppercase">
+															07:30 - 10:00 wib
+														</span>
 													</div>
 												</div>
 											</div>
 										</div>
-										<div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400">
-											<h2 className="text-center text-orange-500 font-semibold text-sm">
-												Belum selesai
-											</h2>
-										</div>
+										<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
+											belum selesai
+										</span>
 									</div>
 								</div>
 							))}

@@ -15,9 +15,9 @@ const TugasGuru = () => {
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [showEditForm, setShowEditForm] = useState(false);
 	const [selectedOption, setSelectedOption] = useState("file");
-	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false); // State untuk mengatur visibilitas modal di mode mobile
+	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
 	const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
-	const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false); // State untuk mengatur visibilitas modal di mode mobile
+	const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
 	const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isTablet, setIsTablet] = useState(false);
@@ -252,7 +252,7 @@ const TugasGuru = () => {
 											d="M5 12h14m-7 7V5"
 										/>
 									</svg>
-									Materi
+									Tugas
 								</button>
 							)}
 							{isTablet && (
@@ -278,7 +278,7 @@ const TugasGuru = () => {
 											d="M5 12h14m-7 7V5"
 										/>
 									</svg>
-									Materi
+									Tugas
 								</button>
 							)}
 							{!isMobile && !isTablet && (
@@ -304,7 +304,7 @@ const TugasGuru = () => {
 											d="M5 12h14m-7 7V5"
 										/>
 									</svg>
-									Materi
+									Tugas
 								</button>
 							)}
 						</div>
@@ -312,7 +312,7 @@ const TugasGuru = () => {
 						<div className="mt-8 flex flex-col gap-3">
 							{detailedCardInfo.map((card) => (
 								<div key={card.id} className="cursor-pointer">
-									<div className=" flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-white">
+									<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
 										<div className="flex gap-3">
 											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 												<svg
@@ -323,17 +323,61 @@ const TugasGuru = () => {
 													viewBox="0 0 24 24"
 												>
 													<path
-														fillRule="evenodd"
+														fill-rule="evenodd"
 														d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-														clipRule="evenodd"
+														clip-rule="evenodd"
 													/>
 												</svg>
 											</div>
 											<div className="flex flex-col">
-												<p className="text-sm font-normal text-gray-600">
-													{card.modul}
+												<p className="text-sm font-normal text-gray-500">
+													Basic Programing
 												</p>
-												<h1 className="text-lg font-semibold">{card.tugas}</h1>
+												<h2 className="text-md font-medium">
+													Membuat Flowchart
+												</h2>
+												<div className="flex flex-wrap gap-2 ">
+													<div className="flex gap-1">
+														<svg
+															className="w-5 h-5 text-gray-500"
+															aria-hidden="true"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth="2"
+																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+															/>
+														</svg>
+														<span className="text-sm text-gray-500">
+															01 Januari 2024
+														</span>
+													</div>
+													<div className="flex gap-1">
+														<svg
+															className="w-5 h-5 text-gray-500"
+															aria-hidden="true"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth="2"
+																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+															/>
+														</svg>
+														<span className="text-sm text-gray-500 uppercase">
+															07:30 - 10:00 wib
+														</span>
+													</div>
+												</div>
 											</div>
 										</div>
 										<Button.Group>
@@ -394,19 +438,18 @@ const TugasGuru = () => {
 								<form className="max-w-full mt-4">
 									<div className="mb-5">
 										<label
-											htmlFor="email"
+											htmlFor="materi"
 											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 										>
-											Mata Pelajaran
+											Materi
 										</label>
 										<select
 											id="countries"
 											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										>
-											<option>Mata Pelajaran</option>
-											<option>Canada</option>
-											<option>France</option>
-											<option>Germany</option>
+											<option>Materi</option>
+											<option>Desain</option>
+											<option>Tools</option>
 										</select>
 									</div>
 									<div className="mb-5">
@@ -471,7 +514,7 @@ const TugasGuru = () => {
 											htmlFor="nama_tugas"
 											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 										>
-											Deadline Tugas
+											Detail Tugas
 										</label>
 										<div className="flex gap-5">
 											<div
@@ -559,19 +602,18 @@ const TugasGuru = () => {
 									<form className="max-w-full mt-4">
 										<div className="mb-5">
 											<label
-												htmlFor="email"
+												htmlFor="materi"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Mata Pelajaran
+												Materi
 											</label>
 											<select
 												id="countries"
 												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											>
-												<option>Mata Pelajaran</option>
-												<option>Canada</option>
-												<option>France</option>
-												<option>Germany</option>
+												<option>Materi</option>
+												<option>Desain</option>
+												<option>Tools</option>
 											</select>
 										</div>
 										<div className="mb-5">
@@ -636,7 +678,7 @@ const TugasGuru = () => {
 												htmlFor="nama_tugas"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Deadline Tugas
+												Detail Tugas
 											</label>
 											<div className="flex gap-5">
 												<div
@@ -705,19 +747,18 @@ const TugasGuru = () => {
 									<form className="max-w-full">
 										<div className="mb-5">
 											<label
-												htmlFor="email"
+												htmlFor="materi"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Mata Pelajaran
+												Materi
 											</label>
 											<select
 												id="countries"
 												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											>
-												<option>Mata Pelajaran</option>
-												<option>Canada</option>
-												<option>France</option>
-												<option>Germany</option>
+												<option>Materi</option>
+												<option>Desain</option>
+												<option>Tools</option>
 											</select>
 										</div>
 										<div className="mb-5">
@@ -782,7 +823,7 @@ const TugasGuru = () => {
 												htmlFor="nama_tugas"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Deadline Tugas
+												Detail Tugas
 											</label>
 											<div className="flex gap-5">
 												<div
@@ -851,19 +892,18 @@ const TugasGuru = () => {
 									<form className="max-w-full">
 										<div className="mb-5">
 											<label
-												htmlFor="email"
+												htmlFor="materi"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Mata Pelajaran
+												Materi
 											</label>
 											<select
 												id="countries"
 												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											>
-												<option>Mata Pelajaran</option>
-												<option>Canada</option>
-												<option>France</option>
-												<option>Germany</option>
+												<option>Materi</option>
+												<option>Desain</option>
+												<option>Tools</option>
 											</select>
 										</div>
 										<div className="mb-5">
@@ -928,7 +968,7 @@ const TugasGuru = () => {
 												htmlFor="nama_tugas"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Deadline Tugas
+												Detail Tugas
 											</label>
 											<div className="flex gap-5">
 												<div
@@ -997,19 +1037,18 @@ const TugasGuru = () => {
 									<form className="max-w-full">
 										<div className="mb-5">
 											<label
-												htmlFor="email"
+												htmlFor="materi"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Mata Pelajaran
+												Materi
 											</label>
 											<select
 												id="countries"
 												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											>
-												<option>Mata Pelajaran</option>
-												<option>Canada</option>
-												<option>France</option>
-												<option>Germany</option>
+												<option>Materi</option>
+												<option>Desain</option>
+												<option>Tools</option>
 											</select>
 										</div>
 										<div className="mb-5">
@@ -1074,7 +1113,7 @@ const TugasGuru = () => {
 												htmlFor="nama_tugas"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Deadline Tugas
+												Detail Tugas
 											</label>
 											<div className="flex gap-5">
 												<div
@@ -1143,19 +1182,18 @@ const TugasGuru = () => {
 									<form className="max-w-full">
 										<div className="mb-5">
 											<label
-												htmlFor="email"
+												htmlFor="materi"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Mata Pelajaran
+												Materi
 											</label>
 											<select
 												id="countries"
 												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											>
-												<option>Mata Pelajaran</option>
-												<option>Canada</option>
-												<option>France</option>
-												<option>Germany</option>
+												<option>Materi</option>
+												<option>Desain</option>
+												<option>Tools</option>
 											</select>
 										</div>
 										<div className="mb-5">
@@ -1220,7 +1258,7 @@ const TugasGuru = () => {
 												htmlFor="nama_tugas"
 												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
 											>
-												Deadline Tugas
+												Detail Tugas
 											</label>
 											<div className="flex gap-5">
 												<div
