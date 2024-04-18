@@ -17,10 +17,11 @@ import {
   FaFileCircleCheck,
   FaCalendarDays,
   FaListCheck,
+  FaBookOpen,
 } from "react-icons/fa6";
 import { FaUser, FaAngleUp } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
-import { useGetUserSiswa } from "../../services/queries";
+
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -91,7 +92,7 @@ const Navigation = () => {
   }, [location.pathname]);
 
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     Swal.fire({
       title: "Konfirmasi Logout",
@@ -112,14 +113,13 @@ const Navigation = () => {
     });
   };
 
-  const siswaQueries = useGetUserSiswa();
   const [dataUser, setDataUser] = useState<any | null>([]);
 
   useEffect(() => {
     const fetchUserLogin = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.74.239:1331/api/Account/userinfo",
+          "http://192.168.144.239:13311/api/Account/userinfo",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -211,6 +211,7 @@ const Navigation = () => {
                 </Dropdown.Header>
               )}
             </div>
+
             {/* role guru */}
             <div>
               {dataUser.role === 2 && (
@@ -299,20 +300,42 @@ const Navigation = () => {
               >
                 <FaCalendarDays
                   className={`mr-2 h-7 w-7 ${
-                    location.pathname === "/jadwal"
+                    location.pathname === "/jadwal-admin"
                       ? "text-[#1b5fbf]"
                       : "text-gray-500"
                   }`}
                 />
                 <span
                   className={`font-semibold text-lg ${
-                    location.pathname === "/jadwal" ? "text-[#1b5fbf]" : ""
+                    location.pathname === "/jadwal-admin"
+                      ? "text-[#1b5fbf]"
+                      : ""
                   }`}
                 >
                   Jadwal
                 </span>
               </Link>
-
+              <Link
+                to="/mapel"
+                className={`flex items-center px-4 py-2 ${
+                  location.pathname === "/mapel" ? "bg-gray-200 rounded-md" : ""
+                }`}
+              >
+                <FaBookOpen
+                  className={`mr-2 h-7 w-7 ${
+                    location.pathname === "/mapel"
+                      ? "text-[#1b5fbf]"
+                      : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={`font-semibold text-lg ${
+                    location.pathname === "/mapel" ? "text-[#1b5fbf]" : ""
+                  }`}
+                >
+                  Mapel
+                </span>
+              </Link>
               <div className="relative">
                 <button
                   className="flex items-center px-4 py-2 w-full text-left"

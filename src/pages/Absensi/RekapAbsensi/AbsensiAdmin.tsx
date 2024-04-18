@@ -10,21 +10,7 @@ const AbsensiAdmin = () => {
           <h1 className="text-3xl font-bold capitalize">Hasil recap absensi</h1>
         </div>
         <div className="mt-8">
-          <div className="flex items-center gap-4">
-            {/* <label className="mb-2 text-lg font-semibold text-gray-900 uppercase">
-              pilih kelas
-            </label> */}
-            <select
-              id="countries"
-              className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 uppercase font-medium focus:ring-0"
-            >
-              <option selected>Pilih Kelas</option>
-              <option value="US">Semua</option>
-              <option value="CA">rpl</option>
-              <option value="FR">tkj</option>
-              <option value="DE">tkr</option>
-            </select>
-          </div>
+         
           <div className="mt-6">
             <TabelRekapAbsensi />
           </div>

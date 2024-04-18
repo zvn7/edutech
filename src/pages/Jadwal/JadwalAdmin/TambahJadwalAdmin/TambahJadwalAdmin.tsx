@@ -6,7 +6,7 @@ const TambahJadwalAdmin = () => {
 		<div>
 			<Navigation />
 			<div className="p-4 sm:ml-64">
-				<Link to="/jadwal">
+				<Link to="/jadwal-admin">
 					<button className="mt-14 flex gap-2 items-center">
 						<div className="bg-white p-2 rounded-full shadow-sm hover:bg-slate-300 hover:cursor-pointer">
 							<svg

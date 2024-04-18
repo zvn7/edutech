@@ -10,7 +10,7 @@ const Siswa = () => {
           <h1 className="text-3xl font-bold capitalize">Halaman Akun siswa</h1>
         </div>
         <div className="mt-8">
-          <TabelSiswa />
+          <TabelSiswa/>
         </div>
       </div>
     </div>
