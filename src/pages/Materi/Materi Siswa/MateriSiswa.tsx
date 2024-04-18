@@ -1,174 +1,179 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "../../../component/Navigation/Navigation";
-import { Dropdown } from "flowbite-react";
 import { Tabs } from "flowbite-react";
-
-interface CardInfo {
-	id: number;
-	title: string;
-	description: string;
-	file: string;
-}
+import {
+	useCourseClassroom,
+	useLessons,
+	useLessonsIds,
+} from "../../../services/queries";
+import axios from "axios";
 
 const MateriSiswa = () => {
-	const [selectedCard, setSelectedCard] = useState<number | null>(null); // State untuk menyimpan ID kartu yang dipilih
-	const [isMobileView, setIsMobileView] = useState<boolean>(false); // State untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
-
-	// Data sampel untuk kartu
-	const detailedCardInfo: CardInfo[] = [
-		{
-			id: 1,
-			title: "Pemrograman Dasar",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "pemrograman_dasar.pdf",
-		},
-		{
-			id: 2,
-			title: "Basic Pemrograman",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "basic_pemrograman.pdf",
-		},
-	];
+	const [selectedCard, setSelectedCard] = useState(null);
+	const [selectedCardId, setSelectedCardId] = useState(null);
+	const [isMobileView, setIsMobileView] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	// const courseIdsQuery = useCourseIds();
+	// const courseQueries = useCourse(courseIdsQuery.data);
+	const lessonsIdsQuery = useLessonsIds();
+	const lessonsQueries = useLessons(lessonsIdsQuery.data);
+	const [selectedSubject, setSelectedSubject] = useState("");
+	const courseClassroom = useCourseClassroom();
+	const { data: formData } = courseClassroom;
+	console.log("formData", formData);
 
 	useEffect(() => {
 		const handleResize = () => {
-			// Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
 			setIsMobileView(window.innerWidth < 768);
 		};
 
 		window.addEventListener("resize", handleResize);
-
-		// Pengecekan awal saat komponen dipasang
 		handleResize();
 
-		// Membersihkan event listener saat komponen di-unmount
 		return () => {
 			window.removeEventListener("resize", handleResize);
 		};
 	}, []);
 
-	// Fungsi untuk menangani klik pada kartu
-	const handleCardClick = (cardId: number) => {
-		setSelectedCard(cardId);
+	const handleCardClick = async (id: any) => {
+		setIsLoading(true); // Set isLoading menjadi true sebelum memuat data
+		try {
+			const response = await fetch(
+				`http://192.168.144.239:13311/api/Courses/${id}`,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+			const data = await response.json();
+			console.log("data", data);
+
+			if (data) {
+				setSelectedCardId(id);
+				console.log("selectedCardId", selectedCardId);
+
+				setSelectedCard(data);
+			} else {
+				console.error("No data received from API");
+			}
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
-	// Fungsi untuk menutup modal
 	const closeModal = () => {
 		setSelectedCard(null);
 	};
 
-	const handleFileDownload = (fileName) => {
-		// Buat tautan untuk mengunduh file
-		const downloadLink = document.createElement("a");
-		downloadLink.href = `/path/to/your/files/${fileName}`;
-		downloadLink.download = fileName;
+	const handleFileDownload = async (id, fileName) => {
+		if (id === "No File available") {
+			alert("No file available to download");
+			return;
+		}
 
-		// Sisipkan tautan ke dalam dokumen dan klik secara otomatis
-		document.body.appendChild(downloadLink);
-		downloadLink.click();
+		try {
+			const response = await axios.get(
+				`http://192.168.144.239:1331/api/Courses/download/${id}`,
+				{
+					responseType: "blob",
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
 
-		// Hapus tautan setelah pengunduhan selesai
-		document.body.removeChild(downloadLink);
+			const blob = new Blob([response.data], { type: "application/pdf" });
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.setAttribute("download", fileName);
+			document.body.appendChild(link);
+			link.click();
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error downloading file:", error);
+			alert("Error downloading file. Please try again later.");
+		}
 	};
+
+	const filteredCourses = formData?.courses.filter(
+		(course) =>
+			selectedSubject === "" || course.uniqueNumberOfLesson === selectedSubject
+	);
 
 	return (
 		<div>
 			<Navigation />
 			<div className="p-4 sm:ml-64">
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-					{/* left side */}
 					<div>
-						<div className=" mt-14 flex justify-between">
+						<div className="mt-14 flex justify-between">
 							<h1 className="text-3xl font-bold font-mono">Materi</h1>
-							<Dropdown label="Mata Pelajaran" color="gray">
-								<Dropdown.Item>Dashboard</Dropdown.Item>
-								<Dropdown.Item>Settings</Dropdown.Item>
-								<Dropdown.Item>Earnings</Dropdown.Item>
-								<Dropdown.Divider />
-								<Dropdown.Item>Separated link</Dropdown.Item>
-							</Dropdown>
+							<select
+								id="subject"
+								className="block  py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+								value={selectedSubject}
+								onChange={(e) => setSelectedSubject(e.target.value)}
+							>
+								<option value="">Semua Mata Pelajaran</option>
+								{lessonsQueries.map(({ data }) => (
+									<option key={data?.id} value={data?.uniqueNumberOfLesson}>
+										{data?.lessonName}
+									</option>
+								))}
+							</select>
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{detailedCardInfo.map((card) => (
-								<div
-									key={card.id}
-									className="cursor-pointer"
-									onClick={() => handleCardClick(card.id)}
-								>
-									<div className="flex items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
-										<div className="flex gap-3">
-											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
-												<svg
-													className="w-12 h-12 text-blue-600 dark:text-white"
-													aria-hidden="true"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														fillRule="evenodd"
-														d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-														clipRule="evenodd"
-													/>
-												</svg>
-											</div>
-											<div className="flex flex-col">
-												<p className="text-sm capitalize text-gray-500">
-													sumitro, S.Pd
-												</p>
-												<p className="text-md font-medium">Basic Programing</p>
-
-												<div className="flex flex-wrap gap-2 text-gray-500">
-													<div className="flex gap-1">
-														<svg
-															className="w-5 h-5 text-gray-500 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
-															/>
-														</svg>
-														<span className="text-sm">01 Januari 2024</span>
-													</div>
-													<div className="flex gap-1">
-														<svg
-															className="w-5 h-5 text-gray-500 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-															/>
-														</svg>
-														<span className="text-sm uppercase">
-															07:30 - 10:00 wib
-														</span>
-													</div>
+							{filteredCourses && (
+								<div key={formData.id} className="cursor-pointer rounded-lg ">
+									{filteredCourses.map((course) => (
+										<div
+											key={course.id}
+											className={`flex items-center shadow-sm p-3 gap-2 bg-white hover:bg-[#fdefc8] mb-2 rounded-lg hover:rounded-lg ${
+												selectedCardId === course.id
+													? "bg-[#fdefc8] rounded-lg"
+													: ""
+											}`}
+											onClick={() => handleCardClick(course.id)}
+										>
+											<div className="flex gap-3">
+												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+													<svg
+														className="w-12 h-12 text-blue-600 dark:text-white"
+														aria-hidden="true"
+														xmlns="http://www.w3.org/2000/svg"
+														fill="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															fillRule="evenodd"
+															d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+															clipRule="evenodd"
+														/>
+													</svg>
+												</div>
+												<div className="flex flex-col">
+													<p className="text-sm capitalize text-gray-500">
+														{course.nameTeacher}
+													</p>
+													<p className="text-md font-semibold text-gray-900">
+														{course.courseName}
+													</p>
+													<p className="text-sm capitalize text-gray-500">
+														{course.lessonName}
+													</p>
 												</div>
 											</div>
 										</div>
-									</div>
+									))}
 								</div>
-							))}
+							)}
 						</div>
 					</div>
-					{/* right side */}
 					{selectedCard &&
 						(isMobileView ? (
 							<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
@@ -176,7 +181,10 @@ const MateriSiswa = () => {
 									<div className="flex justify-end">
 										<button
 											className="text-gray-500 hover:text-gray-700"
-											onClick={closeModal}
+											onClick={() => {
+												closeModal();
+												setSelectedCardId(null); // Atur selectedCardId menjadi null saat tombol close diklik
+											}}
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
@@ -196,41 +204,67 @@ const MateriSiswa = () => {
 									</div>
 									<Tabs aria-label="Tabs with underline" style="underline">
 										<Tabs.Item active title="Deskripsi">
-											<p>{detailedCardInfo[selectedCard - 1].description}</p>
+											<p>
+												{isLoading ? "Memuat ..." : selectedCard.description}
+											</p>
 										</Tabs.Item>
-										<Tabs.Item title="File">
-											<div
-												className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
-												onClick={() =>
-													handleFileDownload(
-														detailedCardInfo[selectedCard - 1].file
-													)
-												}
-												style={{ cursor: "pointer" }}
-											>
-												<div className="flex gap-3">
-													<div className="bg-white rounded-lg h-14 flex items-center">
-														<svg
-															className="w-12 h-12 text-blue-600 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="currentColor"
-															viewBox="0 0 24 24"
-														>
-															<path
-																fillRule="evenodd"
-																d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-																clipRule="evenodd"
-															/>
-														</svg>
-													</div>
-													<div className="flex flex-col justify-center hover:text-blue-700">
-														<p className="text-lg font-semibold">
-															{detailedCardInfo[selectedCard - 1].file}
-														</p>
+										<Tabs.Item title="Sumber">
+											{selectedCard.linkCourse ? (
+												<table className="w-full text-sm text-left rtl:text-right mb-4 text-gray-500 dark:text-gray-400">
+													<tbody>
+														<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+															<td className="px-6 py-4">Link</td>
+															<td className="px-6 py-4 float-end">
+																<a
+																	href={selectedCard.linkCourse}
+																	target="_blank"
+																	className="hover:underline hover:text-blue-600"
+																>
+																	{selectedCard.linkCourse}
+																</a>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											) : null}
+
+											{selectedCard.fileData ? (
+												<div
+													className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+													onClick={() =>
+														handleFileDownload(
+															selectedCard.id,
+															selectedCard.fileName
+														)
+													}
+													style={{ cursor: "pointer" }}
+												>
+													<div className="flex gap-3">
+														<div className="bg-white rounded-lg h-14 flex items-center">
+															<svg
+																className="w-12 h-12 text-blue-600 dark:text-white"
+																aria-hidden="true"
+																xmlns="http://www.w3.org/2000/svg"
+																fill="currentColor"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	fillRule="evenodd"
+																	d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+																	clipRule="evenodd"
+																/>
+															</svg>
+														</div>
+														<div className="flex flex-col justify-center hover:text-blue-700">
+															<p className="text-lg font-semibold">
+																{isLoading
+																	? "Memuat File ..."
+																	: selectedCard.fileName}
+															</p>
+														</div>
 													</div>
 												</div>
-											</div>
+											) : null}
 										</Tabs.Item>
 									</Tabs>
 								</div>
@@ -241,7 +275,10 @@ const MateriSiswa = () => {
 									<div className="flex justify-end">
 										<button
 											className="text-gray-500 hover:text-gray-700"
-											onClick={closeModal}
+											onClick={() => {
+												closeModal();
+												setSelectedCardId(null); // Atur selectedCardId menjadi null saat tombol close diklik
+											}}
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
@@ -261,41 +298,67 @@ const MateriSiswa = () => {
 									</div>
 									<Tabs aria-label="Tabs with underline" style="underline">
 										<Tabs.Item active title="Deskripsi">
-											<p>{detailedCardInfo[selectedCard - 1].description}</p>
+											<p>
+												{isLoading ? "Memuat ..." : selectedCard.description}
+											</p>
 										</Tabs.Item>
-										<Tabs.Item title="File">
-											<div
-												className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
-												onClick={() =>
-													handleFileDownload(
-														detailedCardInfo[selectedCard - 1].file
-													)
-												}
-												style={{ cursor: "pointer" }}
-											>
-												<div className="flex gap-3">
-													<div className="bg-white rounded-lg h-14 flex items-center">
-														<svg
-															className="w-12 h-12 text-blue-600 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="currentColor"
-															viewBox="0 0 24 24"
-														>
-															<path
-																fillRule="evenodd"
-																d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-																clipRule="evenodd"
-															/>
-														</svg>
-													</div>
-													<div className="flex flex-col justify-center hover:text-blue-700">
-														<p className="text-lg font-semibold">
-															{detailedCardInfo[selectedCard - 1].file}
-														</p>
+										<Tabs.Item title="Sumber">
+											{selectedCard.linkCourse ? (
+												<table className="w-full text-sm text-left rtl:text-right mb-4 text-gray-500 dark:text-gray-400">
+													<tbody>
+														<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+															<td className="px-6 py-4">Link</td>
+															<td className="px-6 py-4 float-end">
+																<a
+																	href={selectedCard.linkCourse}
+																	target="_blank"
+																	className="hover:underline hover:text-blue-600"
+																>
+																	{selectedCard.linkCourse}
+																</a>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											) : null}
+
+											{selectedCard.fileData ? (
+												<div
+													className="flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+													onClick={() =>
+														handleFileDownload(
+															selectedCard.id,
+															selectedCard.fileName
+														)
+													}
+													style={{ cursor: "pointer" }}
+												>
+													<div className="flex gap-3">
+														<div className="bg-white rounded-lg h-14 flex items-center">
+															<svg
+																className="w-12 h-12 text-blue-600 dark:text-white"
+																aria-hidden="true"
+																xmlns="http://www.w3.org/2000/svg"
+																fill="currentColor"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	fillRule="evenodd"
+																	d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+																	clipRule="evenodd"
+																/>
+															</svg>
+														</div>
+														<div className="flex flex-col justify-center hover:text-blue-700">
+															<p className="text-lg font-semibold">
+																{isLoading
+																	? "Memuat File ..."
+																	: selectedCard.fileName}
+															</p>
+														</div>
 													</div>
 												</div>
-											</div>
+											) : null}
 										</Tabs.Item>
 									</Tabs>
 								</div>

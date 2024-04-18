@@ -2,13 +2,10 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { Button, FileInput, TextInput, Textarea } from "flowbite-react"; // Import Modal component
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-
-interface CardInfo {
-	id: number;
-	title: string;
-	description: string;
-	file: string;
-}
+import { useTeacherinfo } from "../../../services/queries";
+import { useCreateMateri } from "../../../services/mutation";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { IMateriGuru } from "../../../types/materi";
 
 const MateriGuru = () => {
 	const [showAddForm, setShowAddForm] = useState(false);
@@ -21,6 +18,25 @@ const MateriGuru = () => {
 	const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isTablet, setIsTablet] = useState(false);
+	const teacherinfo = useTeacherinfo();
+	const { data: formData } = teacherinfo;
+	console.log("formData", formData);
+	const createMateriMutation = useCreateMateri();
+	const { register, handleSubmit, reset } = useForm<IMateriGuru>();
+	const [course, setCourse] = useState({
+		courses: [
+			{
+				courseName: "",
+				description: "",
+				fileName: "",
+				linkCourse: "",
+				uniqueNumberOfLesson: "",
+				uniqueNumberOfClassRooms: "",
+				fileData: "",
+				lessonName: "",
+			},
+		],
+	});
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -41,23 +57,6 @@ const MateriGuru = () => {
 	const handleOptionChange = (option: string) => {
 		setSelectedOption(option);
 	};
-
-	const detailedCardInfo: CardInfo[] = [
-		{
-			id: 1,
-			title: "Pemrograman Dasar",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "pemrograman_dasar.pdf",
-		},
-		{
-			id: 2,
-			title: "Basic Pemrograman",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "basic_pemrograman.pdf",
-		},
-	];
 
 	const handleDeleteCard = (cardId: number) => {
 		Swal.fire({
@@ -209,6 +208,37 @@ const MateriGuru = () => {
 		}
 	};
 
+	const handleCreateMateriSubmit: SubmitHandler<IMateriGuru> = (data) => {
+		createMateriMutation.mutate(data, {
+			onSuccess: () => {
+				Swal.fire({
+					title: "Success",
+					text: "Materi Berhasil",
+					icon: "success",
+					confirmButtonColor: "#3085d6",
+					confirmButtonText: "Ok",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						setShowAddForm(false);
+						reset();
+					}
+				});
+			},
+		});
+	};
+
+	// const getTeacherIdFromToken = (): string | null => {
+	// 	const token = localStorage.getItem("token");
+	// 	if (token) {
+	// 		const payload = token.split(".")[1];
+	// 		const decodedPayload = JSON.parse(atob(payload));
+	// 		return decodedPayload?.TeacherId || null;
+	// 	}
+	// 	return null;
+	// };
+
+	// const teacherId = getTeacherIdFromToken();
+
 	return (
 		<div>
 			<Navigation />
@@ -336,7 +366,7 @@ const MateriGuru = () => {
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{detailedCardInfo.map((card) => (
+							{formData?.courses.map((card) => (
 								<div key={card.id} className="cursor-pointer">
 									<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
 										<div className="flex gap-3">
@@ -357,50 +387,17 @@ const MateriGuru = () => {
 											</div>
 											<div className="flex flex-col">
 												<p className="text-sm capitalize text-gray-500">
-													sumitro, S.Pd
+													{
+														formData.lessons.find(
+															(lesson) =>
+																lesson.uniqueNumberOfLesson ===
+																card.uniqueNumberOfLesson
+														)?.lessonName
+													}
 												</p>
-												<p className="text-md font-medium">Basic Programing</p>
-
-												<div className="flex flex-wrap gap-2 text-gray-500">
-													<div className="flex gap-1">
-														<svg
-															className="w-5 h-5 text-gray-500 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
-															/>
-														</svg>
-														<span className="text-sm">01 Januari 2024</span>
-													</div>
-													<div className="flex gap-1">
-														<svg
-															className="w-5 h-5 text-gray-500 dark:text-white"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-															/>
-														</svg>
-														<span className="text-sm uppercase">
-															07:30 - 10:00 wib
-														</span>
-													</div>
-												</div>
+												<p className="text-base font-medium capitalize">
+													{card.courseName}
+												</p>
 											</div>
 										</div>
 										<Button.Group>
@@ -457,68 +454,84 @@ const MateriGuru = () => {
 										</svg>
 									</button>
 								</div>
-								<hr className="my-3" />
-								<p className="mt-2">Deskripsi</p>
-								<Textarea
-									className="mt-2"
-									id="comment"
-									placeholder="Masukkan deskripsi tugas disini..."
-									required
-									rows={4}
-									value={selectedCardDescription}
-									onChange={(e) => setSelectedCardDescription(e.target.value)}
-								/>
+								<form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
+									{/* <input type="hidden" value={teacherId} {...register("teacherId")} /> */}
+									<hr className="my-3" />
+									<p className="mt-2">Nama Materi</p>
+									<TextInput
+										className="mt-2"
+										id="lessonName"
+										placeholder="Masukkan nama materi disini..."
+										required
+										{...register("courses.0.lessonName")}
+									/>
+									<p className="mt-2">Kelas</p>
+									<p className="mt-2">Deskripsi</p>
+									<Textarea
+										className="mt-2"
+										id="comment"
+										placeholder="Masukkan deskripsi tugas disini..."
+										required
+										rows={4}
+										{...register("courses.0.description")}
+									/>
 
-								<p className="mt-2">Modul</p>
-								<div className=" flex gap-5">
-									<div
-										className="flex items-center gap-2 mt-5"
-										onClick={() => handleOptionChange("file")}
-									>
-										<input
-											type="radio"
-											id="file"
-											name="submissionOption"
-											value="file"
-											checked={selectedOption === "file"}
-										/>
-										<label htmlFor="file">File</label>
+									<p className="mt-2">Modul</p>
+									<div className=" flex gap-5">
+										<div
+											className="flex items-center gap-2 mt-5"
+											onClick={() => handleOptionChange("file")}
+										>
+											<input
+												type="radio"
+												id="file"
+												name="submissionOption"
+												value="file"
+												checked={selectedOption === "file"}
+											/>
+											<label htmlFor="file">File</label>
+										</div>
+										<div
+											className="flex items-center gap-2 mt-5"
+											onClick={() => handleOptionChange("link")}
+										>
+											<input
+												type="radio"
+												id="link"
+												name="submissionOption"
+												value="link"
+												checked={selectedOption === "link"}
+											/>
+											<label htmlFor="link">Link</label>
+										</div>
 									</div>
-									<div
-										className="flex items-center gap-2 mt-5"
-										onClick={() => handleOptionChange("link")}
-									>
-										<input
-											type="radio"
-											id="link"
-											name="submissionOption"
-											value="link"
-											checked={selectedOption === "link"}
-										/>
-										<label htmlFor="link">Link</label>
-									</div>
-								</div>
-								{selectedOption === "file" && (
-									<div id="fileUpload" className="mt-4">
-										<FileInput id="file" />
-									</div>
-								)}
-								{selectedOption === "link" && (
-									<div id="linkInput" className="mt-4">
-										<TextInput
-											id="link"
-											type="text"
-											placeholder="Masukkan url atau link yang valid disini"
-											required
-										/>
-									</div>
-								)}
-								<button
-									type="submit"
-									className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-								>
-									Kirim
-								</button>
+									{selectedOption === "file" && (
+										<div id="fileUpload" className="mt-4">
+											<FileInput
+												id="file"
+												{...register("courses.0.fileData")}
+											/>
+										</div>
+									)}
+									{selectedOption === "link" && (
+										<div id="linkInput" className="mt-4">
+											<TextInput
+												id="link"
+												type="text"
+												placeholder="Masukkan url atau link yang valid disini"
+												{...register("courses.0.linkCourse")}
+											/>
+										</div>
+									)}
+									<input
+										type="submit"
+										disabled={createMateriMutation.isPending}
+										value={
+											createMateriMutation.isPending ? "Loading..." : "Simpan"
+										}
+										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
+									/>
+								</form>
 							</div>
 						</div>
 					)}
