@@ -1,6 +1,6 @@
 
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { getAbsensi, getGuru, getMapel, getMapelIds, getSiswa, getSiswaIds, getUserInfo } from "./api";
+import { getAbsensi, getGuru, getMapel, getMapelIds, getSiswa, getSiswaIds, getTeacherinfo, getUserInfo } from "./api";
 import {
 	getAssignments,
 	getAssignmentsIds,
@@ -10,13 +10,12 @@ import {
 	getAttendancesIds,
 	getCourse,
 	getCourseClassroom,
-	getCourseClassroomIds,
+    getCourseClassroomIds,
 	getCourseIds,
 	getLessons,
 	getLessonsIds,
 	getSchedulesIds,
-	getTeacherinfo,
-	getUserSiswa,
+
 } from "./api";
 import { CourseClassroom } from "../types/materi";
 
