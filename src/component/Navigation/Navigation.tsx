@@ -11,13 +11,13 @@ import {
 } from "flowbite-react";
 import { AiFillHome } from "react-icons/ai";
 import {
-  FaBookBookmark,
-  FaClipboardList,
-  FaUserLarge,
-  FaFileCircleCheck,
-  FaCalendarDays,
-  FaListCheck,
-  FaBookOpen,
+	FaBookBookmark,
+	FaClipboardList,
+	FaUserLarge,
+	FaFileCircleCheck,
+	FaCalendarDays,
+	FaListCheck,
+	FaBookOpen,
 } from "react-icons/fa6";
 import { FaUser, FaAngleDown } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
@@ -91,41 +91,46 @@ const Navigation = () => {
 		}
 	}, [location.pathname]);
 
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Konfirmasi Logout",
-      text: "Anda yakin ingin keluar?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, Logout!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Lakukan logout jika pengguna menekan tombol "Ya, Logout!"
-        // Misalnya, panggil fungsi logout atau navigasi ke halaman login
-        localStorage.removeItem("token");
-        navigate("/");
-        console.log("Anda telah logout!");
-      }
-    });
-  };
+	const handleLogout = () => {
+		Swal.fire({
+			title: "Konfirmasi Logout",
+			text: "Anda yakin ingin keluar?",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#d33",
+			cancelButtonColor: "#3085d6",
+			confirmButtonText: "Ya, Logout!",
+		}).then((result) => {
+			if (result.isConfirmed) {
+				// Lakukan logout jika pengguna menekan tombol "Ya, Logout!"
+				// Misalnya, panggil fungsi logout atau navigasi ke halaman login
+				localStorage.removeItem("token");
+				navigate("/");
+				console.log("Anda telah logout!");
+			}
+		});
+	};
 
-  const [dataUser, setDataUser] = useState<any | null>([]);
+	const [dataUser, setDataUser] = useState<any | null>([]);
 
-  useEffect(() => {
-    const fetchUserLogin = async () => {
-      try {
-        const response = await axios.get(
-          "http://192.168.144.239:13311/api/Account/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+	useEffect(() => {
+		const fetchUserLogin = async () => {
+			try {
+				const response = await axios.get(
+					"http://192.168.144.239:13311/api/Account/userinfo",
+					{
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+					}
+				);
+				setDataUser(response.data);
+			} catch (error) {
+				console.log(error);
+			}
+		};
 
 		fetchUserLogin();
 	}, []);
@@ -256,198 +261,198 @@ const Navigation = () => {
 				<div className="h-full px-3 space-y-4">
 					{/* role admin */}
 					{dataUser.role === 1 && (
-            <div className="space-y-3">
-              <Link
-                to="/beranda-admin"
-                className={`flex items-center px-4 py-2 ${
-                  location.pathname === "/beranda-admin"
-                    ? "bg-gray-200 rounded-md"
-                    : ""
-                }`}
-              >
-                <AiFillHome
-                  className={`mr-2 h-7 w-7 ${
-                    location.pathname === "/beranda-admin"
-                      ? "text-[#1b5fbf]"
-                      : "text-gray-500"
-                  }`}
-                />
-                <span
-                  className={`font-semibold text-lg ${
-                    location.pathname === "/beranda-admin"
-                      ? "text-[#1b5fbf]"
-                      : ""
-                  }`}
-                >
-                  Beranda
-                </span>
-              </Link>
-              <Link
-                to="/jadwal-admin"
-                className={`flex items-center px-4 py-2 ${
-                  location.pathname === "/jadwal-admin"
-                    ? "bg-gray-200 rounded-md"
-                    : ""
-                }`}
-              >
-                <FaCalendarDays
-                  className={`mr-2 h-7 w-7 ${
-                    location.pathname === "/jadwal-admin"
-                      ? "text-[#1b5fbf]"
-                      : "text-gray-500"
-                  }`}
-                />
-                <span
-                  className={`font-semibold text-lg ${
-                    location.pathname === "/jadwal-admin"
-                      ? "text-[#1b5fbf]"
-                      : ""
-                  }`}
-                >
-                  Jadwal
-                </span>
-              </Link>
-              <Link
-                to="/mapel"
-                className={`flex items-center px-4 py-2 ${
-                  location.pathname === "/mapel" ? "bg-gray-200 rounded-md" : ""
-                }`}
-              >
-                <FaBookOpen
-                  className={`mr-2 h-7 w-7 ${
-                    location.pathname === "/mapel"
-                      ? "text-[#1b5fbf]"
-                      : "text-gray-500"
-                  }`}
-                />
-                <span
-                  className={`font-semibold text-lg ${
-                    location.pathname === "/mapel" ? "text-[#1b5fbf]" : ""
-                  }`}
-                >
-                  Mapel
-                </span>
-              </Link>
-              <div className="relative">
-                <button
-                  className="flex items-center px-4 py-2 w-full text-left"
-                  onClick={toggleAbsenMenu}
-                >
-                  <FaListCheck
-                    className={`mr-2 h-7 w-7 ${
-                      location.pathname === "/rekap-absensi" ||
-                      location.pathname === "/data-absensi"
-                        ? "text-[#1b5fbf]"
-                        : "text-gray-500"
-                    }`}
-                  />
-                  <span
-                    className={`font-semibold text-lg ${
-                      location.pathname === "/rekap-absensi" ||
-                      location.pathname === "/data-absensi"
-                        ? "text-[#1b5fbf]"
-                        : "text-dark"
-                    }`}
-                  >
-                    Absensi
-                  </span>
-                  <FaAngleUp
-                    className={`ml-auto w-6 h-6 ${
-                      location.pathname === "/rekap-absensi" ||
-                      location.pathname === "/data-absensi"
-                        ? "text-[#1b5fbf]"
-                        : "text-gray-500"
-                    } dark:text-white transform ${
-                      absenMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {absenMenuOpen && (
-                  <div className="ml-10 space-y-2">
-                    <Link
-                      to="/rekap-absensi"
-                      className={`block px-4 py-2 ${
-                        location.pathname === "/rekap-absensi"
-                          ? "bg-gray-200 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      Rekap Absensi
-                    </Link>
-                    <Link
-                      to="/data-absensi"
-                      className={`block px-4 py-2 ${
-                        location.pathname === "/data-absensi"
-                          ? "bg-gray-200 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      Data Absensi
-                    </Link>
-                  </div>
-                )}
-              </div>
-              <div className="relative">
-                <button
-                  className="flex items-center px-4 py-2 w-full text-left"
-                  onClick={toggleUserMenu}
-                >
-                  <FaUser
-                    className={`mr-2 h-7 w-7 ${
-                      location.pathname === "/pengguna-guru" ||
-                      location.pathname === "/pengguna-siswa"
-                        ? "text-[#1b5fbf]"
-                        : "text-gray-500"
-                    }`}
-                  />
-                  <span
-                    className={`font-semibold text-lg ${
-                      location.pathname === "/pengguna-guru" ||
-                      location.pathname === "/pengguna-siswa"
-                        ? "text-[#1b5fbf]"
-                        : "text-dark"
-                    }`}
-                  >
-                    User Menu
-                  </span>
-                  <FaAngleUp
-                    className={`ml-auto w-6 h-6 ${
-                      location.pathname === "/pengguna-guru" ||
-                      location.pathname === "/pengguna-siswa"
-                        ? "text-[#1b5fbf]"
-                        : "text-gray-500"
-                    } dark:text-white transform ${
-                      userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {userMenuOpen && (
-                  <div className="ml-10 space-y-2">
-                    <Link
-                      to="/pengguna-guru"
-                      className={`block px-4 py-2 ${
-                        location.pathname === "/pengguna-guru"
-                          ? "bg-gray-200 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      Guru
-                    </Link>
-                    <Link
-                      to="/pengguna-siswa"
-                      className={`block px-4 py-2 ${
-                        location.pathname === "/pengguna-siswa"
-                          ? "bg-gray-200 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      Siswa
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+						<div className="space-y-3">
+							<Link
+								to="/beranda-admin"
+								className={`flex items-center px-4 py-2 ${
+									location.pathname === "/beranda-admin"
+										? "bg-gray-200 rounded-md"
+										: ""
+								}`}
+							>
+								<AiFillHome
+									className={`mr-2 h-7 w-7 ${
+										location.pathname === "/beranda-admin"
+											? "text-[#1b5fbf]"
+											: "text-gray-500"
+									}`}
+								/>
+								<span
+									className={`font-semibold text-lg ${
+										location.pathname === "/beranda-admin"
+											? "text-[#1b5fbf]"
+											: ""
+									}`}
+								>
+									Beranda
+								</span>
+							</Link>
+							<Link
+								to="/jadwal-admin"
+								className={`flex items-center px-4 py-2 ${
+									location.pathname === "/jadwal-admin"
+										? "bg-gray-200 rounded-md"
+										: ""
+								}`}
+							>
+								<FaCalendarDays
+									className={`mr-2 h-7 w-7 ${
+										location.pathname === "/jadwal-admin"
+											? "text-[#1b5fbf]"
+											: "text-gray-500"
+									}`}
+								/>
+								<span
+									className={`font-semibold text-lg ${
+										location.pathname === "/jadwal-admin"
+											? "text-[#1b5fbf]"
+											: ""
+									}`}
+								>
+									Jadwal
+								</span>
+							</Link>
+							<Link
+								to="/mapel"
+								className={`flex items-center px-4 py-2 ${
+									location.pathname === "/mapel" ? "bg-gray-200 rounded-md" : ""
+								}`}
+							>
+								<FaBookOpen
+									className={`mr-2 h-7 w-7 ${
+										location.pathname === "/mapel"
+											? "text-[#1b5fbf]"
+											: "text-gray-500"
+									}`}
+								/>
+								<span
+									className={`font-semibold text-lg ${
+										location.pathname === "/mapel" ? "text-[#1b5fbf]" : ""
+									}`}
+								>
+									Mapel
+								</span>
+							</Link>
+							<div className="relative">
+								<button
+									className="flex items-center px-4 py-2 w-full text-left"
+									onClick={toggleAbsenMenu}
+								>
+									<FaListCheck
+										className={`mr-2 h-7 w-7 ${
+											location.pathname === "/rekap-absensi" ||
+											location.pathname === "/data-absensi"
+												? "text-[#1b5fbf]"
+												: "text-gray-500"
+										}`}
+									/>
+									<span
+										className={`font-semibold text-lg ${
+											location.pathname === "/rekap-absensi" ||
+											location.pathname === "/data-absensi"
+												? "text-[#1b5fbf]"
+												: "text-dark"
+										}`}
+									>
+										Absensi
+									</span>
+									<FaAngleUp
+										className={`ml-auto w-6 h-6 ${
+											location.pathname === "/rekap-absensi" ||
+											location.pathname === "/data-absensi"
+												? "text-[#1b5fbf]"
+												: "text-gray-500"
+										} dark:text-white transform ${
+											absenMenuOpen ? "rotate-180" : ""
+										}`}
+									/>
+								</button>
+								{absenMenuOpen && (
+									<div className="ml-10 space-y-2">
+										<Link
+											to="/rekap-absensi"
+											className={`block px-4 py-2 ${
+												location.pathname === "/rekap-absensi"
+													? "bg-gray-200 rounded-md"
+													: ""
+											}`}
+										>
+											Rekap Absensi
+										</Link>
+										<Link
+											to="/data-absensi"
+											className={`block px-4 py-2 ${
+												location.pathname === "/data-absensi"
+													? "bg-gray-200 rounded-md"
+													: ""
+											}`}
+										>
+											Data Absensi
+										</Link>
+									</div>
+								)}
+							</div>
+							<div className="relative">
+								<button
+									className="flex items-center px-4 py-2 w-full text-left"
+									onClick={toggleUserMenu}
+								>
+									<FaUser
+										className={`mr-2 h-7 w-7 ${
+											location.pathname === "/pengguna-guru" ||
+											location.pathname === "/pengguna-siswa"
+												? "text-[#1b5fbf]"
+												: "text-gray-500"
+										}`}
+									/>
+									<span
+										className={`font-semibold text-lg ${
+											location.pathname === "/pengguna-guru" ||
+											location.pathname === "/pengguna-siswa"
+												? "text-[#1b5fbf]"
+												: "text-dark"
+										}`}
+									>
+										User Menu
+									</span>
+									<FaAngleUp
+										className={`ml-auto w-6 h-6 ${
+											location.pathname === "/pengguna-guru" ||
+											location.pathname === "/pengguna-siswa"
+												? "text-[#1b5fbf]"
+												: "text-gray-500"
+										} dark:text-white transform ${
+											userMenuOpen ? "rotate-180" : ""
+										}`}
+									/>
+								</button>
+								{userMenuOpen && (
+									<div className="ml-10 space-y-2">
+										<Link
+											to="/pengguna-guru"
+											className={`block px-4 py-2 ${
+												location.pathname === "/pengguna-guru"
+													? "bg-gray-200 rounded-md"
+													: ""
+											}`}
+										>
+											Guru
+										</Link>
+										<Link
+											to="/pengguna-siswa"
+											className={`block px-4 py-2 ${
+												location.pathname === "/pengguna-siswa"
+													? "bg-gray-200 rounded-md"
+													: ""
+											}`}
+										>
+											Siswa
+										</Link>
+									</div>
+								)}
+							</div>
+						</div>
+					)}
 
 					{/* role guru */}
 					{dataUser.role === 2 && (
@@ -494,9 +499,7 @@ const Navigation = () => {
 								/>
 								<span
 									className={`font-semibold text-lg ${
-										location.pathname === "/materi-guru"
-											? "text-[#1b5fbf]"
-											: ""
+										location.pathname === "/materi-guru" ? "text-[#1b5fbf]" : ""
 									}`}
 								>
 									Materi
