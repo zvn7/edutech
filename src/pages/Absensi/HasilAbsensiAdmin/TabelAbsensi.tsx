@@ -1,97 +1,11 @@
 import { useState } from "react";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-type Absensi = {
-  nama: string;
-  tanggal: Date;
-  status: "hadir" | "alfa" | "izin"; // Tiga status baru
-  kelas?: string;
-};
-
-const defaultData: Absensi[] = [
-  {
-    nama: "Ningsih",
-    tanggal: new Date("2022-01-01"),
-    status: "hadir",
-    kelas: "XII A",
-  },
-  {
-    nama: "siska",
-    tanggal: new Date("2022-01-01"),
-    status: "alfa",
-    kelas: "XII A",
-  },
-  {
-    nama: "fuad",
-    tanggal: new Date("2022-01-01"),
-    status: "izin",
-    kelas: "XII A",
-  },
-  {
-    nama: "ningsih",
-    tanggal: new Date("2022-01-02"),
-    status: "hadir",
-    kelas: "XII A",
-  },
-  {
-    nama: "siska",
-    tanggal: new Date("2022-01-02"),
-    status: "alfa",
-    kelas: "XII A",
-  },
-  {
-    nama: "fuad",
-    tanggal: new Date("2022-01-02"),
-    status: "izin",
-    kelas: "XII A",
-  },
-];
-
-const columnHelper = createColumnHelper<Absensi>();
+import { useGetAbsensi } from "../../../services/queries";
 
 const TabelAbsensi = () => {
-  const [data, setData] = useState(() => [...defaultData]);
   const [selectedMonth, setSelectedMonth] = useState<string>("januari");
 
-  const columns = [
-    columnHelper.accessor("nama", {
-      id: "index",
-      header: () => "NO",
-      cell: (info) => info.row.index + 1,
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor("nama", {
-      cell: (info) => info.getValue(),
-      header: () => <span>Nama Lengkap</span>,
-      footer: (info) => info.column.id,
-    }),
-  ];
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    debugTable: true,
-  });
-
-  const [state, setState] = useState(table.initialState);
-
-  // Override the state managers for the table to your own
-  table.setOptions((prev) => ({
-    ...prev,
-    state,
-    onStateChange: setState,
-
-    debugTable: state.pagination.pageIndex > 2,
-  }));
+  const absensiQuery = useGetAbsensi();
+  const { data, isLoading: isAbsensiLoading } = absensiQuery;
 
   // Fungsi untuk mendapatkan jumlah hari dalam bulan
   const getDaysInMonth = (month: string) => {
@@ -114,11 +28,21 @@ const TabelAbsensi = () => {
     return daysInMonthMap[month];
   };
 
+  const [selectedClass, setSelectedClass] = useState("semua");
+
+  const filteredData =
+    selectedClass === "semua"
+      ? data
+      : data?.filter(
+          ({ uniqueNumberOfClassRoom }) =>
+            uniqueNumberOfClassRoom === selectedClass
+        ) || [];
+
   return (
     <div className="shadow-md sm:rounded-lg bg-white">
       <div className="flex flex-column sm:flex-row flex-wrap items-center justify-between pt-3 pb-4 px-4 gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <select
+          {/* <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
             className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
@@ -128,8 +52,19 @@ const TabelAbsensi = () => {
                 {pageSize} data
               </option>
             ))}
-          </select>
+          </select> */}
 
+          <select
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+            className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
+          >
+            {/* <option value="">Pilih Kelas</option> */}
+            <option selected>semua</option>
+            <option value="001">TKJ</option>
+            <option value="002">TKR</option>
+            <option value="003">RPL</option>
+          </select>
           <select
             className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
             value={selectedMonth}
@@ -206,157 +141,169 @@ const TabelAbsensi = () => {
       <div className="w-full overflow-y-auto overflow-x-auto">
         <table className="w-full h-5 text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    rowSpan={3}
-                    key={header.id}
-                    className="sticky left-0 bg-gray-100 border-2 px-6 py-3 text-center"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
-                ))}
+            <tr>
+              <th
+                rowSpan={3}
+                className="sticky left-0 bg-gray-100 border-2 px-6 py-3 text-center"
+              >
+                No
+              </th>
+              <th
+                rowSpan={3}
+                className="sticky left-0 bg-gray-100 border-2 px-6 py-3 text-center"
+              >
+                Nama lengkap
+              </th>
 
-                <th
-                  colSpan={getDaysInMonth(selectedMonth)}
-                  className="border-2 px-2 py-2 pl-20"
-                >
-                  Tanggal
-                </th>
-              </tr>
-            ))}
+              <th
+                colSpan={getDaysInMonth(selectedMonth) * 3}
+                className="border-2 px-2 py-2"
+              >
+                Tanggal
+              </th>
+            </tr>
+
             <tr>
               {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => (
-                <th key={day + 1} className="border-2 text-center py-2">
+                <th
+                  key={day + 1}
+                  colSpan={3}
+                  className="border-2 text-center py-2"
+                >
                   {day + 1}
                 </th>
               ))}
             </tr>
             <tr>
               {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => (
-                <th key={day + 1} className="border-2">
-                  <td className="border-e-2 px-4 py-2">H</td>
-                  <td className="border-e-2 px-4 py-2">A</td>
-                  <td className="border-0 px-4 py-2">I</td>
-                </th>
+                <>
+                  <th key={day + 1} className="border-2 text-center px-6 py-3">
+                    Hadir
+                  </th>
+                  <th key={day + 1} className="border-2 text-center px-6 py-3">
+                    ijin
+                  </th>
+                  <th key={day + 1} className="border-2 text-center px-6 py-3">
+                    Alfa
+                  </th>
+                </>
               ))}
             </tr>
           </thead>
 
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="bg-white border-b hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="sticky left-0 bg-white border-e-2 px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
+            {isAbsensiLoading && (
+              <div className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 text-center">
+                <div role="status">
+                  <svg
+                    aria-hidden="true"
+                    className="inline w-10 h-10 text-gray-200 animate-spin fill-blue-600"
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            )}
+
+            {/* {!isAbsensiLoading &&
+              filteredData &&
+              filteredData.map((absensi, index) => (
+                <tr className="bg-white border-b hover:bg-gray-50">
+                  <td className="sticky left-0 bg-white border-e-2 px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
+                    {index + 1}
                   </td>
-                ))}
-                {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => (
-                  <td key={day + 1} className="border-2 text-center">
-                    {data.some(
-                      (item) =>
-                        item.tanggal === row.original.tanggal &&
-                        item.status === "hadir" &&
-                        new Date(item.tanggal).getDate() === day + 1
-                    ) ? (
-                      <td className="border-e-2 px-2 py-4">
-                        <svg
-                          className="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 11.917 9.724 16.5 19 7.5"
-                          />
-                        </svg>
-                      </td>
-                    ) : (
-                      <td className="border-e-2 px-5 py-4 text-xl"></td>
-                    )}
-                    {data.some(
-                      (item) =>
-                        item.tanggal === row.original.tanggal &&
-                        item.status === "alfa" &&
-                        new Date(item.tanggal).getDate() === day + 1
-                    ) ? (
-                      <td className="border-e-2 px-2 py-4">
-                        <svg
-                          className="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 11.917 9.724 16.5 19 7.5"
-                          />
-                        </svg>
-                      </td>
-                    ) : (
-                      <td className="border-e-2 px-5 py-4"></td>
-                    )}
-                    {data.some(
-                      (item) =>
-                        item.tanggal === row.original.tanggal &&
-                        item.status === "izin" &&
-                        new Date(item.tanggal).getDate() === day + 1
-                    ) ? (
-                      <td className="border-0 px-2 py-4">
-                        <svg
-                          className="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 11.917 9.724 16.5 19 7.5"
-                          />
-                        </svg>
-                      </td>
-                    ) : (
-                      <td className="border-0 px- py-4"></td>
-                    )}
+                  <td className="sticky left-0 bg-white border-e-2 px-4 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
+                    {absensi.nameStudent}
                   </td>
-                ))}
-              </tr>
-            ))}
+
+                  {[...Array(getDaysInMonth(selectedMonth)).keys()].map(
+                    (day) => (
+                      <>
+                        <td key={day + 1} className="border-2 text-center">
+                          {absensi.attendanceStudent[day]?.status === 1
+                            ? "✅"
+                            : "-"}
+                        </td>
+                        <td key={day + 1} className="border-2 text-center">
+                          {absensi.attendanceStudent[day]?.status === 2
+                            ? "✅"
+                            : "-"}
+                        </td>
+                        <td key={day + 1} className="border-2 text-center">
+                          {absensi.attendanceStudent[day]?.status === 3
+                            ? "✅"
+                            : "-"}
+                        </td>
+                      </>
+                    )
+                  )}
+                </tr>
+              ))} */}
+            {!isAbsensiLoading &&
+              (filteredData && filteredData.length > 0 ? (
+                filteredData.map((absensi, index) => (
+                  <tr className="bg-white border-b hover:bg-gray-50">
+                    <td className="sticky left-0 bg-white border-e-2 px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
+                      {index + 1}
+                    </td>
+                    <td className="sticky left-0 bg-white border-e-2 px-4 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
+                      {absensi.nameStudent}
+                    </td>
+
+                    {[...Array(getDaysInMonth(selectedMonth)).keys()].map(
+                      (day) => (
+                        <>
+                          <td key={day + 1} className="border-2 text-center">
+                            {absensi.attendanceStudent &&
+                            absensi.attendanceStudent[day]?.status === 1
+                              ? "✅"
+                              : "-"}
+                          </td>
+                          <td key={day + 1} className="border-2 text-center">
+                            {absensi.attendanceStudent &&
+                            absensi.attendanceStudent[day]?.status === 2
+                              ? "✅"
+                              : "-"}
+                          </td>
+                          <td key={day + 1} className="border-2 text-center">
+                            {absensi.attendanceStudent &&
+                            absensi.attendanceStudent[day]?.status === 3
+                              ? "✅"
+                              : "-"}
+                          </td>
+                        </>
+                      )
+                    )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={getDaysInMonth(selectedMonth) + 2}
+                    className="text-center"
+                  >
+                    No data available
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
       <div className="px-4 py-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="flex items-center gap-1">
+          {/* <span className="flex items-center gap-1">
             <div className="capitalize">halaman</div>
             <strong className="capitalize">
               {table.getState().pagination.pageIndex + 1} dari{" "}
@@ -503,7 +450,7 @@ const TabelAbsensi = () => {
                 </button>
               </li>
             </ul>
-          </nav>
+          </nav> */}
         </div>
       </div>
     </div>

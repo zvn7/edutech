@@ -179,7 +179,7 @@ const TabelRekapAbsensi = () => {
   return (
     <div className="shadow-md sm:rounded-lg bg-white">
       <div className="flex flex-column sm:flex-row flex-wrap items-center justify-between pt-2 pb-4 px-4">
-        <div className="flex items-center gap-1 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
@@ -191,25 +191,16 @@ const TabelRekapAbsensi = () => {
               </option>
             ))}
           </select>
-          <div className="flex flex-column items-center gap-2 py-4 px-4">
-            <label
-              htmlFor="countries"
-              className="block text-sm font-medium text-gray-900 capitalize"
-            >
-              tanggal
-            </label>
-            <input
-              type="date"
-              id="dateInput"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 "
-              placeholder="Hari & Tanggal"
-              value={selectedDate}
-              min={getTwoDaysAgo()} // Tanggal minimum adalah dua hari yang lalu
-              max={getToday()} // Tanggal maksimum adalah hari ini
-              onChange={(e) => setSelectedDate(e.target.value)}
-              required
-            />
-          </div>
+          <select
+            id="countries"
+            className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
+          >
+            <option value="">Pilih Kelas</option>
+            <option value="US">Semua</option>
+            <option value="CA">rpl</option>
+            <option value="FR">tkj</option>
+            <option value="DE">tkr</option>
+          </select>
         </div>
 
         <div className="flex gap-2 items-center">
@@ -240,6 +231,25 @@ const TabelRekapAbsensi = () => {
             />
           </div>
         </div>
+      </div>
+      <div className="flex flex-column items-center gap-2 py-4 px-4">
+        <label
+          htmlFor="countries"
+          className="block text-sm font-medium text-gray-900 capitalize"
+        >
+          tanggal
+        </label>
+        <input
+          type="date"
+          id="dateInput"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 "
+          placeholder="Hari & Tanggal"
+          value={selectedDate}
+          min={getTwoDaysAgo()} // Tanggal minimum adalah dua hari yang lalu
+          max={getToday()} // Tanggal maksimum adalah hari ini
+          onChange={(e) => setSelectedDate(e.target.value)}
+          required
+        />
       </div>
 
       <div className="w-full max-h-80 overflow-y-auto">

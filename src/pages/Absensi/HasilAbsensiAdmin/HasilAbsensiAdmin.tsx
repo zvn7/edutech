@@ -1,131 +1,7 @@
-import { useState } from "react";
 import Navigation from "../../../component/Navigation/Navigation";
-import { Tabs } from "flowbite-react";
-import {
-  FaComputer,
-  FaNetworkWired,
-  FaScrewdriverWrench,
-} from "react-icons/fa6";
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
 import TabelAbsensi from "./TabelAbsensi";
 
-type Absensi = {
-  nama: string;
-  tanggal: string;
-  status: "hadir" | "alfa" | "izin"; // Tiga status baru
-  kelas?: string;
-};
-
-const defaultData: Absensi[] = [
-  {
-    nama: "Ningsih",
-    tanggal: "2022-01-01",
-    status: "hadir",
-  },
-  {
-    nama: "Ningsih",
-    tanggal: "2022-01-01",
-    status: "hadir",
-  },
-  {
-    nama: "Ningsih",
-    tanggal: "2022-01-01",
-    status: "alfa",
-  },
-  {
-    nama: "Ningsih",
-    tanggal: "2022-01-01",
-    status: "izin",
-  },
-];
-
-const columnHelper = createColumnHelper<Absensi>();
 const HasilAbsensiAdmin = () => {
-  const [data, setData] = useState(() => [...defaultData]);
-
-  // const handleStatusChange = (
-  //   rowIndex: number,
-  //   newStatus: "hadir" | "alfa" | "izin"
-  // ) => {
-  //   const newData = [...data];
-  //   newData[rowIndex].status = newStatus;
-  //   setData(newData);
-  // };
-
-  const columns = [
-    columnHelper.accessor("nama", {
-      id: "index",
-      header: () => "NO",
-      cell: (info) => info.row.index + 1,
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor("nama", {
-      cell: (info) => info.getValue(),
-      header: () => <span>Nama</span>,
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor("tanggal", {
-      cell: (info) => info.getValue(),
-      header: () => <span>Tanggal</span>,
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor("status", {
-      header: () => (
-        <span>
-          <div>keterangan</div>
-        </span>
-      ),
-      cell: (info) => {
-        const status = info.getValue();
-        return (
-          <div>
-            {status === "hadir" && (
-              <span className="bg-blue-200 text-blue-800 text-sm font-medium me-2 px-2 py-2 uppercase rounded-lg">
-                hadir
-              </span>
-            )}
-            {status === "alfa" && (
-              <span className="bg-red-200 text-red-800 text-sm font-medium me-2 px-3 py-2 uppercase rounded-lg">
-                alfa
-              </span>
-            )}
-            {status === "izin" && (
-              <span className="bg-yellow-200 text-yellow-800 text-sm font-medium me-2 px-4 py-2 uppercase rounded-lg">
-                izin
-              </span>
-            )}
-          </div>
-        );
-      },
-      footer: (info) => info.column.id,
-    }),
-  ];
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    debugTable: true,
-  });
-
-  const [state, setState] = useState(table.initialState);
-
-  // Override the state managers for the table to your own
-  table.setOptions((prev) => ({
-    ...prev,
-    state,
-    onStateChange: setState,
-
-    debugTable: state.pagination.pageIndex > 2,
-  }));
-
   return (
     <div>
       <Navigation />
@@ -227,45 +103,9 @@ const HasilAbsensiAdmin = () => {
           </div>
         </div>
         <div className="mt-8">
-          <div className="flex items-center gap-4">
-            {/* <label className="mb-2 text-lg font-semibold text-gray-900 uppercase">
-              pilih kelas
-            </label> */}
-            <select
-              id="countries"
-              className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 uppercase font-medium focus:ring-0"
-            >
-              <option selected>Pilih Kelas</option>
-              <option value="US">Semua</option>
-              <option value="CA">rpl</option>
-              <option value="FR">tkj</option>
-              <option value="DE">tkr</option>
-            </select>
-          </div>
           <div className="mt-6">
             <TabelAbsensi />
           </div>
-          {/* <Tabs aria-label="Tabs with underline" style="underline">
-            <Tabs.Item
-              active
-              title="Rekayasa Perangkat Lunak"
-              icon={FaComputer}
-            >
-              <TabelAbsensi />
-            </Tabs.Item>
-            <Tabs.Item
-              title="Teknik Komputer Dan Jaringan"
-              icon={FaNetworkWired}
-            >
-              <TabelAbsensi />
-            </Tabs.Item>
-            <Tabs.Item
-              title="Teknik Kendaraan Ringan"
-              icon={FaScrewdriverWrench}
-            >
-              <TabelAbsensi />
-            </Tabs.Item>
-          </Tabs> */}
         </div>
       </div>
     </div>

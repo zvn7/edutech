@@ -84,7 +84,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/jadwal-siswa",
-    element: <JadwalSiswa/>,
+    element: <JadwalSiswa />,
   },
   {
     path: "/jadwal/tambah-jadwal",
@@ -103,7 +103,7 @@ const router = createBrowserRouter([
     element: <TambahGuru />,
   },
   {
-    path: "/pengguna-guru/edit-guru",
+    path: "/pengguna-guru/edit-guru/:id",
     element: <EditGuru />,
   },
   {
@@ -115,7 +115,7 @@ const router = createBrowserRouter([
     element: <TambahSiswa />,
   },
   {
-    path: "/pengguna-siswa/edit-siswa",
+    path: "/pengguna-siswa/edit-siswa/:id",
     element: <EditSiswa />,
   },
   {
