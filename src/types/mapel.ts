@@ -3,7 +3,7 @@ export interface IMapel{
     lessonName:string,
     nameTeachers:[],
 }
-=======
+
 export interface Mapel {
 	id: number;
 	lessonName: string;
