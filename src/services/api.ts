@@ -3,8 +3,7 @@ import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
 import { IMapel } from "../types/mapel";
 import { Absensi } from "../types/absensi";
-import { Siswa } from "../types/user";
-import { CourseClassroom, IMateriGuru, Materi, MateriGuru } from "../types/materi";
+import { CourseClassroom, IMateriGuru} from "../types/materi";
 import { Tugas } from "../types/tugas";
 import { Pengumpulan } from "../types/pengumpulan";
 import { Mapel } from "../types/mapel";
@@ -123,17 +122,17 @@ export const createUserSiswa = async(data:UserSiswa)=>{
 
 export const getCourseIds = async () => {
 	return (
-		await axios.get<Materi[]>(`${BASE_URL}/api/Courses`, {
+		await axios.get<IMateriGuru[]>(`${BASE_URL}/api/Courses`, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
 		})
-	).data.map((course) => course.id);
+	).data.map((course) => course.teacherId);
 };
 
 export const getCourse = async (id: number) => {
 	try {
-		const response = await axios.get<Materi>(`${BASE_URL}/api/Courses/${id}`, {
+		const response = await axios.get<IMateriGuru>(`${BASE_URL}/api/Courses/${id}`, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
@@ -261,7 +260,7 @@ const getStudentIdFromToken = (): string | null => {
 	return null;
 };
 
-export const editAssignmentSubmission = async (data) => {
+export const editAssignmentSubmission = async (data:any) => {
     try {
         const assignmentId = data.id;
         const studentId = getStudentIdFromToken();
@@ -508,7 +507,7 @@ export const getAbsensi = async()=>{
 
 export const getTeacherinfo = async () => {
 	try {
-		const response = await axios.get<MateriGuru>(`${BASE_URL}/api/Account/courseteacher`, {
+		const response = await axios.get<IMateriGuru>(`${BASE_URL}/api/Account/courseteacher`, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
