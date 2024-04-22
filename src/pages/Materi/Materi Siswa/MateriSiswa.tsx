@@ -4,6 +4,7 @@ import { Tabs } from "flowbite-react";
 import {
 	useCourseClassroom,
 	useLessons,
+	useLessonsClassroom,
 	useLessonsIds,
 } from "../../../services/queries";
 import axios from "axios";
@@ -15,12 +16,15 @@ const MateriSiswa = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	// const courseIdsQuery = useCourseIds();
 	// const courseQueries = useCourse(courseIdsQuery.data);
-	const lessonsIdsQuery = useLessonsIds();
-	const lessonsQueries = useLessons(lessonsIdsQuery.data);
+	// const lessonsIdsQuery = useLessonsIds();
+	const lessonsQueries = useLessonsClassroom();
+	const {data: formLesson } = lessonsQueries;
 	const [selectedSubject, setSelectedSubject] = useState("");
 	const courseClassroom = useCourseClassroom();
 	const { data: formData } = courseClassroom;
 	console.log("formData", formData);
+	
+	
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -76,7 +80,7 @@ const MateriSiswa = () => {
 
 		try {
 			const response = await axios.get(
-				`http://192.168.144.239:1331/api/Courses/download/${id}`,
+				`http://192.168.144.239:13311/api/Courses/download/${id}`,
 				{
 					responseType: "blob",
 					headers: {
@@ -119,12 +123,12 @@ const MateriSiswa = () => {
 								onChange={(e) => setSelectedSubject(e.target.value)}
 							>
 								<option value="">Semua Mata Pelajaran</option>
-								{lessonsQueries.map(({ data }) => (
-									<option key={data?.id} value={data?.uniqueNumberOfLesson}>
-										{data?.lessonName}
+								{formLesson?.map((item) => (
+									<option key={item?.id} value={item?.uniqueNumberOfLesson}>
+										{item?.lessonName}
 									</option>
 								))}
-							</select>
+							</select>   
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">

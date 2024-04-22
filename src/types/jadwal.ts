@@ -3,6 +3,7 @@ export interface Jadwal {
     day: number,
     startTime: string,
     endTime: string,
-    lessonId: number,
-    classRoomId: number
+    lessonName: string,
+    className: string,
+    nameTeacher: string
 }

@@ -1,16 +1,18 @@
 import Navigation from "../../../component/Navigation/Navigation";
 import { Button, FileInput, TextInput, Textarea } from "flowbite-react"; // Import Modal component
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useTeacherinfo } from "../../../services/queries";
+import { useClassRooms, useTeacherinfo } from "../../../services/queries";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IMateriGuru } from "../../../types/materi";
+import Select, { ActionMeta, MultiValue } from "react-select";
 
 const MateriGuru = () => {
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [showEditForm, setShowEditForm] = useState(false);
 	const [selectedOption, setSelectedOption] = useState("file");
+	const [selectedLesson, setSelectedLesson] = useState<string>("");
 	const [selectedCardDescription, setSelectedCardDescription] = useState("");
 	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false); // State untuk mengatur visibilitas modal di mode mobile
 	const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
@@ -24,19 +26,47 @@ const MateriGuru = () => {
 	const createMateriMutation = useCreateMateri();
 	const { register, handleSubmit, reset } = useForm<IMateriGuru>();
 	const [course, setCourse] = useState({
-		courses: [
-			{
-				courseName: "",
-				description: "",
-				fileName: "",
-				linkCourse: "",
-				uniqueNumberOfLesson: "",
-				uniqueNumberOfClassRooms: "",
-				fileData: "",
-				lessonName: "",
-			},
-		],
+		courseName: "",
+		description: "",
+		fileName: "",
+		linkCourse: "",
+		uniqueNumberOfLesson: "",
+		uniqueNumberOfClassRooms: "",
+		fileData: "",
+		lessonName: "",
 	});
+	const classRoom = useClassRooms();
+	const { data: classRoomData } = classRoom;
+	console.log("classRoom", classRoomData);
+	// Buat opsi untuk kelas
+	const classOptions =
+		classRoomData?.classrooms.map((classRoom) => ({
+			label: classRoom.className,
+			value: classRoom.uniqueNumberOfClassRoom,
+		})) || [];
+
+	// Buat opsi untuk pelajaran
+
+	const lessonOptions =
+		classRoomData?.lessons.map((lesson) => ({
+			label: lesson.lessonName,
+			value: lesson.uniqueNumberOfLesson,
+		})) || [];
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		// Update nilai input ke dalam state formulir Anda
+		setCourse({
+			...course,
+			[name]: value,
+		});
+	};
+
+	// const [selectedOptions, setSelectedOptionS ] = useState([])
+
+	// const handleSelectChange =(selectedOptions)=>{
+	// 	setSelectedOptionS(selectedOptions)
+	// }
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -227,6 +257,27 @@ const MateriGuru = () => {
 		});
 	};
 
+	const handleChangeSelect = (
+		newValue: MultiValue<{ label: string; value: number }>,
+		actionMeta: ActionMeta<{ label: string; value: number }>
+	) => {
+		// Dapatkan nilai yang dipilih dari opsi multi select dan perbarui state formulir Anda sesuai
+		const selectedValues = newValue.map((option) => option.value); // Ambil nilai dari opsi yang dipilih
+		setCourse({
+			...course,
+			[actionMeta.name]: selectedValues, // actionMeta.name adalah nama properti yang sedang diubah
+		});
+	};
+
+	const handleTextareaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+		const { name, value } = e.target;
+		// Update nilai input textarea ke dalam state formulir Anda
+		setCourse({
+			...course,
+			[name]: value,
+		});
+	};
+
 	// const getTeacherIdFromToken = (): string | null => {
 	// 	const token = localStorage.getItem("token");
 	// 	if (token) {
@@ -398,6 +449,9 @@ const MateriGuru = () => {
 												<p className="text-base font-medium capitalize">
 													{card.courseName}
 												</p>
+												<p className="text-sm capitalize text-gray-500">
+													{card.classNames.join(", ")}
+												</p>
 											</div>
 										</div>
 										<Button.Group>
@@ -455,17 +509,31 @@ const MateriGuru = () => {
 									</button>
 								</div>
 								<form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
-									{/* <input type="hidden" value={teacherId} {...register("teacherId")} /> */}
 									<hr className="my-3" />
 									<p className="mt-2">Nama Materi</p>
 									<TextInput
 										className="mt-2"
-										id="lessonName"
+										id="courseName"
 										placeholder="Masukkan nama materi disini..."
-										required
-										{...register("courses.0.lessonName")}
+										{...register("courses.0.courseName")}
+										onChange={handleInputChange}
 									/>
+
 									<p className="mt-2">Kelas</p>
+									<Select
+										className="mt-2"
+										options={classOptions}
+										isMulti
+										onChange={handleChangeSelect} // Tambahkan onChange di sini
+									/>
+									<p className="mt-2">Mata Pelajaran</p>
+									<Select
+										className="mt-2"
+										options={lessonOptions}
+										isMulti
+										onChange={handleChangeSelect} // Tambahkan onChange di sini
+									/>
+
 									<p className="mt-2">Deskripsi</p>
 									<Textarea
 										className="mt-2"
@@ -474,8 +542,10 @@ const MateriGuru = () => {
 										required
 										rows={4}
 										{...register("courses.0.description")}
+										onChange={handleTextareaChange} // Tambahkan onChange di sini
 									/>
 
+									{/* Modul */}
 									<p className="mt-2">Modul</p>
 									<div className=" flex gap-5">
 										<div
@@ -488,6 +558,7 @@ const MateriGuru = () => {
 												name="submissionOption"
 												value="file"
 												checked={selectedOption === "file"}
+												onChange={handleInputChange} // Tambahkan onChange di sini
 											/>
 											<label htmlFor="file">File</label>
 										</div>
@@ -501,15 +572,19 @@ const MateriGuru = () => {
 												name="submissionOption"
 												value="link"
 												checked={selectedOption === "link"}
+												onChange={handleInputChange} // Tambahkan onChange di sini
 											/>
 											<label htmlFor="link">Link</label>
 										</div>
 									</div>
+
+									{/* File atau link input */}
 									{selectedOption === "file" && (
 										<div id="fileUpload" className="mt-4">
 											<FileInput
 												id="file"
 												{...register("courses.0.fileData")}
+												onChange={handleInputChange} // Tambahkan onChange di sini
 											/>
 										</div>
 									)}
@@ -520,9 +595,12 @@ const MateriGuru = () => {
 												type="text"
 												placeholder="Masukkan url atau link yang valid disini"
 												{...register("courses.0.linkCourse")}
+												onChange={handleInputChange} // Tambahkan onChange di sini
 											/>
 										</div>
 									)}
+
+									{/* Tombol submit */}
 									<input
 										type="submit"
 										disabled={createMateriMutation.isPending}

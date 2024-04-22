@@ -1,6 +1,16 @@
-
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { getAbsensi, getGuru, getMapel, getMapelIds, getSiswa, getSiswaIds, getTeacherinfo, getUserInfo } from "./api";
+import {
+	getAbsensi,
+	getClassRooms,
+	getGuru,
+	getMapel,
+	getMapelClassroom,
+	getMapelIds,
+	getSiswa,
+	getSiswaIds,
+	getTeacherinfo,
+	getUserInfo,
+} from "./api";
 import {
 	getAssignments,
 	getAssignmentsIds,
@@ -10,53 +20,52 @@ import {
 	getAttendancesIds,
 	getCourse,
 	getCourseClassroom,
-    getCourseClassroomIds,
+	getCourseClassroomIds,
 	getCourseIds,
 	getLessons,
 	getLessonsIds,
 	getSchedulesIds,
-
 } from "./api";
 import { CourseClassroom } from "../types/materi";
 
 // queries get user login
-export function useUserLogin(){
-    return useQueries({
-        queries:[
-            {
-                queryKey:["userinfo"],
-                queryFn:getUserInfo
-            }
-        ]
-    })
+export function useUserLogin() {
+	return useQueries({
+		queries: [
+			{
+				queryKey: ["userinfo"],
+				queryFn: getUserInfo,
+			},
+		],
+	});
 }
 
 //queries get mapel id
-export function useGetMapelId(){
-    return useQuery({
-            queryKey:["mapel"],
-            queryFn:getMapelIds
-        })
+export function useGetMapelId() {
+	return useQuery({
+		queryKey: ["mapel"],
+		queryFn: getMapelIds,
+	});
 }
 
 // queries get mapel
-export function useMapel(id:(number|undefined)[] | undefined){
-    return useQueries({
-        queries:(id ?? []).map((id)=>{
-            return{
-                queryKey:["mapel",id],
-                queryFn:()=>getMapel(id!)
-            }
-          }),
-    })
+export function useMapel(id: (number | undefined)[] | undefined) {
+	return useQueries({
+		queries: (id ?? []).map((id) => {
+			return {
+				queryKey: ["mapel", id],
+				queryFn: () => getMapel(id!),
+			};
+		}),
+	});
 }
 
 // queries get siswa
-export function useGetSiswaId(){
-    return useQuery({
-        queryKey:["siswa"],
-        queryFn:getSiswaIds
-    })
+export function useGetSiswaId() {
+	return useQuery({
+		queryKey: ["siswa"],
+		queryFn: getSiswaIds,
+	});
 }
 
 // queries get siswa
@@ -67,41 +76,40 @@ export function useGetSiswaId(){
 //    })
 // }
 
-export function useSiswa(ids:(string|undefined)[] | undefined){
-    return useQueries({
-        queries: (ids ?? []).map((id)=>{
-            return{
-                queryKey: ["siswa", {id}],
-                queryFn: () => getSiswa(id!)
-            };
-        }),
-    });
+export function useSiswa(ids: (string | undefined)[] | undefined) {
+	return useQueries({
+		queries: (ids ?? []).map((id) => {
+			return {
+				queryKey: ["siswa", { id }],
+				queryFn: () => getSiswa(id!),
+			};
+		}),
+	});
 }
 
 // get siswa by id
-export function useSiswaDetail(id:string){
-    return useQuery({
-        queryKey:["siswa",id],
-        queryFn:()=>getSiswa(id)
-    })
+export function useSiswaDetail(id: string) {
+	return useQuery({
+		queryKey: ["siswa", id],
+		queryFn: () => getSiswa(id),
+	});
 }
 
 // get guru
-export function useGetGuru(){
-    return useQuery({
-        queryKey:["guru"],
-        queryFn:getGuru
-    })
+export function useGetGuru() {
+	return useQuery({
+		queryKey: ["guru"],
+		queryFn: getGuru,
+	});
 }
 
 // get absensi
-export function useGetAbsensi(){
-    return useQuery({
-        queryKey:["absensi"],
-        queryFn:getAbsensi
-    })
+export function useGetAbsensi() {
+	return useQuery({
+		queryKey: ["absensi"],
+		queryFn: getAbsensi,
+	});
 }
-
 
 export function useCourseIds() {
 	return useQuery({
@@ -179,6 +187,13 @@ export function useLessons(ids: (number | undefined)[] | undefined) {
 	});
 }
 
+export function useLessonsClassroom() {
+	return useQuery({
+		queryKey: ["lessonsClassroom"],
+		queryFn: getMapelClassroom,
+	});
+}
+
 export function useSchedulesIds() {
 	return useQuery({
 		queryKey: ["schedules"],
@@ -204,7 +219,6 @@ export function useSchedulesIds() {
 // 	});
 // }
 
-
 export function useAttendancesIds() {
 	return useQuery({
 		queryKey: ["attendances"],
@@ -223,15 +237,15 @@ const getStudentIdFromToken = (): string | null => {
 };
 
 export function useAttendances(ids: (number | undefined)[] | undefined = []) {
-    const studentId = getStudentIdFromToken(); // Mendapatkan ID siswa dari token atau tempat penyimpanan lainnya
-    return useQueries({
-        queries: (ids ?? []).map((id) => {
-            return {
-                queryKey: ["attendances", id],
-                queryFn: () => getAttendances(studentId),
-            };
-        }),
-    });
+	const studentId = getStudentIdFromToken(); // Mendapatkan ID siswa dari token atau tempat penyimpanan lainnya
+	return useQueries({
+		queries: (ids ?? []).map((id) => {
+			return {
+				queryKey: ["attendances", id],
+				queryFn: () => getAttendances(studentId),
+			};
+		}),
+	});
 }
 
 export function useCourseClassroom() {
@@ -259,3 +273,9 @@ export function useTeacherinfo() {
 // 	});
 // }
 
+export function useClassRooms() {
+	return useQuery({
+		queryKey: ["classRooms"],
+		queryFn: getClassRooms,
+	});
+}

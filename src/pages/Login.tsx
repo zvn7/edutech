@@ -70,14 +70,7 @@ const Login = () => {
 		}
 	};
 	return (
-		<section
-			className="bg-gray-50 dark:bg-gray-900 min-h-screen flex justify-center items-center p-4"
-			style={{
-				backgroundImage: `url('/img/background.png')`,
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-			}}
-		>
+		<section className="bg-gray-50 dark:bg-gray-900 min-h-screen flex justify-center items-center p-4">
 			{/* left side */}
 			<motion.div
 				initial={{ opacity: 0, x: -50 }}
@@ -181,7 +174,7 @@ const Login = () => {
 						<span className="text-[#F0CC00]">Guru</span> dan{" "}
 						<span className="text-[#F0CC00]">Siswa</span> secara online
 					</h2>
-					<img className="w-full" src="/img/pp.png" alt="interaksi" />
+					<img className="w-full" src="/img/1.png" alt="interaksi" />
 				</div>
 			</motion.div>
 		</section>

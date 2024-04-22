@@ -12,6 +12,7 @@ export interface CourseClassroom {
 			linkCourse: string;
 			uniqueNumberOfLesson: [string];
 			fileData: string;
+			createdAt: Date;
 		}
 	];
 }
@@ -34,6 +35,7 @@ export interface IMateriGuru {
 			linkCourse: string;
 			uniqueNumberOfLesson: string;
 			uniqueNumberOfClassRooms: [string];
+			classNames: [string];
 			fileData: string;
 			lessonName: string;
 		}
