@@ -134,6 +134,7 @@ const Navigation = () => {
 
     fetchUserLogin();
   }, []);
+  
   const getClassName = (className: string) => {
     switch (className) {
       case "TKJ":

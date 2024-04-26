@@ -10,6 +10,7 @@ const JadwalSiswa = () => {
 	const schedulesIdsQuery = useSchedulesIds();
 	const lessonsIdsQuery = useLessonsIds();
 	const lessonsQueries = useLessons(lessonsIdsQuery.data);
+	const [hoveredTeacher, setHoveredTeacher] = useState(null);
 
 	const [lessonNames, setLessonNames] = useState({});
 
@@ -26,8 +27,22 @@ const JadwalSiswa = () => {
 		}
 	}, [lessonsQueries]);
 
-	const getLessonNameById = (lessonId) => {
-		return lessonNames[lessonId] || "Tidak ada pelajaran";
+	const handleMouseEnter = (teacher) => {
+		setHoveredTeacher(teacher);
+	};
+
+	const handleMouseLeave = () => {
+		setHoveredTeacher(null);
+	};
+
+	const renderTeacherName = (nameTeacher) => {
+		if (hoveredTeacher === nameTeacher) {
+			return nameTeacher;
+		} else {
+			return nameTeacher.length > 15
+				? `${nameTeacher.slice(0, 15)}...`
+				: nameTeacher;
+		}
 	};
 
 	const renderSchedules = () => {
@@ -66,7 +81,7 @@ const JadwalSiswa = () => {
 						>
 							<div className="p-4">
 								<h2 className="m-1 text-lg font-medium">
-									{getLessonNameById(schedule.lessonId)}
+									{schedule.lessonName}
 								</h2>
 								<div className="flex gap-1">
 									<svg
@@ -86,11 +101,15 @@ const JadwalSiswa = () => {
 									</svg>
 									<span className="text-sm uppercase">
 										{schedule.startTime.slice(0, -3)} -{" "}
-										{schedule.endTime.slice(0, -3)} Wib
+										{schedule.endTime.slice(0, -3)} WIB
 									</span>
 								</div>
-								<p className="m-1 text-md font-medium text-gray-700 capitalize">
-									sumitro, S.Pd
+								<p
+									className="m-1 text-md font-medium text-gray-700 capitalize"
+									onMouseEnter={() => handleMouseEnter(schedule.nameTeacher)}
+									onMouseLeave={handleMouseLeave}
+								>
+									{renderTeacherName(schedule.nameTeacher)}
 								</p>
 							</div>
 						</div>

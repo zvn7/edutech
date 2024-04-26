@@ -2,42 +2,43 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { Button, FileInput, TextInput, Textarea } from "flowbite-react"; // Import Modal component
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useTeacherinfo } from "../../../services/queries";
+import {
+	useCourseById,
+	useGetMapelByGuru,
+	useLessonsIds,
+	useTeacherinfo,
+} from "../../../services/queries";
+import Select from "react-select";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IMateriGuru } from "../../../types/materi";
+import { IMateriGuru, UploadMateri } from "../../../types/materi";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
-const MateriGuru = () => {
+const MateriGuru = ({ id }: { id: string }) => {
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [showEditForm, setShowEditForm] = useState(false);
 	const [selectedOption, setSelectedOption] = useState("file");
 	const [selectedCardDescription, setSelectedCardDescription] = useState("");
-	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false); // State untuk mengatur visibilitas modal di mode mobile
+	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
 	const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
-	const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false); // State untuk mengatur visibilitas modal di mode mobile
+	const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
 	const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isTablet, setIsTablet] = useState(false);
+	const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+	const [selectedMapel, setSelectedMapel] = useState([]);
 	const teacherinfo = useTeacherinfo();
 	const { data: formData } = teacherinfo;
-	console.log("formData", formData);
-	const createMateriMutation = useCreateMateri();
-	const { register, handleSubmit, reset } = useForm<IMateriGuru>();
-	const [course, setCourse] = useState({
-		courses: [
-			{
-				courseName: "",
-				description: "",
-				fileName: "",
-				linkCourse: "",
-				uniqueNumberOfLesson: "",
-				uniqueNumberOfClassRooms: "",
-				fileData: "",
-				lessonName: "",
-			},
-		],
-	});
 
+	const [formUpdate, setFormUpdate] = useState({
+		courseName: "",
+		description: "",
+		fileData: "",
+		linkCourse: "",
+		lessonName: "",
+		fileName: "",
+	});
 	useEffect(() => {
 		const handleResize = () => {
 			const windowWidth = window.innerWidth;
@@ -53,27 +54,6 @@ const MateriGuru = () => {
 			window.removeEventListener("resize", handleResize); // Bersihkan event listener saat komponen di-unmount
 		};
 	}, []);
-
-	const handleOptionChange = (option: string) => {
-		setSelectedOption(option);
-	};
-
-	const handleDeleteCard = (cardId: number) => {
-		Swal.fire({
-			title: "Are you sure?",
-			text: "You will not be able to recover this card!",
-			icon: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, delete it!",
-		}).then((result) => {
-			if (result.isConfirmed) {
-				console.log("Deleting card with ID:", cardId);
-				Swal.fire("Deleted!", "Your card has been deleted.", "success");
-			}
-		});
-	};
 
 	const handleShowAddForm = () => {
 		if (showEditForm) {
@@ -97,8 +77,10 @@ const MateriGuru = () => {
 		}
 	};
 
-	const handleShowEditForm = () => {
+	const handleShowEditForm = (id: string) => {
+		// Jika sedang menampilkan form tambah
 		if (showAddForm) {
+			// Tampilkan SweetAlert untuk konfirmasi
 			Swal.fire({
 				title: "Anda yakin ingin meninggalkan halaman?",
 				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
@@ -110,12 +92,66 @@ const MateriGuru = () => {
 				cancelButtonText: "Tidak, batalkan",
 			}).then((result) => {
 				if (result.isConfirmed) {
+					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
+					// Tampilkan form edit
 					setShowEditForm(true);
+					setSelectedCourse(id);
+					console.log("selected id", id);
 				}
 			});
 		} else {
-			setShowEditForm(!showEditForm);
+			// Jika sedang menampilkan form edit
+			if (showEditForm) {
+				// Tampilkan SweetAlert untuk konfirmasi
+				Swal.fire({
+					title: "Anda yakin ingin meninggalkan halaman?",
+					text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+					icon: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#3085d6",
+					cancelButtonColor: "#d33",
+					confirmButtonText: "Ya, lanjutkan",
+					cancelButtonText: "Tidak, batalkan",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						// Tampilkan form edit
+						setShowEditForm(true);
+						setSelectedCourse(id);
+						console.log("selected id", id);
+					}
+				});
+			} else {
+				// Tampilkan form edit jika tidak sedang menampilkan form tambah
+				getDataAndShowEditForm(id);
+			}
+		}
+	};
+
+	const getDataAndShowEditForm = async (id: string) => {
+		try {
+			const response = await axios.get(
+				`http://192.168.139.239:13311/api/Courses/${id}`,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+
+			setFormUpdate({
+				...formUpdate,
+				courseName: response.data.courseName || "",
+				lessonName: response.data.lessonName || "",
+				description: response.data.description || "",
+				linkCourse: response.data.linkCourse || "",
+			});
+			setSelectedLesson(response.data.lessonName);
+			setShowEditForm(true);
+			setSelectedCourse(id);
+			console.log("selected id", response.data);
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -147,7 +183,8 @@ const MateriGuru = () => {
 		setisMobileModalOpenEdit(false);
 	};
 
-	const handleShowModalEditFormMobile = () => {
+	const handleShowModalEditFormMobile = (id: string) => {
+		setSelectedCourse(id);
 		setisMobileModalOpenEdit(true);
 		setisMobileModalOpenAdd(false);
 	};
@@ -180,64 +217,155 @@ const MateriGuru = () => {
 		setisTabletModalOpenEdit(false);
 	};
 
-	const handleShowModalEditFormTablet = () => {
+	const handleShowModalEditFormTablet = (id: string) => {
+		setSelectedCourse(id);
+		console.log("selectedCourse", selectedCourse);
+
 		setisTabletModalOpenEdit(true);
 		setisTabletModalOpenAdd(false);
 	};
 
-	const handleCloseModalFormTablet = () => {
-		if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
-			Swal.fire({
-				title: "Anda yakin ingin meninggalkan halaman?",
-				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
-				icon: "warning",
-				showCancelButton: true,
-				confirmButtonColor: "#3085d6",
-				cancelButtonColor: "#d33",
-				confirmButtonText: "Ya, lanjutkan",
-				cancelButtonText: "Tidak, batalkan",
-			}).then((result) => {
-				if (result.isConfirmed) {
-					setisTabletModalOpenAdd(false);
-					setisTabletModalOpenEdit(false);
-				}
-			});
-		} else {
-			setisTabletModalOpenAdd(false);
-			setisTabletModalOpenEdit(false);
-		}
+	const handleOptionChange = (option: string) => {
+		setSelectedOption(option);
 	};
 
-	const handleCreateMateriSubmit: SubmitHandler<IMateriGuru> = (data) => {
-		createMateriMutation.mutate(data, {
+	const [form, setForm] = useState({
+		CourseName: "",
+		Description: "",
+		FileData: "",
+		LinkCourse: "",
+		LessonName: "",
+		TeacherId: "",
+	});
+
+	const [selectedLesson, setSelectedLesson] = useState("semua");
+
+	const handleInputChange = (e: any) => {
+		const { value, name } = e.target;
+		setFormUpdate({
+			...formUpdate,
+			[name]: value,
+		});
+		console.log("data form", form);
+	};
+
+	const createMateri = useCreateMateri();
+	const { register, handleSubmit, setValue, reset } = useForm<UploadMateri>();
+
+	const navigate = useNavigate();
+
+	const handleCreateMateriSubmit: SubmitHandler<UploadMateri> = (data) => {
+		createMateri.mutate(data, {
 			onSuccess: () => {
 				Swal.fire({
-					title: "Success",
-					text: "Materi Berhasil",
 					icon: "success",
-					confirmButtonColor: "#3085d6",
+					title: "Berhasil!",
+					text: "Materi Berhasil ditambahkan!",
 					confirmButtonText: "Ok",
 				}).then((result) => {
 					if (result.isConfirmed) {
 						setShowAddForm(false);
 						reset();
+						setForm({
+							CourseName: "",
+							Description: "",
+							FileData: "",
+							LinkCourse: "",
+							LessonName: "",
+							TeacherId: "",
+							UniqueNumberOfClassRooms: [],
+						});
+						setSelectedJurusan([]);
+						setSelectedMapel([]);
+						navigate("/materi-guru");
 					}
 				});
 			},
 		});
 	};
 
-	// const getTeacherIdFromToken = (): string | null => {
-	// 	const token = localStorage.getItem("token");
-	// 	if (token) {
-	// 		const payload = token.split(".")[1];
-	// 		const decodedPayload = JSON.parse(atob(payload));
-	// 		return decodedPayload?.TeacherId || null;
-	// 	}
-	// 	return null;
-	// };
+	const queryMapel = useGetMapelByGuru();
+	const { data: dataMapel } = queryMapel;
 
-	// const teacherId = getTeacherIdFromToken();
+	const filteredData =
+		selectedLesson === "semua"
+			? formData?.courses || []
+			: formData?.courses.filter(
+					({ lessonName }) => lessonName === selectedLesson
+			  ) || [];
+
+	const mapelOption = dataMapel?.map((mapel) => ({
+		value: mapel.lessonName,
+		label: mapel.lessonName,
+	}));
+
+	const handleMapelChange = (e: any) => {
+		setSelectedMapel(
+			e.map((option: any) => ({
+				value: option.value as string,
+				label: option.label as string,
+			}))
+		);
+
+		setValue(
+			"LessonName",
+			e.map((option: any) => option.label)
+		);
+	};
+
+	const handleLessonChange = (e: any) => {
+		setSelectedLesson(e.target.value);
+	};
+
+	const [searchTerm, setSearchTerm] = useState("");
+
+	const searchFilter = (lesson: any) => {
+		return lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase());
+	};
+
+	const [loading, setLoading] = useState(false);
+
+	const { data: dataCourse } = useCourseById(selectedCourse ?? "");
+
+	const handleSubmitEdit = async (e: any) => {
+		e.preventDefault();
+		setLoading(true);
+
+		try {
+			const response = await axios.put(
+				`http://192.168.139.239:13311/api/Courses/${id}`,
+				form,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+			console.log(response.data);
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil!",
+				text: "Materi Berhasil diperbarui!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setShowEditForm(false);
+				}
+			});
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleInputEditChange = (e: any) => {
+		const { value, name } = e.target;
+		setFormUpdate({
+			...formUpdate,
+			[name]: value,
+		});
+	};
 
 	return (
 		<div>
@@ -246,8 +374,18 @@ const MateriGuru = () => {
 				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
 					{/* left side */}
 					<div>
-						<div className=" mt-14 flex justify-between">
-							<h1 className="text-3xl font-bold font-mono">Materi</h1>
+						<div className="mt-16 flex justify-between items-center">
+							<h1 className="text-3xl font-bold capitalize">Materi</h1>
+							<select
+								value={selectedLesson}
+								onChange={handleLessonChange}
+								className="border border-gray-300 bg-white p-1 rounded-lg capitalize"
+							>
+								<option selected>semua</option>
+								{dataMapel?.map((item) => (
+									<option value={item.lessonName}>{item.lessonName}</option>
+								))}
+							</select>
 						</div>
 
 						<div className="mt-5 flex justify-between gap-4">
@@ -279,8 +417,10 @@ const MateriGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-96 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										placeholder="Cari..."
+										value={searchTerm}
+										onChange={(e) => setSearchTerm(e.target.value)}
+										className="capitalize block md:w-96 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+										placeholder="Cari materi disini..."
 										required
 									/>
 								</div>
@@ -366,64 +506,71 @@ const MateriGuru = () => {
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{formData?.courses.map((card) => (
-								<div key={card.id} className="cursor-pointer">
-									<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
-										<div className="flex gap-3">
-											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
-												<svg
-													className="w-12 h-12 text-blue-600 dark:text-white"
-													aria-hidden="true"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														fillRule="evenodd"
-														d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-														clipRule="evenodd"
-													/>
-												</svg>
+							{filteredData.filter(searchFilter).length > 0 ? (
+								filteredData.filter(searchFilter).map((card) => (
+									<div key={card.id} className="cursor-pointer">
+										<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
+											<div className="flex gap-3">
+												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+													<svg
+														className="w-12 h-12 text-blue-600 dark:text-white"
+														aria-hidden="true"
+														xmlns="http://www.w3.org/2000/svg"
+														fill="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															fillRule="evenodd"
+															d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+															clipRule="evenodd"
+														/>
+													</svg>
+												</div>
+												<div className="flex flex-col">
+													<p className="text-sm capitalize text-gray-500">
+														{card.lessonName}
+													</p>
+													<p className="text-base font-medium capitalize">
+														{card.courseName}
+													</p>
+													<p className="text-sm capitalize text-gray-500">
+														{card.longClassName}
+													</p>
+												</div>
 											</div>
-											<div className="flex flex-col">
-												<p className="text-sm capitalize text-gray-500">
-													{
-														formData.lessons.find(
-															(lesson) =>
-																lesson.uniqueNumberOfLesson ===
-																card.uniqueNumberOfLesson
-														)?.lessonName
-													}
-												</p>
-												<p className="text-base font-medium capitalize">
-													{card.courseName}
-												</p>
-											</div>
-										</div>
-										<Button.Group>
 											<Button
 												color="warning"
 												onClick={
 													isMobile
-														? handleShowModalEditFormMobile
+														? () => handleShowModalEditFormMobile(card.id)
 														: isTablet
-														? handleShowModalEditFormTablet
-														: handleShowEditForm
+														? () => handleShowModalEditFormTablet(card.id)
+														: () => handleShowEditForm(card.id)
 												}
 											>
 												Edit
 											</Button>
-
-											<Button
-												onClick={() => handleDeleteCard(card.id)}
-												color="failure"
-											>
-												Hapus
-											</Button>
-										</Button.Group>
+										</div>
 									</div>
-								</div>
-							))}
+								))
+							) : (
+								<p className="text-center text-gray-400">
+									Tidak ada hasil pencarian yang sesuai.
+								</p>
+							)}
+
+							{filteredData.length === 0 && searchTerm.length === 0 && (
+								<p className="text-center text-gray-400">
+									Tidak ada data yang sesuai dengan pilihan pelajaran yang
+									dipilih.
+								</p>
+							)}
+
+							{/* {filteredData.length === 0 && searchTerm.length > 0 && (
+								<p className="text-center text-gray-400">
+									Tidak ada hasil pencarian yang sesuai.
+								</p>
+							)} */}
 						</div>
 					</div>
 					{/* right side */}
@@ -455,27 +602,59 @@ const MateriGuru = () => {
 									</button>
 								</div>
 								<form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
-									{/* <input type="hidden" value={teacherId} {...register("teacherId")} /> */}
 									<hr className="my-3" />
-									<p className="mt-2">Nama Materi</p>
-									<TextInput
-										className="mt-2"
-										id="lessonName"
-										placeholder="Masukkan nama materi disini..."
-										required
-										{...register("courses.0.lessonName")}
+
+									<div>
+										<label
+											htmlFor="name"
+											className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+										>
+											nama materi
+										</label>
+										<input
+											type="text"
+											// value={form.CourseName}
+
+											{...register(`CourseName`, { required: true })}
+											onChange={handleInputChange}
+											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+											placeholder="Masukkan nama lengkap"
+											required
+											onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+												e.target.setCustomValidity(
+													"Nama Lengkap tidak boleh kosong"
+												)
+											}
+											onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+												e.target.setCustomValidity("")
+											}
+										/>
+									</div>
+
+									<p className="mt-2">Mata Pelajaran</p>
+									<Select
+										isMulti
+										{...register("LessonName")}
+										value={selectedMapel}
+										onChange={handleMapelChange}
+										options={mapelOption}
+										className="react-select-container mt-2"
+										classNamePrefix="react-select"
 									/>
-									<p className="mt-2">Kelas</p>
+
 									<p className="mt-2">Deskripsi</p>
-									<Textarea
-										className="mt-2"
+									<textarea
+										className="mt-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
 										id="comment"
+										value={form.Description}
+										{...register(`Description`)}
+										onChange={handleInputChange}
 										placeholder="Masukkan deskripsi tugas disini..."
 										required
 										rows={4}
-										{...register("courses.0.description")}
 									/>
 
+									{/* Modul */}
 									<p className="mt-2">Modul</p>
 									<div className=" flex gap-5">
 										<div
@@ -505,12 +684,11 @@ const MateriGuru = () => {
 											<label htmlFor="link">Link</label>
 										</div>
 									</div>
+
+									{/* File atau link input */}
 									{selectedOption === "file" && (
 										<div id="fileUpload" className="mt-4">
-											<FileInput
-												id="file"
-												{...register("courses.0.fileData")}
-											/>
+											<FileInput id="file" />
 										</div>
 									)}
 									{selectedOption === "link" && (
@@ -518,17 +696,17 @@ const MateriGuru = () => {
 											<TextInput
 												id="link"
 												type="text"
+												value={form.LinkCourse}
+												{...register("LinkCourse")}
+												onChange={handleInputChange}
 												placeholder="Masukkan url atau link yang valid disini"
-												{...register("courses.0.linkCourse")}
 											/>
 										</div>
 									)}
+
+									{/* Tombol submit */}
 									<input
 										type="submit"
-										disabled={createMateriMutation.isPending}
-										value={
-											createMateriMutation.isPending ? "Loading..." : "Simpan"
-										}
 										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
 									/>
 								</form>
@@ -561,15 +739,52 @@ const MateriGuru = () => {
 									</button>
 								</div>
 								<hr className="my-3" />
+								<div>
+									<label
+										htmlFor="name"
+										className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+									>
+										nama materi
+									</label>
+									<input
+										type="text"
+										name="courseName"
+										value={formUpdate.courseName}
+										onChange={handleInputEditChange}
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+										placeholder="Masukkan nama lengkap"
+										required
+										onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+											e.target.setCustomValidity(
+												"Nama Lengkap tidak boleh kosong"
+											)
+										}
+										onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+											e.target.setCustomValidity("")
+										}
+									/>
+								</div>
+
+								<p className="mt-2">Mata Pelajaran</p>
+								<Select
+									isMulti
+									name="lessonName"
+									value={selectedMapel}
+									onChange={handleMapelChange}
+									options={mapelOption}
+									className="react-select-container mt-2"
+									classNamePrefix="react-select"
+								/>
+
 								<p className="mt-2">Deskripsi</p>
-								<Textarea
-									className="mt-2"
-									id="comment"
+								<textarea
+									className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
 									placeholder="Masukkan deskripsi tugas disini..."
 									required
 									rows={4}
-									value={selectedCardDescription}
-									onChange={(e) => setSelectedCardDescription(e.target.value)}
+									name="description"
+									value={formUpdate.description}
+									onChange={handleInputEditChange}
 								/>
 
 								<p className="mt-2">Modul</p>
@@ -618,9 +833,34 @@ const MateriGuru = () => {
 								)}
 								<button
 									type="submit"
-									className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
+									className="flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+									disabled={loading}
+									onClick={handleSubmitEdit}
 								>
-									Kirim
+									{loading ? (
+										<svg
+											className="animate-spin w-5 h-5 mr-3"
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+										>
+											<circle
+												className="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="4"
+											></circle>
+											<path
+												className="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0112 4.472v3.585l-2.829 2.829zm0 8.446a8.045 8.045 0 01-2.38-2.38l2.38-2.83v5.21zM12 20.528a7.995 7.995 0 01-4-.943v-3.585L9.172 16.7c.258.258.563.465.896.605zm4-1.947l2.829-2.83 2.83 2.83-2.83 2.83v-5.22a8.045 8.045 0 01-2.38 2.38zm2.39-8.38L19.528 12h-5.21l2.83-2.829 2.83 2.829zM12 5.473V1.548A8.045 8.045 0 0115.473 4.39L12 7.863zm-2.829-.707L7.17 4.39A8.045 8.045 0 0110.39 1.548l-1.219 1.218zm1.219 13.123l-1.22 1.219a8.045 8.045 0 012.38 2.38l1.22-1.22zM16.832 16.7l1.219 1.22a8.045 8.045 0 012.38-2.38l-1.218-1.219z"
+											></path>
+										</svg>
+									) : (
+										"Simpan"
+									)}
 								</button>
 							</div>
 						</div>

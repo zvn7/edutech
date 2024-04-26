@@ -1,90 +1,100 @@
-import { useMutation, useQueryClient} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginUser } from "../types/login";
-import {createGuru, createMapel, createSchedules, createUserSiswa, deleteMapel, deleteSchedule, editSiswa, postDataExcelSiswa, postLogin} from "./api";
-import { IMapel } from '../types/mapel';
+import {
+  postLogin,
+	createMapel,
+  deleteMapel,
+	createUserSiswa,
+	editSiswa,
+	postDataExcelSiswa,
+  createGuru,
+  createSchedules,
+  deleteSchedule,
+} from "./api";
+import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
 import {
 	createAssignmentSubmissions,
 	editAssignmentSubmission,
 	createMateri,
 } from "./api";
-import { Pengumpulan } from '../types/pengumpulan';
-import { IMateriGuru } from '../types/materi';
+import { Pengumpulan } from "../types/pengumpulan";
+import { IMateriGuru, MateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
 
 // login
-export function useLogin(){
-    const queryClient = useQueryClient();
+export function useLogin() {
+	const queryClient = useQueryClient();
 
-    return useMutation<LoginUser, Error, LoginUser, unknown>({
-        mutationFn: async (data: LoginUser) => {
-            try {
-                const result = await postLogin(data);
-                return result;
-            } catch (error) {
-                throw new Error("Failed to login");
-            }
-        },
-        onMutate: () => {
-            console.log("mutate");
-        },
-        onError: () => {
-            console.log("error");
-        },
-        onSettled: () => {
-            console.log("settled");
-        },
-        onSuccess: async (data:any) => {
-            console.log("success", data);
-            await queryClient.invalidateQueries({ queryKey: ["login"] });
-        },
-    })
+	return useMutation<LoginUser, Error, LoginUser, unknown>({
+		mutationFn: async (data: LoginUser) => {
+			try {
+				const result = await postLogin(data);
+				return result;
+			} catch (error) {
+				throw new Error("Failed to login");
+			}
+		},
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["login"] });
+		},
+	});
 }
 
 // create mapel
-export function useCreateMapel(){
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationKey: ['createMapel'],
-        mutationFn:(data:IMapel)=>createMapel(data),
-        onMutate:()=>{
-            console.log("mutate")
-        },
-        onError:()=>{
-            console.log("error");
-        },
-        onSettled:()=>{
-            console.log("settled");
-        },
-        onSuccess: async (data:any) => {
-            console.log("success", data);
-            await queryClient.invalidateQueries({ queryKey: ["mapel"] });
-        },
-    })
+export function useCreateMapel() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ["createMapel"],
+		mutationFn: (data: IMapel) => createMapel(data),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["mapel"] });
+		},
+	});
 }
 
 // create pengguna siswa
-export function useCreateUserSiswa(){
-    const queryClient = useQueryClient()
+export function useCreateUserSiswa() {
+	const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationKey: ['createUserSiswa'],
-        mutationFn:(data:UserSiswa)=>createUserSiswa(data),
+	return useMutation({
+		mutationKey: ["createUserSiswa"],
+		mutationFn: (data: UserSiswa) => createUserSiswa(data),
 
-        onMutate:()=>{
-            console.log("mutate")
-        },
-        onError:()=>{
-            console.log("error");
-        },
-        onSettled:()=>{
-            console.log("settled");
-        },
-        onSuccess: async (data:any) => {
-            console.log("success", data);
-            await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
-        },
-    })
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
+		},
+	});
 }
 
 // create jadwal
@@ -134,48 +144,49 @@ export function useCreateJadwalAdmin(){
 // }
 
 //edit data siswa
-export function useEditSiswa(){
-    const queryClient = useQueryClient()
+export function useEditSiswa() {
+	const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationKey: ['editSiswa'],
-        mutationFn: ({ id, data }: { id: string, data: UserSiswa }) => editSiswa(id, data),
-        onMutate:()=>{
-            console.log("mutate")
-        },
-        onError:()=>{
-            console.log("error");
-        },
-        onSettled:()=>{
-            console.log("settled");
-        },
-        onSuccess: async (data:any) => {
-            console.log("success", data);
-            await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
-        },
-    })
+	return useMutation({
+		mutationKey: ["editSiswa"],
+		mutationFn: ({ id, data }: { id: string; data: UserSiswa }) =>
+			editSiswa(id, data),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
+		},
+	});
 }
 
-export function useDeleteMapel(){
-    const queryClient = useQueryClient()
+export function useDeleteMapel() {
+	const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationKey: ['deleteMapel'],
-        mutationFn: (id: string) => deleteMapel(id),
-        onMutate:()=>{
-            console.log("mutate")
-        },
-        onError:()=>{
-            console.log("error");
-        },
-        onSettled:()=>{
-            console.log("settled");
-        },
-        onSuccess: async (data:any) => {
-            console.log("success", data);
-            await queryClient.invalidateQueries({ queryKey: ["mapel"] });
-        },
-    })
+	return useMutation({
+		mutationKey: ["deleteMapel"],
+		mutationFn: (id: string) => deleteMapel(id),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["mapel"] });
+		},
+	});
 }
 
 export function useCreateAssignmentSubmissions() {
@@ -247,7 +258,7 @@ export function useCreateMateri() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationKey: ["createMateri"],
-		mutationFn: (data: IMateriGuru) => createMateri(data),
+		mutationFn: (data: UploadMateri) => createMateri(data),
 		onMutate: () => {
 			console.log("Mutate");
 		},
@@ -257,10 +268,10 @@ export function useCreateMateri() {
 		onSettled: () => {
 			console.log("Settled");
 		},
-		onSuccess: async (data:any) => {
+		onSuccess: async (data: any) => {
 			console.log("Success", data);
-			await queryClient.invalidateQueries({ queryKey: ["materiGuru"] });
-		}
+			await queryClient.invalidateQueries({ queryKey: ["course"] });
+		},
 	});
 }
 

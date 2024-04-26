@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navigation from "../../../component/Navigation/Navigation";
 import { Table } from "flowbite-react";
 import {
+	useAssigmentDetail,
 	useAssignments,
 	useAssignmentsIds,
 	useAttendances,
@@ -13,10 +14,10 @@ import {
 import React from "react";
 
 const BerandaSiswa = () => {
-	const assignmentsIdsQuery = useAssignmentsIds();
-	const assignmentsQueries = useAssignments(assignmentsIdsQuery.data);
-	const courseIdsQuery = useCourseIds();
-	const courseQueries = useCourse(courseIdsQuery.data);
+	const assignmentsIdsQuery = useAssignments();
+	const assignmentsQueries = useAssigmentDetail(assignmentsIdsQuery.data);
+	// const courseIdsQuery = useCourseIds();
+	// const courseQueries = useCourse(courseIdsQuery.data);
 	const courseClassroom = useCourseClassroom();
 	const { data: formData } = courseClassroom;
 	const attendancesIdsQuery = useAttendancesIds();
@@ -33,6 +34,24 @@ const BerandaSiswa = () => {
 	};
 
 	const nameStudent = getNameStudentFromToken();
+
+	const formatDate = (dateString: any) => {
+		try {
+			const parsedDate = new Date(dateString);
+			// Periksa apakah parsedDate adalah waktu yang valid
+			if (isNaN(parsedDate.getTime())) {
+				// Jika parsedDate tidak valid, kembalikan string "Invalid Date"
+				return "Invalid Date";
+			}
+			const options = { day: "numeric", month: "long", year: "numeric" };
+			const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
+			return dateFormatter.format(parsedDate);
+		} catch (error) {
+			console.error("Error formatting date:", error);
+			// Jika terjadi kesalahan dalam pemformatan, kembalikan string kosong
+			return "";
+		}
+	};
 
 	return (
 		<div>
@@ -74,10 +93,13 @@ const BerandaSiswa = () => {
 												</div>
 												<div className="flex flex-col">
 													<p className="text-sm capitalize text-gray-500">
-														{/* {formData.teacherName} */} Sumitro
+														{course.lessonName}
 													</p>
-													<p className="text-md text-xl font-semibold text-gray-900">
+													<p className="text-md font-semibold text-gray-900">
 														{course.courseName}
+													</p>
+													<p className="text-sm capitalize text-gray-500">
+														{course.nameTeacher}
 													</p>
 												</div>
 											</div>
@@ -120,7 +142,7 @@ const BerandaSiswa = () => {
 											</div>
 											<div className="flex flex-col">
 												<p className="text-sm font-normal text-gray-500">
-													{data?.courseName}
+													{data?.lessonName}
 												</p>
 												<h2 className="text-md font-medium">
 													{data?.assignmentName}
@@ -143,7 +165,7 @@ const BerandaSiswa = () => {
 															/>
 														</svg>
 														<span className="text-sm text-gray-500">
-															{data?.assignmentDate}
+															{formatDate(data?.assignmentDate)}
 														</span>
 													</div>
 												</div>
@@ -191,18 +213,19 @@ const BerandaSiswa = () => {
 															className="bg-white dark:border-gray-700 dark:bg-gray-800"
 														>
 															<Table.Cell className="font-medium text-gray-900">
-																{attendance.date}
+																{formatDate(attendance.date)}
 															</Table.Cell>
+
 															<Table.Cell>
 																<span
-																	className={`text-sm font-medium px-2 py-2 uppercase rounded-lg ${(() => {
+																	className={`text-base font-medium text-center me-2 px-2.5 py-0.5 rounded capitalize ${(() => {
 																		switch (attendance.status) {
 																			case 1:
-																				return "bg-blue-200 text-blue-800";
-																			case 2: 
-																				return "bg-yellow-200 text-yellow-800"; // Menambahkan warna kuning untuk status izin
+																				return "bg-blue-100 text-blue-800";
+																			case 2:
+																				return "bg-yellow-100 text-yellow-600";
 																			case 3:
-																				return "bg-red-200 text-red-800"; // Mengganti warna merah untuk status alfa
+																				return "bg-red-100 text-red-800";
 																			default:
 																				return "";
 																		}
