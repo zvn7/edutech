@@ -238,6 +238,21 @@ export const getAssignments = async (id: string) => {
 	}
 };
 
+export const createTugas = async (data: Tugas) => {
+	try {
+		const response = await axios.post(`${BASE_URL}/api/Assignments`, data, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to post materi:", error);
+	}
+};
+
 const getClassRoomIdFromToken = (): string | null => {
 	const token = localStorage.getItem("token");
 	if (token) {
@@ -630,7 +645,7 @@ export const getAbsensi = async () => {
 
 export const getTeacherinfo = async () => {
 	try {
-		const response = await axios.get<IMateriGuru>(
+		const response = await axios.get<IMateriGuru[]>(
 			`${BASE_URL}/api/Courses/teachercourses`,
 			{
 				headers: {

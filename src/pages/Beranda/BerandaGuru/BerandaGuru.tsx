@@ -35,13 +35,13 @@ const BerandaGuru = () => {
 					</p>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
-					<div>
-						{/* materi terbaru */}
-						<div className="flex flex-col gap-3">
-							<h1 className="font-bold text-xl mb-3">Materi Terbaru</h1>
-							{formData && (
-								<div key={formData?.id} className="cursor-pointer">
-									{formData.courses.map((course) => (
+					{/* materi terbaru */}
+					<div className="flex flex-col gap-3">
+						<h1 className="font-bold text-xl mb-3">Materi Terbaru</h1>
+						{formData && (
+							<div>
+								{formData.courses.slice(0, 5).map((course, index) => (
+									<div key={index}>
 										<div className="flex items-center  rounded-lg shadow-sm p-3 gap-2 bg-white mb-2">
 											<div className="flex gap-3">
 												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
@@ -60,36 +60,35 @@ const BerandaGuru = () => {
 													</svg>
 												</div>
 												<div className="flex flex-col">
-												<p className="text-sm capitalize text-gray-500">
-													{course.lessonName}
-												</p>
-												<p className="text-base font-medium capitalize">
-													{course.courseName}
-												</p>
-												<p className="text-sm capitalize text-gray-500">
-													{course.longClassName}
-												</p>
+													<p className="text-sm capitalize text-gray-500">
+														{course.lessonName}
+													</p>
+													<p className="text-base font-medium capitalize">
+														{course.courseName}
+													</p>
+													<p className="text-sm capitalize text-gray-500">
+														{course.longClassName}
+													</p>
 												</div>
 											</div>
 										</div>
-									))}
-								</div>
-							)}
-
-							<Link
-								to="HalamanMateri"
-								className="bg-white p-2 rounded text-blue-700 hover:bg-gray-200 hover:text-blue-500"
-							>
-								Selengkapnya...
-							</Link>
-						</div>
+									</div>
+								))}
+							</div>
+						)}
+						<Link
+							to="/materi-guru"
+							className="bg-white p-2 rounded text-blue-700 hover:bg-gray-200 hover:text-blue-500"
+						>
+							Selengkapnya...
+						</Link>
 					</div>
 					{/* tugas */}
 					<div className="flex flex-col gap-3">
 						<h1 className="font-bold text-xl mb-3">Daftar Tugas</h1>
-						{assigmentQueries.data?.map((items) => (
-							<div key={items?.id} className="cursor-pointer">
-								<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
+						{assigmentQueries.data?.slice(0, 5).map((items) => (
+							<div key={items?.id}>
+								<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-1">
 									<div className="flex gap-3">
 										<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 											<svg
@@ -110,7 +109,15 @@ const BerandaGuru = () => {
 											<p className="text-sm font-normal text-gray-500">
 												{items.lessonName}
 											</p>
-											<h2 className="text-md font-medium">{items.assignmentName}</h2>
+											<h2
+												className="text-md font-medium"
+												title={items?.assignmentName}
+											>
+												{items?.assignmentName &&
+												items.assignmentName.length > 25
+													? items.assignmentName.substring(0, 25) + "..."
+													: items.assignmentName}
+											</h2>
 											<div className="flex flex-wrap gap-2 ">
 												<div className="flex gap-1">
 													<svg
@@ -132,34 +139,14 @@ const BerandaGuru = () => {
 														{items.assignmentDate}
 													</span>
 												</div>
-												<div className="flex gap-1">
-													<svg
-														className="w-5 h-5 text-gray-500"
-														aria-hidden="true"
-														xmlns="http://www.w3.org/2000/svg"
-														fill="none"
-														viewBox="0 0 24 24"
-													>
-														<path
-															stroke="currentColor"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth="2"
-															d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-														/>
-													</svg>
-												</div>
 											</div>
 										</div>
 									</div>
-									<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
-										belum selesai
-									</span>
 								</div>
 							</div>
 						))}
 						<Link
-							to="HalamanTugas"
+							to="/tugas-guru"
 							className="bg-white p-2 rounded text-blue-700 hover:bg-gray-200 hover:text-blue-500"
 						>
 							Selengkapnya...

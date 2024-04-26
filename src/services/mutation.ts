@@ -10,6 +10,7 @@ import {
   createGuru,
   createSchedules,
   deleteSchedule,
+  createTugas,
 } from "./api";
 import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
@@ -21,6 +22,7 @@ import {
 import { Pengumpulan } from "../types/pengumpulan";
 import { IMateriGuru, MateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
+import { Tugas } from "../types/tugas";
 
 // login
 export function useLogin() {
@@ -320,4 +322,26 @@ export function useCreateUserGuru(){
             await queryClient.invalidateQueries({ queryKey: ["userguru"] });
         },
     })
+}
+
+// create tugas
+export function useCreateTugas() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ["createTugas"],
+		mutationFn: (data: Tugas) => createTugas(data),
+		onMutate: () => {
+			console.log("Mutate");
+		},
+		onError: () => {
+			console.log("Error");
+		},
+		onSettled: () => {
+			console.log("Settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("Success", data);
+			await queryClient.invalidateQueries({ queryKey: ["assignments"] });
+		},
+	});
 }

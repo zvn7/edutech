@@ -5,14 +5,13 @@ import Swal from "sweetalert2";
 import {
 	useCourseById,
 	useGetMapelByGuru,
-	useLessonsIds,
 	useTeacherinfo,
 } from "../../../services/queries";
 import Select from "react-select";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IMateriGuru, UploadMateri } from "../../../types/materi";
-import { useNavigate, useParams } from "react-router-dom";
+import { UploadMateri } from "../../../types/materi";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const MateriGuru = ({ id }: { id: string }) => {
@@ -212,6 +211,29 @@ const MateriGuru = ({ id }: { id: string }) => {
 		}
 	};
 
+	const handleCloseModalFormTablet = () => {
+		if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
+			Swal.fire({
+				title: "Anda yakin ingin meninggalkan halaman?",
+				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak, batalkan",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setisTabletModalOpenAdd(false);
+					setisTabletModalOpenEdit(false);
+				}
+			});
+		} else {
+			setisTabletModalOpenAdd(false);
+			setisTabletModalOpenEdit(false);
+		}
+	};
+
 	const handleShowModalAddFormTablet = () => {
 		setisTabletModalOpenAdd(true);
 		setisTabletModalOpenEdit(false);
@@ -373,7 +395,7 @@ const MateriGuru = ({ id }: { id: string }) => {
 			<div className="p-4 sm:ml-64">
 				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
 					{/* left side */}
-					<div>
+					<div className="">
 						<div className="mt-16 flex justify-between items-center">
 							<h1 className="text-3xl font-bold capitalize">Materi</h1>
 							<select
@@ -505,77 +527,79 @@ const MateriGuru = ({ id }: { id: string }) => {
 							)}
 						</div>
 
-						<div className="mt-8 flex flex-col gap-3">
-							{filteredData.filter(searchFilter).length > 0 ? (
-								filteredData.filter(searchFilter).map((card) => (
-									<div key={card.id} className="cursor-pointer">
-										<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
-											<div className="flex gap-3">
-												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
-													<svg
-														className="w-12 h-12 text-blue-600 dark:text-white"
-														aria-hidden="true"
-														xmlns="http://www.w3.org/2000/svg"
-														fill="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															fillRule="evenodd"
-															d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-															clipRule="evenodd"
-														/>
-													</svg>
+						<div className="overflow-y-auto max-h-screen">
+							<div className="mt-8 flex flex-col gap-3 ">
+								{filteredData.filter(searchFilter).length > 0 ? (
+									filteredData.filter(searchFilter).map((card) => (
+										<div key={card.id} className="cursor-pointer">
+											<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
+												<div className="flex gap-3">
+													<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+														<svg
+															className="w-12 h-12 text-blue-600 dark:text-white"
+															aria-hidden="true"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																fillRule="evenodd"
+																d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+																clipRule="evenodd"
+															/>
+														</svg>
+													</div>
+													<div className="flex flex-col">
+														<p className="text-sm capitalize text-gray-500">
+															{card.lessonName}
+														</p>
+														<p className="text-base font-medium capitalize">
+															{card.courseName}
+														</p>
+														<p className="text-sm capitalize text-gray-500">
+															{card.longClassName}
+														</p>
+													</div>
 												</div>
-												<div className="flex flex-col">
-													<p className="text-sm capitalize text-gray-500">
-														{card.lessonName}
-													</p>
-													<p className="text-base font-medium capitalize">
-														{card.courseName}
-													</p>
-													<p className="text-sm capitalize text-gray-500">
-														{card.longClassName}
-													</p>
-												</div>
+												<Button
+													color="warning"
+													onClick={
+														isMobile
+															? () => handleShowModalEditFormMobile(card.id)
+															: isTablet
+															? () => handleShowModalEditFormTablet(card.id)
+															: () => handleShowEditForm(card.id)
+													}
+												>
+													Edit
+												</Button>
 											</div>
-											<Button
-												color="warning"
-												onClick={
-													isMobile
-														? () => handleShowModalEditFormMobile(card.id)
-														: isTablet
-														? () => handleShowModalEditFormTablet(card.id)
-														: () => handleShowEditForm(card.id)
-												}
-											>
-												Edit
-											</Button>
 										</div>
-									</div>
-								))
-							) : (
-								<p className="text-center text-gray-400">
-									Tidak ada hasil pencarian yang sesuai.
-								</p>
-							)}
+									))
+								) : (
+									<p className="text-center text-gray-400">
+										Tidak ada hasil pencarian yang sesuai.
+									</p>
+								)}
 
-							{filteredData.length === 0 && searchTerm.length === 0 && (
-								<p className="text-center text-gray-400">
-									Tidak ada data yang sesuai dengan pilihan pelajaran yang
-									dipilih.
-								</p>
-							)}
+								{filteredData.length === 0 && searchTerm.length === 0 && (
+									<p className="text-center text-gray-400">
+										Tidak ada data yang sesuai dengan pilihan pelajaran yang
+										dipilih.
+									</p>
+								)}
 
-							{/* {filteredData.length === 0 && searchTerm.length > 0 && (
+								{/* {filteredData.length === 0 && searchTerm.length > 0 && (
 								<p className="text-center text-gray-400">
 									Tidak ada hasil pencarian yang sesuai.
 								</p>
 							)} */}
+							</div>
 						</div>
 					</div>
 					{/* right side */}
 					{showAddForm && (
-						<div>
+						<div className="fixed right-4 top-6 w-2/5 max-h-screen overflow-y-auto">
 							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
 								<div className="flex justify-between">
 									<p className="text-gray-500 text-xl font-bold">
@@ -645,9 +669,8 @@ const MateriGuru = ({ id }: { id: string }) => {
 									<p className="mt-2">Deskripsi</p>
 									<textarea
 										className="mt-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-										id="comment"
-										value={form.Description}
-										{...register(`Description`)}
+										id="Description"
+										{...register(`Description`, { required: true })}
 										onChange={handleInputChange}
 										placeholder="Masukkan deskripsi tugas disini..."
 										required
@@ -696,7 +719,6 @@ const MateriGuru = ({ id }: { id: string }) => {
 											<TextInput
 												id="link"
 												type="text"
-												value={form.LinkCourse}
 												{...register("LinkCourse")}
 												onChange={handleInputChange}
 												placeholder="Masukkan url atau link yang valid disini"
@@ -707,6 +729,8 @@ const MateriGuru = ({ id }: { id: string }) => {
 									{/* Tombol submit */}
 									<input
 										type="submit"
+										disabled={createMateri.isPending}
+										value={createMateri.isPending ? "Menyimpan..." : "Simpan"}
 										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
 									/>
 								</form>
