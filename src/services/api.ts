@@ -660,7 +660,7 @@ export const createMateri = async (data: UploadMateri) => {
 	}
 };
 
-export const getClassRooms = async () => {
+export const getClassRoomsByTeacherId = async () => {
 	try {
 		const response = await axios.get<Ikelas>(
 			`${BASE_URL}/api/ClassRooms/classRoomTeacherId`,

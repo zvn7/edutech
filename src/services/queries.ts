@@ -16,6 +16,7 @@ import {
 	getUserInfo,
   getGuru,
   getGuruById,
+  getClassRoomsByTeacherId,
 } from "./api";
 import {
 	getAssignments,
@@ -299,13 +300,6 @@ export function useTeacherinfo() {
 // 	});
 // }
 
-export function useClassRooms() {
-	return useQuery({
-		queryKey: ["classRooms"],
-		queryFn: getClassRooms,
-	});
-}
-
 export function useGetMapelByGuru() {
 	return useQuery({
 		queryKey: ["lessonByTeacher"],
@@ -330,6 +324,6 @@ export function useCourseById(id: string) {
 export function useGetClassrooms(){
     return useQuery({
         queryKey: ["classrooms"],
-        queryFn: getClassRooms
+        queryFn: getClassRoomsByTeacherId
     })
 }
