@@ -9,8 +9,9 @@ import { Pengumpulan } from "../types/pengumpulan";
 import { Mapel } from "../types/mapel";
 import { Jadwal } from "../types/jadwal";
 import { Kehadiran } from "../types/kehadiran";
+import { Classrooms } from "../types/kelas";
 
-const BASE_URL = "http://192.168.144.239:13311";
+const BASE_URL = "http://192.168.139.239:13311";
 
 // login
 export const postLogin = async (data: LoginUser) => {
@@ -189,6 +190,23 @@ const getClassRoomIdFromToken = (): string | null => {
 	return null;
 };
 
+export const getClassRooms = async (data: Classrooms) => {
+	try {
+		const response = await axios.get<Classrooms[]>(
+			`${BASE_URL}/api/ClassRooms`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
+};
+
 export const getAssignmentSubmissionsIds = async () => {
 	return (
 		await axios.get<Pengumpulan[]>(`${BASE_URL}/api/AssignmentSubmissions`, {
@@ -294,13 +312,17 @@ export const editAssignmentSubmission = async (data: any) => {
 };
 
 export const getLessonsIds = async () => {
-	return (
-		await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons`, {
+	try {
+		const response = await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons`, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
 		})
-	).data.map((lesson) => lesson.id);
+		return response.data
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");		
+	}
 };
 
 export const getLessons = async (id: number) => {
@@ -325,6 +347,37 @@ export const getSchedulesIds = async () => {
 			},
 		})
 	).data.map((schedules) => schedules);
+};
+
+
+// create jadwal admin
+export const createSchedules = async(data:Jadwal)=>{
+	try {
+		const response = await axios.post(`${BASE_URL}/api/schedules`,data,{
+			headers:{
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
+		return response.data
+	} catch (error) {
+		console.error("Failed to post assignments:", error);
+		throw new Error("Failed to post assignments");
+	}
+}
+
+// hapus jadwal
+export const deleteSchedule = async (id: string) => {
+	try {
+		const response = await axios.delete(`${BASE_URL}/api/Schedules/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
 };
 
 // export const getSchedules = async (id: number) => {
@@ -500,23 +553,7 @@ export const editSiswa = async (id: string, data: UserSiswa) => {
 	}
 };
 
-// get guru
-export const getGuru = async () => {
-	try {
-		const response = await axios.get<UserGuru[]>(
-			`${BASE_URL}/api/Account/teachers`,
-			{
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
-			}
-		);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		throw new Error("Failed to get data");
-	}
-};
+
 
 // get absensi siswa
 export const getAbsensi = async () => {
@@ -563,3 +600,57 @@ export const createMateri = async (data: IMateriGuru) => {
 		console.error("Failed to post materi:", error);
 	}
 };
+
+
+// awal api guru
+
+// get guru
+export const getGuru = async () => {
+	try {
+		const response = await axios.get<UserGuru[]>(
+			`${BASE_URL}/api/Account/teachers`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
+};
+
+// get guru by id
+export const getGuruById = async (id: string)=>{
+	try {
+		const response = await axios.get<UserGuru>(`${BASE_URL}/api/Account/teacher/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
+}
+
+// create guru
+export const createGuru = async (data: UserGuru) => {
+	try {
+		const response = await axios.post(`${BASE_URL}/api/Account/register/teacher`, data, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.error("Terjadi Kesalahan ketika ");
+		throw new Error("Failed to post data");
+	}
+};
+
+// akhir api guru

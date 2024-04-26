@@ -1,6 +1,6 @@
 
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { getAbsensi, getGuru, getMapel, getMapelIds, getSiswa, getSiswaIds, getTeacherinfo, getUserInfo } from "./api";
+import { getAbsensi, getClassRooms, getGuru, getGuruById, getMapel, getMapelIds, getSiswa, getSiswaIds, getTeacherinfo, getUserInfo } from "./api";
 import {
 	getAssignments,
 	getAssignmentsIds,
@@ -92,6 +92,14 @@ export function useGetGuru(){
         queryKey:["guru"],
         queryFn:getGuru
     })
+}
+
+// get guru by id
+export function useGuruDetail(id:string){
+	return useQuery({
+		queryKey:["guru",id],
+		queryFn:()=>getGuruById(id)
+	})
 }
 
 // get absensi
@@ -259,3 +267,9 @@ export function useTeacherinfo() {
 // 	});
 // }
 
+export function useGetClassrooms(){
+    return useQuery({
+        queryKey: ["classrooms"],
+        queryFn: getClassRooms
+    })
+}

@@ -30,7 +30,7 @@ const EditSiswa = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.144.239:13311/api/Account/student/${id}`,
+          `http://192.168.139.239:13311/api/Account/student/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -67,7 +67,7 @@ const EditSiswa = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://192.168.144.239:13311/api/Account/edit/student/${id}`,
+        `http://192.168.139.239:13311/api/Account/edit/student/${id}`,
         formData,
         {
           headers: {
@@ -202,6 +202,14 @@ const EditSiswa = () => {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                       placeholder="masukkan nomor telepon"
                       required
+                      onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.currentTarget.setCustomValidity(
+                          "Nomor Telepon tidak boleh kosong"
+                        )
+                      }
+                      onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.currentTarget.setCustomValidity("")
+                      }
                     />
                     <span className="text-sm text-red-500">
                       * no.tlp mulai dari 0

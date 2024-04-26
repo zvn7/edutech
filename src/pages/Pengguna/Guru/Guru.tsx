@@ -7,7 +7,7 @@ const Guru = () => {
       <Navigation />
       <div className="p-4 sm:ml-64">
         <div className="mt-14">
-          <h1 className="text-3xl font-bold capitalize font-mono">
+          <h1 className="text-3xl font-bold capitalize">
             Daftar Guru
           </h1>
         </div>

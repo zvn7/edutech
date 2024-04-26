@@ -3,16 +3,23 @@ import { useGetAbsensi } from "../../../services/queries";
 
 const TabelAbsensi = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("januari");
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedClass, setSelectedClass] = useState("semua");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const absensiQuery = useGetAbsensi();
   const { data, isLoading: isAbsensiLoading } = absensiQuery;
 
   // Fungsi untuk mendapatkan jumlah hari dalam bulan
   const getDaysInMonth = (month: string) => {
+    // Ubah bulan menjadi huruf kecil untuk konsistensi
+    const lowercaseMonth = month.toLowerCase();
+
     // Definisikan jumlah hari dalam setiap bulan
     const daysInMonthMap: { [key: string]: number } = {
       januari: 31,
-      februari: 29, // Anda mungkin perlu penanganan khusus untuk tahun kabisat
+      februari: 28, // Ubah menjadi 28 untuk tahun non-kabisat
       maret: 31,
       april: 30,
       mei: 31,
@@ -25,10 +32,21 @@ const TabelAbsensi = () => {
       desember: 31,
     };
 
-    return daysInMonthMap[month];
-  };
+    // Penanganan khusus untuk bulan Februari pada tahun kabisat
+    if (lowercaseMonth === "februari") {
+      const currentYear = new Date().getFullYear();
+      // Tambahkan pengecekan tahun kabisat
+      if (
+        (currentYear % 4 === 0 && currentYear % 100 !== 0) ||
+        currentYear % 400 === 0
+      ) {
+        // Jika tahun kabisat, ubah jumlah hari Februari menjadi 29
+        daysInMonthMap.februari = 29;
+      }
+    }
 
-  const [selectedClass, setSelectedClass] = useState("semua");
+    return daysInMonthMap[lowercaseMonth];
+  };
 
   const filteredData =
     selectedClass === "semua"
@@ -38,21 +56,48 @@ const TabelAbsensi = () => {
             uniqueNumberOfClassRoom === selectedClass
         ) || [];
 
+  const totalPages = Math.ceil(
+    (filteredData ? filteredData.length : 0) / pageSize
+  );
+
+  const handlePageSizeChange = (e: any) => {
+    setPageSize(Number(e.target.value));
+  };
+
+  const handleClassChange = (e: any) => {
+    setSelectedClass(e.target.value);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+  };
+
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
+  };
+
+  const searchFilter = (absensi: any) => {
+    return absensi.nameStudent.toLowerCase().includes(searchTerm.toLowerCase());
+  };
   return (
     <div className="shadow-md sm:rounded-lg bg-white">
       <div className="flex flex-column sm:flex-row flex-wrap items-center justify-between pt-3 pb-4 px-4 gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
+          <select
+            value={pageSize}
+            onChange={handlePageSizeChange}
             className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
           >
             {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
+              <option key={pageSize} value={pageSize} className="text-normal">
                 {pageSize} data
               </option>
             ))}
-          </select> */}
+          </select>
 
           <select
             value={selectedClass}
@@ -108,6 +153,8 @@ const TabelAbsensi = () => {
             <input
               type="text"
               id="table-search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="block p-1.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-56 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 capitalize"
               placeholder="Cari absensi disini..."
             />
@@ -138,54 +185,57 @@ const TabelAbsensi = () => {
         </div>
       </div>
 
-      <div className="w-full overflow-y-auto overflow-x-auto">
-        <table className="w-full h-5 text-sm text-left rtl:text-right text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
-            <tr>
+      <div className="w-full overflow-y-auto overflow-x-auto h-96">
+        <table className="w-full border-collapse text-sm text-left rtl:text-right text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-white sticky top-0 z-50">
+            <tr className="border-2">
               <th
                 rowSpan={3}
-                className="sticky left-0 bg-gray-100 border-2 px-6 py-3 text-center"
+                className="bg-white left-0 z-50 border-2 px-6 py-3 text-center"
               >
                 No
               </th>
               <th
                 rowSpan={3}
-                className="sticky left-0 bg-gray-100 border-2 px-6 py-3 text-center"
+                className="bg-white left-16 z-50 border-2 px-6 py-3 text-center"
               >
                 Nama lengkap
               </th>
-
               <th
-                colSpan={getDaysInMonth(selectedMonth) * 3}
-                className="border-2 px-2 py-2"
+                colSpan={getDaysInMonth(selectedMonth)}
+                className="px-2 py-2 border-2"
               >
                 Tanggal
               </th>
             </tr>
 
-            <tr>
-              {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => (
-                <th
-                  key={day + 1}
-                  colSpan={3}
-                  className="border-2 text-center py-2"
-                >
-                  {day + 1}
-                </th>
-              ))}
+            <tr className="border-2">
+              {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => {
+                // Tambahkan 1 pada indeks bulan untuk mendapatkan tanggal yang sesuai
+                const date = day;
+                return (
+                  <th
+                    key={day + 1}
+                    // colSpan={3}
+                    className="text-center py-2 border-2"
+                  >
+                    {date}
+                  </th>
+                );
+              })}
             </tr>
-            <tr>
+            <tr className="border-2">
               {[...Array(getDaysInMonth(selectedMonth)).keys()].map((day) => (
                 <>
                   <th key={day + 1} className="border-2 text-center px-6 py-3">
-                    Hadir
+                    keterangan
                   </th>
-                  <th key={day + 1} className="border-2 text-center px-6 py-3">
+                  {/* <th key={day + 1} className="border-2 text-center px-6 py-3">
                     ijin
                   </th>
                   <th key={day + 1} className="border-2 text-center px-6 py-3">
                     Alfa
-                  </th>
+                  </th> */}
                 </>
               ))}
             </tr>
@@ -252,47 +302,100 @@ const TabelAbsensi = () => {
               ))} */}
             {!isAbsensiLoading &&
               (filteredData && filteredData.length > 0 ? (
-                filteredData.map((absensi, index) => (
-                  <tr className="bg-white border-b hover:bg-gray-50">
-                    <td className="sticky left-0 bg-white border-e-2 px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
-                      {index + 1}
-                    </td>
-                    <td className="sticky left-0 bg-white border-e-2 px-4 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
-                      {absensi.nameStudent}
-                    </td>
-
-                    {[...Array(getDaysInMonth(selectedMonth)).keys()].map(
-                      (day) => (
+                filteredData.filter(searchFilter).map((absensi, index) => (
+                  <tr className="bg-white border-2 hover:bg-gray-50">
+                    {index >= currentPage * pageSize &&
+                      index < (currentPage + 1) * pageSize && (
                         <>
-                          <td key={day + 1} className="border-2 text-center">
-                            {absensi.attendanceStudent &&
-                            absensi.attendanceStudent[day]?.status === 1
-                              ? "✅"
+                          <td className=" sticky left-0 bg-white px-6 py-4 font-medium text-gray-900 capitalize">
+                            {index + 1}
+                          </td>
+                          <td className="sticky left-16 bg-white border-2 px-4 py-4 font-medium text-gray-900 whitespace-nowrap capitalize">
+                            {absensi.nameStudent}
+                          </td>
+
+                          {/* {[...Array(getDaysInMonth(selectedMonth)).keys()].map(
+                      (day) => {
+                        const absensiDate = new Date(
+                          `${selectedMonth} ${
+                            day + 1
+                          }, ${new Date().getFullYear()}`
+                        );
+                        const absensiDateString = absensiDate
+                          .toISOString()
+                          .slice(0, 10);
+                        const attendance = absensi.attendanceStudent || [];
+                        const attendanceStatus = attendance.find(
+                          (attendance) => attendance.date === absensiDateString
+                        )?.status;
+                        return (
+                          <td
+                            key={day + 1}
+                            className="border-2 text-center font-medium text-black"
+                          >
+                            {attendanceStatus
+                              ? attendanceStatus === 1
+                                ? "Hadir"
+                                : attendanceStatus === 2
+                                ? "Ijin"
+                                : "Alfa"
                               : "-"}
                           </td>
-                          <td key={day + 1} className="border-2 text-center">
-                            {absensi.attendanceStudent &&
-                            absensi.attendanceStudent[day]?.status === 2
-                              ? "✅"
-                              : "-"}
-                          </td>
-                          <td key={day + 1} className="border-2 text-center">
-                            {absensi.attendanceStudent &&
-                            absensi.attendanceStudent[day]?.status === 3
-                              ? "✅"
-                              : "-"}
-                          </td>
+                        );
+                      }
+                    )} */}
+                          {[...Array(getDaysInMonth(selectedMonth)).keys()].map(
+                            (day) => {
+                              // Tambahkan 1 pada indeks bulan untuk mendapatkan tanggal yang sesuai
+                              const date = day + 1;
+                              // Buat tanggal dengan format yang sesuai
+                              const absensiDate = new Date(
+                                `${selectedMonth} ${date}, ${new Date().getFullYear()}`
+                              );
+                              // Ubah tanggal menjadi string dengan format ISO
+                              const absensiDateString = absensiDate
+                                .toISOString()
+                                .slice(0, 10);
+                              // Temukan status kehadiran siswa untuk tanggal yang bersangkutan
+                              const attendanceStatus =
+                                absensi?.attendanceStudent?.find(
+                                  (attendance) =>
+                                    attendance.date === absensiDateString
+                                )?.status;
+
+                              return (
+                                <td
+                                  key={day + 1}
+                                  className="border-2 text-center font-medium text-black"
+                                >
+                                  {attendanceStatus ? (
+                                    attendanceStatus === 1 ? (
+                                      <span className="bg-blue-100 text-blue-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                        Hadir
+                                      </span>
+                                    ) : attendanceStatus === 2 ? (
+                                      <span className="bg-yellow-100 text-yellow-600 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                        Ijin
+                                      </span>
+                                    ) : (
+                                      <span className="bg-red-100 text-red-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                        alfa
+                                      </span>
+                                    )
+                                  ) : (
+                                    "-"
+                                  )}
+                                </td>
+                              );
+                            }
+                          )}
                         </>
-                      )
-                    )}
+                      )}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={getDaysInMonth(selectedMonth) + 2}
-                    className="text-center"
-                  >
+                  <td colSpan={getDaysInMonth(selectedMonth) + 2}>
                     No data available
                   </td>
                 </tr>
@@ -301,156 +404,69 @@ const TabelAbsensi = () => {
         </table>
       </div>
 
-      <div className="px-4 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {/* <span className="flex items-center gap-1">
-            <div className="capitalize">halaman</div>
-            <strong className="capitalize">
-              {table.getState().pagination.pageIndex + 1} dari{" "}
-              {table.getPageCount()}
-            </strong>
-          </span>
-
-          <nav aria-label="Page navigation example">
-            <ul className="flex items-center -space-x-px h-10 text-base">
-              <li>
-                <button
-                  className="flex items-center justify-center px-4 h-9 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 "
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 1 1 5l4 4"
-                    />
-                  </svg>
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 1 1 5l4 4"
-                    />
-                  </svg>
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white "
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 1 1 5l4 4"
-                    />
-                  </svg>
-                </button>
-              </li>
-              <li>
-                <input
-                  type="number"
-                  defaultValue={table.getState().pagination.pageIndex + 1}
-                  onChange={(e) => {
-                    const page = e.target.value
-                      ? Number(e.target.value) - 1
-                      : 0;
-                    table.setPageIndex(page);
-                  }}
-                  className="flex items-center justify-center w-14 text-center h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 "
-                  placeholder="1"
-                />
-              </li>
-              <li>
-                <button
-                  className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
-                  <svg
-                    className="w-3 h-3 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
-                </button>
-              </li>
-            </ul>
-          </nav> */}
+      <div className="flex items-center justify-between flex-wrap gap-2 p-4">
+        <span className="flex items-center gap-1">
+          <div className="capitalize">halaman</div>
+          <strong className="capitalize">
+            {currentPage + 1} dari {totalPages}
+          </strong>
+        </span>
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 0}
+            className="mr-2 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+          >
+            <svg
+              className="w-3 h-3 rtl:rotate-180"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 1 1 5l4 4"
+              />
+            </svg>
+          </button>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => goToPage(index)}
+              className={`mr-2 px-4 py-2 h-10 ${
+                currentPage === index
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-800"
+              } rounded`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages - 1}
+            className="ml-1 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+          >
+            <svg
+              className="w-3 h-3 rtl:rotate-180"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="m1 9 4-4-4-4"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

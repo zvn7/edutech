@@ -10,6 +10,7 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedClass, setSelectedClass] = useState("semua");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const siswaQuery = useGetSiswaId();
 
@@ -112,8 +113,6 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
     return `${date} ${months[month - 1]} ${year}`;
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-
   // Fungsi untuk mencari data berdasarkan nama lengkap dan NIS
   const searchFilter = (siswa: any) => {
     return (
@@ -121,6 +120,7 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
       siswa.className.toUpperCase().includes(searchTerm.toUpperCase())
     );
   };
+
   return (
     <>
       <div className="shadow-md sm:rounded-lg bg-white">
@@ -233,7 +233,7 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
         </div>
         <div className="relative overflow-x-auto">
           <table className="w-full uppertext-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-900 uppercase bg-gray-100 ">
+            <thead className="text-xs text-gray-900 uppercase bg-gray-100">
               <th className="px-6 py-3">No</th>
               <th className="px-6 py-3">Nama Lengkap</th>
               <th className="px-6 py-3">nis</th>

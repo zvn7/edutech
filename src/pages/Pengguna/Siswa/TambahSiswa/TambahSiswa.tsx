@@ -43,7 +43,7 @@ const TambahSiswa = () => {
       onSuccess: () => {
         Swal.fire({
           icon: "success",
-          title: "Siswa Berhasil ditambahkan!",
+          title: "Berhasil",
           text: "Siswa Berhasil ditambahkan!",
           confirmButtonText: "Ok",
         }).then((result) => {
