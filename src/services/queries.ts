@@ -1,8 +1,12 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import {
 	getAbsensi,
+	getAssigmentByClassroomId,
+	getAssigmentByTeacherId,
 	getClassRooms,
+	getCourseById,
 	getGuru,
+	getLessonByTeacherId,
 	getMapel,
 	getMapelClassroom,
 	getMapelIds,
@@ -20,13 +24,11 @@ import {
 	getAttendancesIds,
 	getCourse,
 	getCourseClassroom,
-	getCourseClassroomIds,
 	getCourseIds,
 	getLessons,
 	getLessonsIds,
 	getSchedulesIds,
 } from "./api";
-import { CourseClassroom } from "../types/materi";
 
 // queries get user login
 export function useUserLogin() {
@@ -136,14 +138,28 @@ export function useAssignmentsIds() {
 	});
 }
 
-export function useAssignments(ids: (number | undefined)[] | undefined) {
+export function useAssignmentsByTeacherId() {
+	return useQuery({
+		queryKey: ["assignmentsByTeacherId"],
+		queryFn: getAssigmentByTeacherId,
+	});
+}
+
+export function useAssigmentDetail(ids: (string | undefined)[] | undefined) {
 	return useQueries({
 		queries: (ids ?? []).map((id) => {
 			return {
-				queryKey: ["assignments", id],
+				queryKey: ["assigmentDetail", id],
 				queryFn: () => getAssignments(id!),
 			};
 		}),
+	});
+}
+
+export function useAssignments() {
+	return useQuery({
+		queryKey: ["assignmentsByClassroomId"],
+		queryFn: getAssigmentByClassroomId,
 	});
 }
 
@@ -277,5 +293,26 @@ export function useClassRooms() {
 	return useQuery({
 		queryKey: ["classRooms"],
 		queryFn: getClassRooms,
+	});
+}
+
+export function useGetMapelByGuru() {
+	return useQuery({
+		queryKey: ["lessonByTeacher"],
+		queryFn: getLessonByTeacherId,
+	});
+}
+
+// export function useSiswaDetail(id: string) {
+// 	return useQuery({
+// 		queryKey: ["siswa", id],
+// 		queryFn: () => getSiswa(id),
+// 	});
+// }
+
+export function useCourseById(id: string) {
+	return useQuery({
+		queryKey: ["course", id],
+		queryFn: () => getCourseById(id),
 	});
 }

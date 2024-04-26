@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navigation from "../../../component/Navigation/Navigation";
 import { Table } from "flowbite-react";
 import {
+	useAssigmentDetail,
 	useAssignments,
 	useAssignmentsIds,
 	useAttendances,
@@ -13,8 +14,8 @@ import {
 import React from "react";
 
 const BerandaSiswa = () => {
-	const assignmentsIdsQuery = useAssignmentsIds();
-	const assignmentsQueries = useAssignments(assignmentsIdsQuery.data);
+	const assignmentsIdsQuery = useAssignments();
+	const assignmentsQueries = useAssigmentDetail(assignmentsIdsQuery.data);
 	// const courseIdsQuery = useCourseIds();
 	// const courseQueries = useCourse(courseIdsQuery.data);
 	const courseClassroom = useCourseClassroom();
@@ -35,10 +36,21 @@ const BerandaSiswa = () => {
 	const nameStudent = getNameStudentFromToken();
 
 	const formatDate = (dateString: any) => {
-		const parsedDate = new Date(dateString);
-		const options = { day: "numeric", month: "long", year: "numeric" };
-		const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
-		return dateFormatter.format(parsedDate);
+		try {
+			const parsedDate = new Date(dateString);
+			// Periksa apakah parsedDate adalah waktu yang valid
+			if (isNaN(parsedDate.getTime())) {
+				// Jika parsedDate tidak valid, kembalikan string "Invalid Date"
+				return "Invalid Date";
+			}
+			const options = { day: "numeric", month: "long", year: "numeric" };
+			const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
+			return dateFormatter.format(parsedDate);
+		} catch (error) {
+			console.error("Error formatting date:", error);
+			// Jika terjadi kesalahan dalam pemformatan, kembalikan string kosong
+			return "";
+		}
 	};
 
 	return (
@@ -81,10 +93,13 @@ const BerandaSiswa = () => {
 												</div>
 												<div className="flex flex-col">
 													<p className="text-sm capitalize text-gray-500">
-														{course.nameTeacher}
+														{course.lessonName}
 													</p>
-													<p className="text-md text-xl font-semibold text-gray-900">
+													<p className="text-md font-semibold text-gray-900">
 														{course.courseName}
+													</p>
+													<p className="text-sm capitalize text-gray-500">
+														{course.nameTeacher}
 													</p>
 												</div>
 											</div>
@@ -127,7 +142,7 @@ const BerandaSiswa = () => {
 											</div>
 											<div className="flex flex-col">
 												<p className="text-sm font-normal text-gray-500">
-													{data?.courseName}
+													{data?.lessonName}
 												</p>
 												<h2 className="text-md font-medium">
 													{data?.assignmentName}
@@ -150,7 +165,7 @@ const BerandaSiswa = () => {
 															/>
 														</svg>
 														<span className="text-sm text-gray-500">
-															{data?.assignmentDate}
+															{formatDate(data?.assignmentDate)}
 														</span>
 													</div>
 												</div>

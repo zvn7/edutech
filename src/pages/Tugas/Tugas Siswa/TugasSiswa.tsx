@@ -7,6 +7,7 @@ import {
 	useEditAssignmentSubmission,
 } from "../../../services/mutation";
 import {
+	useAssigmentDetail,
 	useAssignments,
 	useAssignmentsIds,
 	useAssignmentSubmissions,
@@ -19,8 +20,8 @@ const TugasSiswa = () => {
 	const [selectedCardId, setSelectedCardId] = useState(null);
 	const [isMobileView, setIsMobileView] = useState<boolean>(false);
 	const [selectedOption, setSelectedOption] = useState("file");
-	const assignmentsIdsQuery = useAssignmentsIds();
-	const assignmentsQueries = useAssignments(assignmentsIdsQuery.data);
+	const assignmentsIdsQuery = useAssignments();
+	const assignmentsQueries = useAssigmentDetail(assignmentsIdsQuery.data);
 	const assignmentSubmissionsQueries = useAssignmentSubmissions([
 		selectedCardId,
 	]);
@@ -43,7 +44,7 @@ const TugasSiswa = () => {
 	// const fetchAssignmentId = async () => {
 	//     try {
 	//         // Mengambil assignmentId dari link API
-	//         const response = await axios.get('http://192.168.144.239:13311/api/Assignments/{id}');
+	//         const response = await axios.get('http://192.168.139.239:13311/api/Assignments/{id}');
 	//         // Set assignmentId yang diperoleh dari respons server
 	//         setAssignmentId(response.data.assignmentId);
 	//     } catch (error) {
@@ -183,6 +184,55 @@ const TugasSiswa = () => {
 		setSelectedCard(null);
 	};
 
+	const formatDate = (dateString: any) => {
+		try {
+			const parsedDate = new Date(dateString);
+			// Periksa apakah parsedDate adalah waktu yang valid
+			if (isNaN(parsedDate.getTime())) {
+				// Jika parsedDate tidak valid, kembalikan string "Invalid Date"
+				return "Invalid Date";
+			}
+			const options = { day: "numeric", month: "long", year: "numeric" };
+			const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
+			return dateFormatter.format(parsedDate);
+		} catch (error) {
+			console.error("Error formatting date:", error);
+			// Jika terjadi kesalahan dalam pemformatan, kembalikan string kosong
+			return "";
+		}
+	};
+
+	const handleFileDownload = async (id, assignmentfileName) => {
+		if (id === "No File available") {
+			alert("No file available to download");
+			return;
+		}
+
+		try {
+			const response = await axios.get(
+				`http://192.168.139.239:13311/api/Assignments/download/${id}`,
+				{
+					responseType: "blob",
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+
+			const blob = new Blob([response.data], { type: "application/pdf" });
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.setAttribute("download", assignmentfileName);
+			document.body.appendChild(link);
+			link.click();
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error downloading file:", error);
+			alert("Error downloading file. Please try again later.");
+		}
+	};
+
 	return (
 		<div>
 			<Navigation />
@@ -195,72 +245,77 @@ const TugasSiswa = () => {
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{assignmentsQueries.map(({ data }) => (
-								<div
-									key={data?.id}
-									onClick={() => handleCardClick(data?.id)}
-									className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
-								>
-									<div
-										className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
-											selectedCardId === data?.id
-												? "bg-[#fdefc8] rounded-lg"
-												: ""
-										}`}
-									>
-										<div className="flex gap-3">
-											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
-												<svg
-													className="w-12 h-12 text-blue-600 dark:text-white"
-													aria-hidden="true"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														fill-rule="evenodd"
-														d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-														clip-rule="evenodd"
-													/>
-												</svg>
-											</div>
-											<div className="flex flex-col">
-												<p className="text-sm font-normal text-gray-500">
-													{data?.courseName}
-												</p>
-												<h2 className="text-md font-medium">
-													{data?.assignmentName}
-												</h2>
-												<div className="flex flex-wrap gap-2 ">
-													<div className="flex gap-1">
+							{assignmentsQueries.map(
+								({ data }) => (
+									console.log(data),
+									(
+										<div
+											key={data?.id}
+											onClick={() => handleCardClick(data?.id)}
+											className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
+										>
+											<div
+												className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
+													selectedCardId === data?.id
+														? "bg-[#fff8e5] rounded-lg"
+														: ""
+												}`}
+											>
+												<div className="flex gap-3">
+													<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 														<svg
-															className="w-5 h-5 text-gray-500"
+															className="w-12 h-12 text-blue-600 dark:text-white"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
+															fill="currentColor"
 															viewBox="0 0 24 24"
 														>
 															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+																fill-rule="evenodd"
+																d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+																clip-rule="evenodd"
 															/>
 														</svg>
-														<span className="text-sm text-gray-500">
-															{data?.assignmentDate}
-														</span>
+													</div>
+													<div className="flex flex-col">
+														<p className="text-sm font-normal text-gray-500">
+															{data?.lessonName}
+														</p>
+														<h2 className="text-md font-medium">
+															{data?.assignmentName}
+														</h2>
+														<div className="flex flex-wrap gap-2 ">
+															<div className="flex gap-1">
+																<svg
+																	className="w-5 h-5 text-gray-500"
+																	aria-hidden="true"
+																	xmlns="http://www.w3.org/2000/svg"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																>
+																	<path
+																		stroke="currentColor"
+																		strokeLinecap="round"
+																		strokeLinejoin="round"
+																		strokeWidth="2"
+																		d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+																	/>
+																</svg>
+																<span className="text-sm text-gray-500">
+																	{formatDate(data?.assignmentDate)}
+																</span>
+															</div>
+														</div>
 													</div>
 												</div>
+												<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
+													{data?.assignmentStatus}
+												</span>
 											</div>
 										</div>
-										<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
-											status
-										</span>
-									</div>
-								</div>
-							))}
+									)
+								)
+							)}
 						</div>
 					</div>
 					{/* right side */}
@@ -520,7 +575,16 @@ const TugasSiswa = () => {
 													: selectedCard.assignmentDescription}
 											</p>
 											<h1 className="text-2xl font-bold mt-8">Tugas</h1>
-											<div className="mt-5 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]">
+											<div
+												className="mt-5 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+												onClick={() =>
+													handleFileDownload(
+														selectedCard.id,
+														selectedCard.assignmentfileName
+													)
+												}
+												style={{ cursor: "pointer" }}
+											>
 												<div className="flex gap-3">
 													<div className="bg-white rounded-lg h-14 flex items-center">
 														<svg
@@ -654,8 +718,13 @@ const TugasSiswa = () => {
 											{assignmentSubmissionsData &&
 												assignmentSubmissionsData.map(
 													(assignmentSubmission, index) => {
-														const { isLoading, error } =
+														const assignmentSubmissionQuery =
 															assignmentSubmissionsQueries[index];
+
+														if (!assignmentSubmissionQuery) return null; // Tambahkan pemeriksaan nol di sini
+
+														const { isLoading, error } =
+															assignmentSubmissionQuery;
 
 														if (isLoading) return <p>Loading...</p>;
 														if (error) return <p>Error: {error.message}</p>;

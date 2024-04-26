@@ -18,13 +18,11 @@ const MateriSiswa = () => {
 	// const courseQueries = useCourse(courseIdsQuery.data);
 	// const lessonsIdsQuery = useLessonsIds();
 	const lessonsQueries = useLessonsClassroom();
-	const {data: formLesson } = lessonsQueries;
+	const { data: formLesson } = lessonsQueries;
 	const [selectedSubject, setSelectedSubject] = useState("");
 	const courseClassroom = useCourseClassroom();
 	const { data: formData } = courseClassroom;
 	console.log("formData", formData);
-	
-	
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -43,7 +41,7 @@ const MateriSiswa = () => {
 		setIsLoading(true); // Set isLoading menjadi true sebelum memuat data
 		try {
 			const response = await fetch(
-				`http://192.168.144.239:13311/api/Courses/${id}`,
+				`http://192.168.139.239:13311/api/Courses/${id}`,
 				{
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -80,7 +78,7 @@ const MateriSiswa = () => {
 
 		try {
 			const response = await axios.get(
-				`http://192.168.144.239:13311/api/Courses/download/${id}`,
+				`http://192.168.139.239:13311/api/Courses/download/${id}`,
 				{
 					responseType: "blob",
 					headers: {
@@ -128,7 +126,7 @@ const MateriSiswa = () => {
 										{item?.lessonName}
 									</option>
 								))}
-							</select>   
+							</select>
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
@@ -162,13 +160,13 @@ const MateriSiswa = () => {
 												</div>
 												<div className="flex flex-col">
 													<p className="text-sm capitalize text-gray-500">
-														{course.nameTeacher}
+														{course.lessonName}
 													</p>
 													<p className="text-md font-semibold text-gray-900">
 														{course.courseName}
 													</p>
 													<p className="text-sm capitalize text-gray-500">
-														{course.lessonName}
+														{course.nameTeacher}
 													</p>
 												</div>
 											</div>

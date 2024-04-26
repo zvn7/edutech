@@ -3,7 +3,12 @@ import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
 import { IMapel } from "../types/mapel";
 import { Absensi } from "../types/absensi";
-import { CourseClassroom, IMateriGuru } from "../types/materi";
+import {
+	CourseClassroom,
+	DetailMateri,
+	IMateriGuru,
+	UploadMateri,
+} from "../types/materi";
 import { Tugas } from "../types/tugas";
 import { Pengumpulan } from "../types/pengumpulan";
 import { Mapel } from "../types/mapel";
@@ -11,7 +16,7 @@ import { Jadwal } from "../types/jadwal";
 import { Kehadiran } from "../types/kehadiran";
 import { Ikelas } from "../types/kelas";
 
-const BASE_URL = "http://192.168.144.239:13311";
+const BASE_URL = "http://192.168.139.239:13311";
 
 // login
 export const postLogin = async (data: LoginUser) => {
@@ -93,11 +98,14 @@ export const getMapel = async (id: number) => {
 
 export const getMapelClassroom = async () => {
 	try {
-		const response = await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons/lessonClassRoomId`, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
+		const response = await axios.get<Mapel[]>(
+			`${BASE_URL}/api/Lessons/lessonClassRoomId`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -177,7 +185,43 @@ export const getAssignmentsIds = async () => {
 	).data.map((assignments) => assignments.id);
 };
 
-export const getAssignments = async (id: number) => {
+export const getAssigmentByTeacherId = async () => {
+	return (
+		await axios.get<Tugas[]>(
+			`${BASE_URL}/api/Assignments/getAssignmentByTeacherId`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		)
+	).data.map((assignments) => assignments);
+};
+
+export const getAssigmentByClassroomId = async () => {
+	return (
+		await axios.get<Tugas[]>(
+			`${BASE_URL}/api/Assignments/getAssignmentByClassRoomId`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		)
+	).data.map((assignments) => assignments.id);
+};
+
+// export const getAssignmentByTeacherId = async () => {
+// 	return (
+// 		await axios.get<Tugas[]>(`${BASE_URL}/api/Assignments/getAssignmentByTeacherId`, {
+// 			headers: {
+// 				Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 			},
+// 		})
+// 	).data.map((assignments) => assignments.id);
+// };
+
+export const getAssignments = async (id: string) => {
 	try {
 		const response = await axios.get<Tugas>(
 			`${BASE_URL}/api/Assignments/${id}`,
@@ -309,13 +353,17 @@ export const editAssignmentSubmission = async (data: any) => {
 };
 
 export const getLessonsIds = async () => {
-	return (
-		await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons`, {
+	try {
+		const response = await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons`, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
-		})
-	).data.map((lesson) => lesson.id);
+		});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to fetch Lessons");
+	}
 };
 
 export const getLessons = async (id: number) => {
@@ -565,10 +613,11 @@ export const getTeacherinfo = async () => {
 	}
 };
 
-export const createMateri = async (data: IMateriGuru) => {
+export const createMateri = async (data: UploadMateri) => {
 	try {
 		const response = await axios.post(`${BASE_URL}/api/Courses`, data, {
 			headers: {
+				"Content-Type": "multipart/form-data",
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
 		});
@@ -594,5 +643,59 @@ export const getClassRooms = async () => {
 		// Tangani kesalahan dengan tepat, seperti dengan menampilkan pesan kesalahan atau logging
 		console.error("Error fetching class rooms:", error);
 		throw error; // lemparkan kembali kesalahan untuk ditangani di tempat lain jika perlu
+	}
+};
+
+// get lesson by id guru
+export const getLessonByTeacherId = async () => {
+	try {
+		const response = await axios.get<Mapel[]>(
+			`${BASE_URL}/api/Lessons/lessonTeacherId`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		// Tangani kesalahan dengan tepat, seperti dengan menampilkan pesan kesalahan atau logging
+		console.error("Error fetching class rooms:", error);
+		throw error; // lemparkan kembali kesalahan untuk ditangani di tempat lain jika perlu
+	}
+};
+
+// export const getSiswa = async (id: string) => {
+// 	try {
+// 		const response = await axios.get<UserSiswa>(
+// 			`${BASE_URL}/api/Account/student/${id}`,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 		);
+// 		return response.data;
+// 	} catch (error) {
+// 		console.log(error);
+// 		throw new Error("Failed to get data");
+// 	}
+// };
+
+// get course by id
+export const getCourseById = async (id: string) => {
+	try {
+		const response = await axios.get<DetailMateri>(
+			`${BASE_URL}/api/Courses/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
 	}
 };

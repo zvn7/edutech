@@ -19,25 +19,51 @@ export interface CourseClassroom {
 
 export interface IMateriGuru {
 	teacherId: string;
-	lessons: [
-		{
-			id: string;
-			lessonName: string;
-			uniqueNumberOfLesson: string;
-		}
-	];
 	courses: [
 		{
 			id: string;
+			nameTeacher: string;
 			courseName: string;
 			description: string;
 			fileName: string;
 			linkCourse: string;
-			uniqueNumberOfLesson: string;
-			uniqueNumberOfClassRooms: [string];
-			classNames: [string];
+			className: string;
 			fileData: string;
 			lessonName: string;
+			longClassName: string;
 		}
 	];
+}
+
+export interface UploadMateri {
+	id: string;
+	CourseName: string;
+	Description: string;
+	FileData: string;
+	LinkCourse: string;
+	LessonName: string;
+	TeacherId: string;
+}
+
+export interface EditMateri {
+	id: string;
+	CourseName: string;
+	Description: string;
+	FileData: string;
+	LinkCourse: string;
+	LessonName: string;
+	TeacherId: string;
+}
+
+export interface DetailMateri {
+	id: string;
+	nameTeacher: string;
+	courseName: string;
+	description: string;
+	fileName: string;
+	linkCourse: string;
+	className: string;
+	fileData: string;
+	lessonName: string;
+	longClassName: string;
 }

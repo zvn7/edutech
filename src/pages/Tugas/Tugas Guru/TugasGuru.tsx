@@ -2,14 +2,7 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { Button, FileInput, Modal, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-
-interface CardInfo {
-	id: number;
-	modul: string;
-	tugas: string;
-	description: string;
-	file: string;
-}
+import { useAssignmentsByTeacherId } from "../../../services/queries";
 
 const TugasGuru = () => {
 	const [showAddForm, setShowAddForm] = useState(false);
@@ -21,6 +14,7 @@ const TugasGuru = () => {
 	const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isTablet, setIsTablet] = useState(false);
+	const assigmentQueries = useAssignmentsByTeacherId();
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -41,26 +35,6 @@ const TugasGuru = () => {
 	const handleOptionChange = (option: string) => {
 		setSelectedOption(option);
 	};
-
-	// Data sampel untuk kartu
-	const detailedCardInfo: CardInfo[] = [
-		{
-			id: 1,
-			modul: "Pemrograman Dasar",
-			tugas: "Pemrograman Dasar",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "pemrograman_dasar.pdf",
-		},
-		{
-			id: 2,
-			modul: "Basic Pemrograman",
-			tugas: "Basic Pemrograman",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			file: "basic_pemrograman.pdf",
-		},
-	];
 
 	const handleDeleteCard = (cardId: number) => {
 		// Use SweetAlert to confirm deletion
@@ -163,11 +137,6 @@ const TugasGuru = () => {
 		setisMobileModalOpenAdd(false);
 	};
 
-	// const handleCloseModalFormMobile = () => {
-	// 	setisMobileModalOpenAdd(false);
-	// 	setisMobileModalOpenEdit(false);
-	// };
-
 	const handleShowModalAddFormTablet = () => {
 		setisTabletModalOpenAdd(true);
 		setisTabletModalOpenEdit(false);
@@ -177,11 +146,6 @@ const TugasGuru = () => {
 		setisTabletModalOpenEdit(true);
 		setisTabletModalOpenAdd(false);
 	};
-
-	// const handleCloseModalFormTablet = () => {
-	// 	setisTabletModalOpenAdd(false);
-	// 	setisTabletModalOpenEdit(false);
-	// };
 
 	return (
 		<div>
@@ -310,8 +274,8 @@ const TugasGuru = () => {
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{detailedCardInfo.map((card) => (
-								<div key={card.id} className="cursor-pointer">
+							{assigmentQueries.data?.map((items) => (
+								<div key={items?.id} className="cursor-pointer">
 									<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
 										<div className="flex gap-3">
 											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
@@ -331,10 +295,10 @@ const TugasGuru = () => {
 											</div>
 											<div className="flex flex-col">
 												<p className="text-sm font-normal text-gray-500">
-													Basic Programing
+													{items?.lessonName}
 												</p>
 												<h2 className="text-md font-medium">
-													Membuat Flowchart
+													{items?.assignmentName}
 												</h2>
 												<div className="flex flex-wrap gap-2 ">
 													<div className="flex gap-1">
@@ -354,27 +318,7 @@ const TugasGuru = () => {
 															/>
 														</svg>
 														<span className="text-sm text-gray-500">
-															01 Januari 2024
-														</span>
-													</div>
-													<div className="flex gap-1">
-														<svg
-															className="w-5 h-5 text-gray-500"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke="currentColor"
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth="2"
-																d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-															/>
-														</svg>
-														<span className="text-sm text-gray-500 uppercase">
-															07:30 - 10:00 wib
+															{items?.assignmentDate}
 														</span>
 													</div>
 												</div>
