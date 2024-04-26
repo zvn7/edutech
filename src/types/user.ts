@@ -16,18 +16,20 @@ export interface UserLogin{
   uniqueNumber: string
 }
 
-export interface UserGuru{
-  id:string,
-  teacherId:string,
-  nameTeacher: string,
-  birthDate:string,
-  birthPlace: string,
-  address: string,
-  phoneNumber: string,
-  nip: string,
-  username: string,
-  password: string,
+export interface UserGuru {
+  id: string;
+  status: string;
+  nameTeacher: string;
+  birthDate: string;
+  birthPlace: string;
+  address: string;
+  phoneNumber: string;
+  nip: string;
+  gender: string;
+  lessonNames: string[];
+  classNames: string[];
 }
+
 
 export interface UserSiswa{
   id:string,

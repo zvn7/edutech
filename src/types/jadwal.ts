@@ -1,9 +1,11 @@
 export interface Jadwal {
     id: number,
     day: number,
-    startTime: string,
-    endTime: string,
+    startTime: number,
+    endTime: number,
     lessonName: string,
-    className: string,
+    className : string,
     nameTeacher: string
 }
+
+

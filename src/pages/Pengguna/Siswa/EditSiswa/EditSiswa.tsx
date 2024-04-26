@@ -25,18 +25,18 @@ const EditSiswa = () => {
 	});
 
 	const [loading, setLoading] = useState(false);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`http://192.168.139.239:13311/api/Account/student/${id}`,
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`,
-						},
-					}
-				);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.139.239:13311/api/Account/student/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
 				setFormData({
 					...formData,
@@ -64,35 +64,35 @@ const EditSiswa = () => {
 	const handleSubmitEdit = async (e: any) => {
 		e.preventDefault();
 
-		setLoading(true);
-		try {
-			const response = await axios.put(
-				`http://192.168.139.239:13311/api/Account/edit/student/${id}`,
-				formData,
-				{
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
-					},
-				}
-			);
-			console.log(response.data);
-			Swal.fire({
-				icon: "success",
-				title: "Berhasil",
-				text: "Siswa Berhasil diperbarui!",
-				confirmButtonText: "Ok",
-			}).then((result) => {
-				/* Read more about isConfirmed, isDenied below */
-				if (result.isConfirmed) {
-					navigate("/pengguna-siswa");
-				}
-			});
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://192.168.139.239:13311/api/Account/edit/student/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Siswa Berhasil diperbarui!",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          navigate("/pengguna-siswa");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 	const handleInputChange = (e: any) => {
 		const { value, name } = e.target;
@@ -188,25 +188,32 @@ const EditSiswa = () => {
 											<option value="003">RPL</option>
 										</select>
 									</div>
-
-									<div>
-										<label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-											nomor telepon
-										</label>
-										<input
-											type="number"
-											name="phoneNumber"
-											// {...register("phoneNumber")}
-											value={formData.phoneNumber}
-											onChange={handleInputChange}
-											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-											placeholder="masukkan nomor telepon"
-											required
-										/>
-										<span className="text-sm text-red-500">
-											* no.tlp mulai dari 0
-										</span>
-									</div>
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                      nomor telepon
+                    </label>
+                    <input
+                      type="number"
+                      name="phoneNumber"
+                      // {...register("phoneNumber")}
+                      value={formData.phoneNumber}
+                      onChange={handleInputChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                      placeholder="masukkan nomor telepon"
+                      required
+                      onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.currentTarget.setCustomValidity(
+                          "Nomor Telepon tidak boleh kosong"
+                        )
+                      }
+                      onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.currentTarget.setCustomValidity("")
+                      }
+                    />
+                    <span className="text-sm text-red-500">
+                      * no.tlp mulai dari 0
+                    </span>
+                  </div>
 
 									{/* alamat & no tlp */}
 									<div>

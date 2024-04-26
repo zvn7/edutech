@@ -1,33 +1,120 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "../../../../component/Navigation/Navigation";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { useLessonsIds } from "../../../../services/queries";
+import { useForm } from "react-hook-form";
+import { UserGuru } from "../../../../types/user";
 
-interface Mapel {
-  value: number;
-  label: string;
-}
-
-interface Jurusan {
-  value: number;
-  label: string;
-}
-
-const Mapels: Mapel[] = [
-  { value: 1, label: "PPKN" },
-  { value: 2, label: "gambar teknik" },
-  { value: 3, label: "pemrogramanan dasar" },
-  { value: 4, label: "jaringan dasar" },
-];
-
-const Jurusans: Jurusan[] = [
-  { value: 1, label: "RPL" },
-  { value: 2, label: "TKJ" },
-  { value: 3, label: "TKR" },
-];
 const EditGuru = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const lessonQueries = useLessonsIds();
+  const { data: dataLessons } = lessonQueries;
+
+  console.log(dataLessons);
+
+  const { register, handleSubmit, reset, setValue } = useForm<UserGuru>();
+
+  const option = dataLessons?.map((lesson) => ({
+    value: lesson.lessonName,
+    label: lesson.lessonName,
+  }));
+
   const [selectedMapel, setSelectedMapel] = useState<string[]>([]);
   const [selectedJurusan, setSelectedJurusan] = useState<string[]>([]);
+
+  const [formData, setFormData] = useState({
+    status: "",
+    nameTeacher: "",
+    birthDate: "",
+    birthPlace: "",
+    address: "",
+    phoneNumber: "",
+    nip: "",
+    gender: "",
+    lessonNames: [],
+    classNames: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.139.239:13311/api/Account/teacher/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        setFormData({
+          ...formData,
+          nameTeacher: response.data.nameTeacher || "",
+          birthDate: response.data.birthDate || "",
+          birthPlace: response.data.birthPlace || "",
+          address: response.data.address || "",
+          phoneNumber: response.data.phoneNumber || "",
+          nip: response.data.nip || "",
+          lessonTeacher: response.data.lessonTeacher || [],
+        });
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    setSelectedMapel(
+      formData.lessonNames.map((lesson: any) => lesson.lessonName) || []
+    );
+  }, [formData]);
+
+  const handleLessonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedMapel = [e.target.value];
+    setSelectedMapel(selectedMapel);
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmitEdit = async (e: any) => {
+    e.preventDefault();
+
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://192.168.139.239:13311/api/Account/teacher/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Siswa Berhasil diperbarui!",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          navigate("/pengguna-guru");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [iconVisible, setIconVisible] = useState(false);
   const setHandleMapel = (e: any) => {
@@ -40,9 +127,56 @@ const EditGuru = () => {
     );
   };
 
+  const handleInputChange = (e: any) => {
+    const { value, name } = e.target;
+
+    // Memastikan bahwa nomor telepon dimulai dengan angka 0
+    if (name === "phoneNumber" && value.length === 1 && value !== "0") {
+      return; // Mencegah input jika angka pertama bukan 0
+    }
+    if (name === "phoneNumber" && value.length > 15) {
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const setHandleIcon = () => {
     setIconVisible(!iconVisible);
   };
+
+  const handleBatal = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Peringatan",
+      text: "Apakah Anda yakin ingin membatalkan?",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/pengguna-guru");
+      }
+    });
+  };
+
+  // const handleMapelChange = (e: any) => {
+  //   setSelectedMapel(
+  //     e.map((option: any) => ({
+  //       value: option.value as string,
+  //       label: option.label as string,
+  //     }))
+  //   );
+  //   setValue(
+  //     "lessonTeacher.0.lessonName",
+  //     e.map((option: any) => option.value)
+  //   );
+  // };
 
   return (
     <div>
@@ -77,166 +211,113 @@ const EditGuru = () => {
               <h2 className="mb-4 text-xl font-bold text-gray-900 capitalize">
                 edit data guru
               </h2>
-              <form action="#">
-                <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                  {/* nama lengkap & nis */}
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-                    >
-                      nama lengkap
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-                      placeholder="Masukkan nama lengkap"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium text-blue-700 uppercase"
-                    >
-                      nip
-                    </label>
-                    <input
-                      type="number"
-                      name="name"
-                      id="name"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-                      placeholder="Masukkan NIP"
-                      required
-                    />
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                {/* nama lengkap & nis */}
+                <div>
+                  <label
+                    htmlFor="nameTeacher"
+                    className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+                  >
+                    nama lengkap
+                  </label>
+                  <input
+                    type="text"
+                    name="nameTeacher"
+                    value={formData.nameTeacher}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+                    placeholder="Masukkan nama lengkap"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="nip"
+                    className="block mb-2 text-sm font-medium text-blue-700 uppercase"
+                  >
+                    nip
+                  </label>
+                  <input
+                    type="text"
+                    name="nip"
+                    value={formData.nip}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+                    placeholder="Masukkan NIP"
+                    required
+                  />
+                </div>
 
-                  {/* username dan password */}
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      nama pengguna
-                    </label>
-                    <input
-                      type="text"
-                      name="brand"
-                      id="brand"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                      placeholder="Masukkan nama pengguna"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      kata sandi
-                    </label>
-                    <div className="relative ">
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center ps-3.5">
-                        <button
-                          type="button"
-                          onClick={setHandleIcon}
-                          className="text-gray-400 focus:outline-none hover:text-gray-600"
-                        >
-                          {iconVisible ? (
-                            <svg
-                              className="w-6 h-6 text-gray-600 "
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                              />
-                            </svg>
-                          ) : (
-                            <svg
-                              className="w-6 h-6 text-gray-600 "
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
-                              />
-                              <path
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                      <input
-                        type={iconVisible ? "text" : "password"}
-                        name="price"
-                        id="price"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                        placeholder="kata sandi"
-                        required
-                      />
+                {/* username dan password */}
+                {/* <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    nama pengguna
+                  </label>
+                  <input
+                    type="text"
+                    name="brand"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                    placeholder="Masukkan nama pengguna"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    kata sandi
+                  </label>
+                  <div className="relative ">
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center ps-3.5">
+                      <button
+                        type="button"
+                        onClick={setHandleIcon}
+                        className="text-gray-400 focus:outline-none hover:text-gray-600"
+                      >
+                        {iconVisible ? (
+                          <svg
+                            className="w-6 h-6 text-gray-600 "
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                            />
+                          </svg>
+                        ) : (
+                          <svg
+                            className="w-6 h-6 text-gray-600 "
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
+                            />
+                            <path
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                            />
+                          </svg>
+                        )}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* mapel & jurusan */}
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      mata pelajaran
-                    </label>
-                    <Select
-                      options={Mapels}
-                      onChange={setHandleMapel}
-                      placeholder="pilih mapel..."
-                      isMulti
-                      className=" text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full capitalize"
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      jurusan
-                    </label>
-                    <Select
-                      options={Jurusans}
-                      placeholder="pilih jurusan..."
-                      onChange={setHandleJurusan}
-                      isMulti
-                      className=" text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full capitalize"
-                    />
-                  </div>
-
-                  {/* tempat & tgl lahir */}
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      tempat lahir
-                    </label>
                     <input
-                      type="text"
-                      name="brand"
-                      id="brand"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                      placeholder="Masukkan nama pengguna"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      tanggal lahir
-                    </label>
-                    <input
-                      type="date"
+                      type={iconVisible ? "text" : "password"}
                       name="price"
                       id="price"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
@@ -244,51 +325,146 @@ const EditGuru = () => {
                       required
                     />
                   </div>
+                </div> */}
 
-                  {/* alamat & no tlp */}
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      alamat
-                    </label>
-                    <textarea
-                      name="brand"
-                      id="brand"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                      placeholder="Masukkan alamat lengkap"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      nomor telepon
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      id="price"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                      placeholder="masukkan nomor telepon"
-                      required
-                    />
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <button
-                      type="submit"
-                      className="flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
-                    >
-                      simpan
-                    </button>
-                    <Link to="/pengguna-guru">
-                      <button
-                        type="submit"
-                        className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
-                      >
-                        batal
-                      </button>
-                    </Link>
-                  </div>
+                {/* mapel & jurusan */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    Mata Pelajaran
+                  </label>
+                  <Select
+                    isMulti
+                    value={formData.lessonNames}
+                    onChange={(selectedOptions) => {
+                      const selectedLessonNames = selectedOptions.map(
+                        (option) => option.value
+                      );
+                      setFormData({
+                        ...formData,
+                        lessonTeacher: selectedLessonNames.map(
+                          (lessonName) => ({ lessonName })
+                        ),
+                      });
+                    }}
+                    options={option}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    required
+                  />
                 </div>
-              </form>
+
+                {/* <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    jurusan
+                  </label>
+                  <select
+                    name="jurusan"
+                    value={formData.uniqueNumberOfClassRoom}
+                    onChange={handleInputChange}
+                    className=" text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full capitalize"
+                  />
+                </div> */}
+
+                {/* tempat & tgl lahir */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    tempat lahir
+                  </label>
+                  <input
+                    type="text"
+                    name="birthPlace"
+                    value={formData.birthPlace}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                    placeholder="Masukkan nama pengguna"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    tanggal lahir
+                  </label>
+                  <input
+                    type="date"
+                    name="birthDate"
+                    value={formData.birthDate}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    placeholder="kata sandi"
+                    required
+                  />
+                </div>
+
+                {/* alamat & no tlp */}
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    nomor telepon
+                  </label>
+                  <input
+                    type="number"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    placeholder="masukkan nomor telepon"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                    alamat
+                  </label>
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                    placeholder="Masukkan alamat lengkap"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2 items-center">
+                  <button
+                    type="submit"
+                    className="flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+                    disabled={loading}
+                    onClick={handleSubmitEdit}
+                  >
+                    {loading ? (
+                      <svg
+                        className="animate-spin w-5 h-5 mr-3"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0112 4.472v3.585l-2.829 2.829zm0 8.446a8.045 8.045 0 01-2.38-2.38l2.38-2.83v5.21zM12 20.528a7.995 7.995 0 01-4-.943v-3.585L9.172 16.7c.258.258.563.465.896.605zm4-1.947l2.829-2.83 2.83 2.83-2.83 2.83v-5.22a8.045 8.045 0 01-2.38 2.38zm2.39-8.38L19.528 12h-5.21l2.83-2.829 2.83 2.829zM12 5.473V1.548A8.045 8.045 0 0115.473 4.39L12 7.863zm-2.829-.707L7.17 4.39A8.045 8.045 0 0110.39 1.548l-1.219 1.218zm1.219 13.123l-1.22 1.219a8.045 8.045 0 012.38 2.38l1.22-1.22zM16.832 16.7l1.219 1.22a8.045 8.045 0 012.38-2.38l-1.218-1.219z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      "Simpan"
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleBatal}
+                    className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
+                  >
+                    batal
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         </div>

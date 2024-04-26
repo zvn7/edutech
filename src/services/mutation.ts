@@ -1,25 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginUser } from "../types/login";
 import {
+  postLogin,
 	createMapel,
+  deleteMapel,
 	createUserSiswa,
-	deleteMapel,
 	editSiswa,
 	postDataExcelSiswa,
-	postLogin,
+  createGuru,
+  createSchedules,
+  deleteSchedule,
 } from "./api";
 import { IMapel } from "../types/mapel";
-import { UserSiswa } from "../types/user";
+import { UserGuru, UserSiswa } from '../types/user';
 import {
-	postLoginSiswa,
-	postLoginGuru,
-	postLogin,
 	createAssignmentSubmissions,
 	editAssignmentSubmission,
 	createMateri,
 } from "./api";
 import { Pengumpulan } from "../types/pengumpulan";
 import { IMateriGuru, MateriGuru, UploadMateri } from "../types/materi";
+import { Jadwal } from '../types/jadwal';
 
 // login
 export function useLogin() {
@@ -94,6 +95,30 @@ export function useCreateUserSiswa() {
 			await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
 		},
 	});
+}
+
+// create jadwal
+export function useCreateJadwalAdmin(){
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationKey:['createJadwalAdmin'],
+        mutationFn:(data:Jadwal)=>createSchedules(data),
+
+        onMutate:()=>{
+            console.log("mutate")
+        },
+        onError:()=>{
+            console.log("error");
+        },
+        onSettled:()=>{
+            console.log("settled");
+        },
+        onSuccess: async (data:any) => {
+            console.log("success", data);
+            await queryClient.invalidateQueries({ queryKey: ["jadwal"] });
+        },
+    })
 }
 
 // upload file excel datas siswa
@@ -228,6 +253,7 @@ export function useEditAssignmentSubmission() {
 	});
 }
 
+// create materi
 export function useCreateMateri() {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -247,4 +273,51 @@ export function useCreateMateri() {
 			await queryClient.invalidateQueries({ queryKey: ["course"] });
 		},
 	});
+}
+
+// delete jadwal
+export function useDeleteSchedules(){
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationKey: ['deleteJadwal'],
+        mutationFn: (id: string) => deleteSchedule(id),
+        onMutate:()=>{
+            console.log("mutate")
+        },
+        onError:()=>{
+            console.log("error");
+        },
+        onSettled:()=>{
+            console.log("settled");
+        },
+        onSuccess: async (data:any) => {
+            console.log("success", data);
+            await queryClient.invalidateQueries({ queryKey: ["schedules"] });
+        },
+    })
+}
+
+// create guru
+export function useCreateUserGuru(){
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationKey: ['createUserGuru'],
+        mutationFn:(data:UserGuru)=>createGuru(data),
+
+        onMutate:()=>{
+            console.log("mutate")
+        },
+        onError:()=>{
+            console.log("error");
+        },
+        onSettled:()=>{
+            console.log("settled");
+        },
+        onSuccess: async (data:any) => {
+            console.log("success", data);
+            await queryClient.invalidateQueries({ queryKey: ["userguru"] });
+        },
+    })
 }

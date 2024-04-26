@@ -87,11 +87,11 @@ const router = createBrowserRouter([
     element: <JadwalSiswa />,
   },
   {
-    path: "/jadwal/tambah-jadwal",
+    path: "/jadwal-admin/tambah-jadwal",
     element: <TambahJadwalAdmin />,
   },
   {
-    path: "/jadwal/edit-jadwal",
+    path: "/jadwal-admin/edit-jadwal/:id",
     element: <EditJadwalAdmin />,
   },
   {

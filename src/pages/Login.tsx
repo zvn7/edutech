@@ -7,32 +7,32 @@ import { LoginUser } from "../types/login";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-	const [showPassword, setShowPassword] = useState(false);
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [role, setRole] = useState(0);
-	const togglePasswordVisibility = () => {
-		setShowPassword(!showPassword);
-	};
+  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState(0);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-	const onChangeUsername = (e: any) => {
-		setUsername(e.target.value);
-	};
+  const onChangeUsername = (e: any) => {
+    setUsername(e.target.value);
+  };
 
-	const onChangePassword = (e: any) => {
-		setPassword(e.target.value);
-	};
+  const onChangePassword = (e: any) => {
+    setPassword(e.target.value);
+  };
 
-	const loginMutation = useLogin();
-	const navigate = useNavigate();
-	const onSubmit = async () => {
-		try {
-			const result = await loginMutation.mutateAsync({
-				username: username,
-				password: password,
-				token: "",
-				role: role,
-			});
+  const loginMutation = useLogin();
+  const navigate = useNavigate();
+  const onSubmit = async () => {
+    try {
+      const result = await loginMutation.mutateAsync({
+        username: username,
+        password: password,
+        token: "",
+        role: role,
+      });
 
 			// Jika tidak terjadi kesalahan, maka result akan berisi data yang sesuai dengan tipe LoginSiswa
 			const data = result as LoginUser;

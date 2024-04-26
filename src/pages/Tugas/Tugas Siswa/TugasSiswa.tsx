@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Navigation from "../../../component/Navigation/Navigation";
 import {
-	useCreateAssignmentSubmissions,
-	useEditAssignmentSubmission,
+  useCreateAssignmentSubmissions,
+  useEditAssignmentSubmission,
 } from "../../../services/mutation";
 import {
 	useAssigmentDetail,
@@ -32,14 +32,14 @@ const TugasSiswa = () => {
 	const { register, handleSubmit } = useForm<Pengumpulan>();
 	// const [assignmentId, setAssignmentId] = useState(null);
 
-	const handleOptionChange = (option: string) => {
-		setSelectedOption(option);
-	};
+  const handleOptionChange = (option: string) => {
+    setSelectedOption(option);
+  };
 
-	// useEffect(() => {
-	// 	// Panggil fungsi untuk mendapatkan assignmentId saat komponen dimuat
-	// 	fetchAssignmentId();
-	// }, []);
+  // useEffect(() => {
+  // 	// Panggil fungsi untuk mendapatkan assignmentId saat komponen dimuat
+  // 	fetchAssignmentId();
+  // }, []);
 
 	// const fetchAssignmentId = async () => {
 	//     try {
@@ -52,137 +52,137 @@ const TugasSiswa = () => {
 	//     }
 	// };
 
-	// const handleFormSubmit = async (formData, id) => {
-	// 	try {
-	// 		// Pastikan assignmentId telah diperoleh sebelum membuat permintaan untuk mengedit pengumpulan tugas
-	// 		if (!id) {
-	// 			console.error("AssignmentId is not available");
-	// 			return;
-	// 		}
-	// 		// Panggil mutasi untuk mengedit pengumpulan tugas dengan assignmentId yang telah diperoleh
-	// 		await editAssignmentSubmissionMutation.mutateAsync({
-	// 			...formData,
-	// 			assignmentId: id,
-	// 		});
-	// 		console.log("Assignment submission edited successfully!");
-	// 	} catch (error) {
-	// 		console.error("Error editing assignment submission:", error);
-	// 	}
-	// };
+  // const handleFormSubmit = async (formData, id) => {
+  // 	try {
+  // 		// Pastikan assignmentId telah diperoleh sebelum membuat permintaan untuk mengedit pengumpulan tugas
+  // 		if (!id) {
+  // 			console.error("AssignmentId is not available");
+  // 			return;
+  // 		}
+  // 		// Panggil mutasi untuk mengedit pengumpulan tugas dengan assignmentId yang telah diperoleh
+  // 		await editAssignmentSubmissionMutation.mutateAsync({
+  // 			...formData,
+  // 			assignmentId: id,
+  // 		});
+  // 		console.log("Assignment submission edited successfully!");
+  // 	} catch (error) {
+  // 		console.error("Error editing assignment submission:", error);
+  // 	}
+  // };
 
-	// Fungsi untuk menangani pengiriman formulir
-	const handleUpdateAssignmentSubmissions = async (formData, assignmentId) => {
-		try {
-			// Dapatkan studentId menggunakan fungsi getStudentIdFromToken
-			const studentId = getStudentIdFromToken();
+  // Fungsi untuk menangani pengiriman formulir
+  const handleUpdateAssignmentSubmissions = async (formData, assignmentId) => {
+    try {
+      // Dapatkan studentId menggunakan fungsi getStudentIdFromToken
+      const studentId = getStudentIdFromToken();
 
-			// Persiapkan data yang akan dikirim ke API
-			let requestBody;
-			if (selectedOption === "file") {
-				requestBody = {
-					fileData: formData.fileData,
-					type: "file",
-				};
-			} else if (selectedOption === "link") {
-				requestBody = {
-					link: formData.link,
-					type: "link",
-				};
-			}
+      // Persiapkan data yang akan dikirim ke API
+      let requestBody;
+      if (selectedOption === "file") {
+        requestBody = {
+          fileData: formData.fileData,
+          type: "file",
+        };
+      } else if (selectedOption === "link") {
+        requestBody = {
+          link: formData.link,
+          type: "link",
+        };
+      }
 
-			// Lakukan pengiriman data ke API
-			const response = await fetch(
-				`http://192.168.55.44:13311/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
-				{
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(requestBody),
-				}
-			);
+      // Lakukan pengiriman data ke API
+      const response = await fetch(
+        `http://192.168.139.239:13311/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
 
-			// Periksa status respons
-			if (!response.ok) {
-				throw new Error("Failed to update assignment submissions");
-			}
+      // Periksa status respons
+      if (!response.ok) {
+        throw new Error("Failed to update assignment submissions");
+      }
 
-			// Handle respons jika perlu
-			const responseData = await response.json();
-			console.log("Assignment submissions updated successfully:", responseData);
+      // Handle respons jika perlu
+      const responseData = await response.json();
+      console.log("Assignment submissions updated successfully:", responseData);
 
-			// Setelah pembaruan berhasil, Anda dapat melakukan tindakan tambahan, seperti memberi notifikasi atau memperbarui tampilan
-		} catch (error) {
-			// Tangani kesalahan jika ada
-			console.error("Error updating assignment submissions:", error);
-		}
-	};
+      // Setelah pembaruan berhasil, Anda dapat melakukan tindakan tambahan, seperti memberi notifikasi atau memperbarui tampilan
+    } catch (error) {
+      // Tangani kesalahan jika ada
+      console.error("Error updating assignment submissions:", error);
+    }
+  };
 
-	const getStudentIdFromToken = () => {
-		// Ambil token dari local storage
-		const token = localStorage.getItem("token");
-		if (token) {
-			const payload = token.split(".")[1];
-			const decodedPayload = JSON.parse(atob(payload));
-			return decodedPayload?.StudentId || null;
-		}
-		return null;
-	};
+  const getStudentIdFromToken = () => {
+    // Ambil token dari local storage
+    const token = localStorage.getItem("token");
+    if (token) {
+      const payload = token.split(".")[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      return decodedPayload?.StudentId || null;
+    }
+    return null;
+  };
 
-	const handleCardClick = async (id: any) => {
-		setIsLoading(true);
-		setSelectedCardId(id);
-		const studentId = getStudentIdFromToken();
-		const assignmentId = id;
+  const handleCardClick = async (id: any) => {
+    setIsLoading(true);
+    setSelectedCardId(id);
+    const studentId = getStudentIdFromToken();
+    const assignmentId = id;
 
-		// Persiapkan data untuk dikirim ke API
-		const data = {
-			studentId: studentId,
-			assignmentId: assignmentId,
-		};
+    // Persiapkan data untuk dikirim ke API
+    const data = {
+      studentId: studentId,
+      assignmentId: assignmentId,
+    };
 
-		try {
-			// Kirim data ke API
-			await createAssignmentSubmissions.mutate(data);
-			console.log("Data berhasil dikirim ke API:", data);
+    try {
+      // Kirim data ke API
+      await createAssignmentSubmissions.mutate(data);
+      console.log("Data berhasil dikirim ke API:", data);
 
-			// Panggil fungsi handleUpdateAssignmentSubmissions dengan assignmentId yang diperoleh dari handleCardClick
-			await handleUpdateAssignmentSubmissions(formData, assignmentId);
-		} catch (error) {
-			console.error("Terjadi kesalahan saat mengirim data:", error);
-		}
+      // Panggil fungsi handleUpdateAssignmentSubmissions dengan assignmentId yang diperoleh dari handleCardClick
+      await handleUpdateAssignmentSubmissions(formData, assignmentId);
+    } catch (error) {
+      console.error("Terjadi kesalahan saat mengirim data:", error);
+    }
 
-		// Setelah mengirimkan data, perbarui selectedCard
-		setSelectedCard({
-			...assignmentsQueries.find(({ data }) => data?.id === id)?.data,
-			studentId: studentId,
-			assignmentId: assignmentId,
-		});
+    // Setelah mengirimkan data, perbarui selectedCard
+    setSelectedCard({
+      ...assignmentsQueries.find(({ data }) => data?.id === id)?.data,
+      studentId: studentId,
+      assignmentId: assignmentId,
+    });
 
-		setIsLoading(false);
-	};
+    setIsLoading(false);
+  };
 
-	useEffect(() => {
-		const handleResize = () => {
-			// Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
-			setIsMobileView(window.innerWidth < 768);
-		};
+  useEffect(() => {
+    const handleResize = () => {
+      // Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
+      setIsMobileView(window.innerWidth < 768);
+    };
 
-		window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
 
-		// Pengecekan awal saat komponen dipasang
-		handleResize();
+    // Pengecekan awal saat komponen dipasang
+    handleResize();
 
-		// Membersihkan event listener saat komponen di-unmount
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
+    // Membersihkan event listener saat komponen di-unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
-	// Fungsi untuk menutup modal
-	const closeModal = () => {
-		setSelectedCard(null);
-	};
+  // Fungsi untuk menutup modal
+  const closeModal = () => {
+    setSelectedCard(null);
+  };
 
 	const formatDate = (dateString: any) => {
 		try {
@@ -481,10 +481,8 @@ const TugasSiswa = () => {
 													(assignmentSubmission, index) => {
 														const { isLoading, error } =
 															assignmentSubmissionsQueries[index];
-
-														if (isLoading) return <p>Loading...</p>;
-														if (error) return <p>Error: {error.message}</p>;
-
+                            if (isLoading) return <p>Loading...</p>;
+                            if (error) return <p>Error: {error.message}</p>;
 														return (
 															<div key={index}>
 																<p className="text-md font-bold">
@@ -728,68 +726,68 @@ const TugasSiswa = () => {
 
 														if (isLoading) return <p>Loading...</p>;
 														if (error) return <p>Error: {error.message}</p>;
-
-														return (
-															<div key={index}>
-																<p className="text-md font-bold">
-																	Informasi Tugas
-																</p>
-																<div className="relative overflow-x-auto sm:rounded-lg mt-4">
-																	<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-																		<tbody>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">
-																					Judul Tugas
-																				</td>
-																				<td className="px-6 py-4 float-end">
-																					{selectedCard
-																						? selectedCard.assignmentName
-																						: "Tugas"}
-																				</td>
-																			</tr>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">Status</td>
-																				<td className="px-6 py-4 float-end">
-																					{assignmentSubmission.status === 1 ||
-																					assignmentSubmission.status === 2
-																						? "Belum Dikoreksi"
-																						: "Sudah Dikoreksi"}
-																				</td>
-																			</tr>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">Nilai</td>
-																				<td className="px-6 py-4 float-end">
-																					{assignmentSubmission.grade ||
-																						"Belum ada nilai"}
-																				</td>
-																			</tr>
-																		</tbody>
-																	</table>
-																</div>
-																<div>
-																	<p className="text-md font-bold mt-4">
-																		Review Guru
-																	</p>
-																	<div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
-																		<h2 className="p-2 text-orange-500 font-semibold text-sm">
-																			{assignmentSubmission.comment ||
-																				"Belum ada review"}
-																		</h2>
-																	</div>
-																</div>
-															</div>
-														);
-													}
-												)}
-										</Tabs.Item>
-									</Tabs>
-								</div>
-							</div>
-						))}
-				</div>
-			</div>
-		</div>
-	);
+                            
+                            return (
+                              <div key={index}>
+                                <p className="text-md font-bold">
+                                  Informasi Tugas
+                                </p>
+                                <div className="relative overflow-x-auto sm:rounded-lg mt-4">
+                                  <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    <tbody>
+                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td className="px-6 py-4">
+                                          Judul Tugas
+                                        </td>
+                                        <td className="px-6 py-4 float-end">
+                                          {selectedCard
+                                            ? selectedCard.assignmentName
+                                            : "Tugas"}
+                                        </td>
+                                      </tr>
+                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td className="px-6 py-4">Status</td>
+                                        <td className="px-6 py-4 float-end">
+                                          {assignmentSubmission.status === 1 ||
+                                          assignmentSubmission.status === 2
+                                            ? "Belum Dikoreksi"
+                                            : "Sudah Dikoreksi"}
+                                        </td>
+                                      </tr>
+                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td className="px-6 py-4">Nilai</td>
+                                        <td className="px-6 py-4 float-end">
+                                          {assignmentSubmission.grade ||
+                                            "Belum ada nilai"}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <div>
+                                  <p className="text-md font-bold mt-4">
+                                    Review Guru
+                                  </p>
+                                  <div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
+                                    <h2 className="p-2 text-orange-500 font-semibold text-sm">
+                                      {assignmentSubmission.comment ||
+                                        "Belum ada review"}
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                    </Tabs.Item>
+                  </Tabs>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default TugasSiswa;

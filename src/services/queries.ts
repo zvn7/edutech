@@ -14,6 +14,8 @@ import {
 	getSiswaIds,
 	getTeacherinfo,
 	getUserInfo,
+  getGuru,
+  getGuruById,
 } from "./api";
 import {
 	getAssignments,
@@ -103,6 +105,14 @@ export function useGetGuru() {
 		queryKey: ["guru"],
 		queryFn: getGuru,
 	});
+}
+
+// get guru by id
+export function useGuruDetail(id:string){
+	return useQuery({
+		queryKey:["guru",id],
+		queryFn:()=>getGuruById(id)
+	})
 }
 
 // get absensi
@@ -315,4 +325,11 @@ export function useCourseById(id: string) {
 		queryKey: ["course", id],
 		queryFn: () => getCourseById(id),
 	});
+}
+
+export function useGetClassrooms(){
+    return useQuery({
+        queryKey: ["classrooms"],
+        queryFn: getClassRooms
+    })
 }

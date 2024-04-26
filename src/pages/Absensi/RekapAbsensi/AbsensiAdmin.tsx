@@ -7,7 +7,7 @@ const AbsensiAdmin = () => {
       <Navigation />
       <div className="p-4 sm:ml-64">
         <div className=" mt-14">
-          <h1 className="text-3xl font-bold capitalize">Hasil recap absensi</h1>
+          <h1 className="text-3xl font-bold capitalize">recap absensi</h1>
         </div>
         <div className="mt-8">
          

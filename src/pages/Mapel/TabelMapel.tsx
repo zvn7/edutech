@@ -1,26 +1,34 @@
 import { useState } from "react";
-import { useGetGuru, useGetMapelId } from "../../services/queries";
-import { Button, FooterDivider, Modal, ModalBody } from "flowbite-react";
+import { useGetMapelId } from "../../services/queries";
+import { Button, Modal, ModalBody } from "flowbite-react";
 import { useCreateMapel, useDeleteMapel } from "../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IMapel } from "../../types/mapel";
 import Swal from "sweetalert2";
-import { deleteMapel } from "../../services/api";
+import Select from "react-select";
+
+interface Jurusan {
+  value: string;
+  label: string;
+}
 
 const TabelMapel = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subject, setSubject] = useState({
     lessonName: "",
-    nameTeacher: "",
+    classNames: [],
   });
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
+  const createMapelMutation = useCreateMapel();
+  const [selectedJurusan, setSelectedJurusan] = useState<Jurusan[]>([]);
   const [selectedClass, setSelectedClass] = useState("semua");
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const { register, handleSubmit, reset, setValue, clearErrors } =
+    useForm<IMapel>();
   const mapelQuery = useGetMapelId();
-  const guruQuery = useGetGuru();
   const { data, isLoading: isMapelLoading } = mapelQuery;
-  const { data: dataGuru } = guruQuery;
 
   const handlePageSizeChange = (e: any) => {
     setPageSize(Number(e.target.value));
@@ -35,9 +43,7 @@ const TabelMapel = () => {
   //     ? data
   //     : data?.filter(({ lessonName }) => lessonName === selectedClass) || [];
 
-  const totalPages = Math.ceil(
-    (data ? data.length : 0) / pageSize
-  );
+  const totalPages = Math.ceil((data ? data.length : 0) / pageSize);
 
   const goToPreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
@@ -51,13 +57,17 @@ const TabelMapel = () => {
     setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-
   const searchFilter = (mapel: any) => {
-    return (
-      mapel.lessonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mapel.nameTeacher.toUpperCase().includes(searchTerm.toUpperCase())
+    const teacherMatch = mapel.teacherLesson?.some((lesson: any) =>
+      lesson.nameTeacher.toUpperCase().includes(searchTerm.toUpperCase())
     );
+    // Pencarian berdasarkan nama mata pelajaran
+    const subjectMatch = mapel.lessonName
+      .toUpperCase()
+      .includes(searchTerm.toUpperCase());
+
+    // Mengembalikan true jika ada kecocokan baik untuk nama guru maupun nama mata pelajaran
+    return teacherMatch || subjectMatch;
   };
 
   const openModal = () => {
@@ -79,21 +89,44 @@ const TabelMapel = () => {
         setIsModalOpen(false);
         setSubject({
           lessonName: "",
-          nameTeacher: "",
+          classNames: [],
         });
         reset();
+
+        clearErrors("classNames");
+        // Reset selectedJurusan
+        setSelectedJurusan([]);
       }
     });
   };
 
   const handleInputChange = (e: any) => {
-    const { value } = e.target;
-    setSubject(value);
+    const { value, name } = e.target;
+    setSubject({
+      ...subject,
+      [name]: value,
+    });
   };
 
-  const createMapelMutation = useCreateMapel();
+  const [jurusanOptions] = useState<Jurusan[]>([
+    { value: "TKJ", label: "TKJ" },
+    { value: "TKR", label: "TKR" },
+    { value: "RPL", label: "RPL" },
+  ]);
 
-  const { register, handleSubmit, reset } = useForm<IMapel>();
+  const handleJurusanChange = (selectedOptions: any) => {
+    setSelectedJurusan(
+      selectedOptions.map((option: any) => ({
+        value: option.value as string,
+        label: option.label as string,
+      }))
+    );
+
+    setValue(
+      "classNames",
+      selectedOptions.map((option: any) => option.value)
+    );
+  };
 
   const handleCreateMapelSubmit: SubmitHandler<IMapel> = (data) => {
     createMapelMutation.mutate(data, {
@@ -105,6 +138,7 @@ const TabelMapel = () => {
           confirmButtonText: "Ok",
         }).then((result) => {
           if (result.isConfirmed) {
+            setSelectedJurusan([]);
             setIsModalOpen(false);
             reset();
           }
@@ -142,6 +176,7 @@ const TabelMapel = () => {
       }
     }
   };
+
   return (
     <>
       <div className="shadow-md sm:rounded-lg bg-white">
@@ -158,16 +193,17 @@ const TabelMapel = () => {
                 </option>
               ))}
             </select>
-
-            {/* <select
+            {/* 
+            <select
               value={selectedClass}
               onChange={handleClassChange}
               className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
             >
               <option selected>semua</option>
-              <option value="TKR">TKR</option>
-              <option value="TKJ">TKJ</option>
-              <option value="RPL">RPL</option>
+
+              {data?.map((item)=>(
+                <option value={item.lessonName}>{item.lessonName}</option>
+              ))}
             </select> */}
 
             <div className="flex gap-2 items-center">
@@ -237,6 +273,9 @@ const TabelMapel = () => {
                   Mata Pelajaran
                 </th>
                 <th scope="col" className="px-6 py-3">
+                  jurusan
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Nama guru pengajar
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -295,7 +334,30 @@ const TabelMapel = () => {
                             scope="row"
                             className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
                           >
-                            {mapel.nameTeachers}
+                            {mapel.classNames.map((item) => (
+                              <>
+                                <td className="py-1 font-medium text-gray-900 whitespace-nowrap capitalize">
+                                  <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded ">
+                                    {item}
+                                  </span>
+                                </td>
+                              </>
+                            ))}
+                          </td>
+                          <td
+                            scope="row"
+                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
+                          >
+                            {mapel.teacherLesson.map((item) => (
+                              <tr>
+                                <td className="py-2 font-medium text-gray-900 whitespace-nowrap capitalize">
+                                  {item.nameTeacher} -{" "}
+                                  <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded ">
+                                    {item.classNames.join(", ")}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
                           </td>
                           <td>
                             <Button.Group>
@@ -386,13 +448,14 @@ const TabelMapel = () => {
           </div>
         </div>
       </div>
+      {/* modal create mapel */}
       <Modal show={isModalOpen} size="md" onClose={closeModal} popup>
         <Modal.Header className="p-6">
           <h3 className="text-xl font-medium text-gray-900 dark:text-white">
             Tambah Mata Pelajaran
           </h3>
         </Modal.Header>
-        {/* <ModalBody>
+        <ModalBody>
           <form
             className="space-y-6"
             onSubmit={handleSubmit(handleCreateMapelSubmit)}
@@ -406,7 +469,6 @@ const TabelMapel = () => {
                 type="text"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                 placeholder="Nama Mata Pelajaran"
-                value={subject.lessonName}
                 {...register("lessonName")}
                 onChange={handleInputChange}
                 required
@@ -420,31 +482,19 @@ const TabelMapel = () => {
             </div>
             <div>
               <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                Nama Guru
+                Jurusan
               </label>
-              <select
-                id="nameTeacher"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                {...register("nameTeachers")}
-                value={subject.nameTeachers}
+              <Select
+                id="jurusan-select"
+                isMulti
+                {...register("classNames")}
+                value={selectedJurusan}
+                onChange={handleJurusanChange}
+                options={jurusanOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
                 required
-                onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  e.currentTarget.setCustomValidity(
-                    "Pilih guru tidak boleh kosong"
-                  )
-                }
-                onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  e.currentTarget.setCustomValidity("")
-                }
-              >
-                <option value="">Pilih Nama Guru</option>
-                {dataGuru &&
-                  dataGuru.map((teacher, index) => (
-                    <option key={index} value={teacher.nameTeacher}>
-                      {teacher.nameTeacher}
-                    </option>
-                  ))}
-              </select>
+              />
             </div>
             <div className="w-full mt-6">
               <input
@@ -464,8 +514,10 @@ const TabelMapel = () => {
               </button>
             </div>
           </form>
-        </ModalBody> */}
+        </ModalBody>
       </Modal>
+
+      {/* modal edit mapel */}
     </>
   );
 };

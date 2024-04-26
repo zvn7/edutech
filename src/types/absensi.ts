@@ -9,5 +9,4 @@ export interface Absensi{
           date:string, 
         }
     ],
-    
 }
