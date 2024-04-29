@@ -15,7 +15,8 @@ import React from "react";
 
 const BerandaSiswa = () => {
 	const assignmentsIdsQuery = useAssignments();
-	const assignmentsQueries = useAssigmentDetail(assignmentsIdsQuery.data);
+	const { data: dataTugas } = assignmentsIdsQuery;
+
 	// const courseIdsQuery = useCourseIds();
 	// const courseQueries = useCourse(courseIdsQuery.data);
 	const courseClassroom = useCourseClassroom();
@@ -73,7 +74,7 @@ const BerandaSiswa = () => {
 							<h1 className="font-bold text-xl mb-3">Materi Terbaru</h1>
 							{formData && (
 								<div key={formData?.id} className="cursor-pointer">
-									{formData.courses.map((course) => (
+									{formData.map((course) => (
 										<div className="flex items-center rounded-lg shadow-sm p-3 gap-2 bg-white mb-2 hover:bg-[#fdefc8]">
 											<div className="flex gap-3">
 												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
@@ -118,9 +119,9 @@ const BerandaSiswa = () => {
 						{/* tugas */}
 						<div className="mt-8 flex flex-col gap-3">
 							<h1 className="font-bold text-xl mb-3">Daftar Tugas</h1>
-							{assignmentsQueries.slice(0, 5).map(({ data }) => (
+							{dataTugas?.slice(0, 5).map((item) => (
 								<div
-									key={data?.id}
+									key={item?.id}
 									className="cursor-pointer flex flex-col gap-3"
 								>
 									<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2 hover:bg-[#fdefc8]">
@@ -142,10 +143,10 @@ const BerandaSiswa = () => {
 											</div>
 											<div className="flex flex-col">
 												<p className="text-sm font-normal text-gray-500">
-													{data?.lessonName}
+													{item?.lessonName}
 												</p>
 												<h2 className="text-md font-medium">
-													{data?.assignmentName}
+													{item?.assignmentName}
 												</h2>
 												<div className="flex flex-wrap gap-2 ">
 													<div className="flex gap-1">
@@ -165,14 +166,14 @@ const BerandaSiswa = () => {
 															/>
 														</svg>
 														<span className="text-sm text-gray-500">
-															{formatDate(data?.assignmentDate)}
+															{formatDate(item?.assignmentDate)}
 														</span>
 													</div>
 												</div>
 											</div>
 										</div>
 										<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
-											belum selesai
+											{item?.assignmentSubmissionStatus}
 										</span>
 									</div>
 								</div>

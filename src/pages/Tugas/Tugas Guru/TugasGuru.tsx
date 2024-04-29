@@ -6,7 +6,7 @@ import {
 	useAssignmentsByTeacherId,
 	useTeacherinfo,
 } from "../../../services/queries";
-import { useCreateTugas } from "../../../services/mutation";
+import { useCreateTugas, useDeleteTugas } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Tugas } from "../../../types/tugas";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +59,18 @@ const TugasGuru = () => {
 			...form,
 			[name]: value,
 		});
+		// Mendapatkan nilai dari input datetime-local
 	};
+
+	function handleDateTimeChange(event: any) {
+		const localDate = new Date(event.target.value);
+		const utcDate = new Date(
+			localDate.getTime() + localDate.getTimezoneOffset() * 60000
+		);
+		// utcDate sekarang dalam format UTC
+		// Lakukan sesuatu dengan utcDate, seperti menyimpannya ke state
+		console.log("data utcDate", utcDate);
+	}
 
 	const handleCreateTugasSubmit: SubmitHandler<Tugas> = (data) => {
 		createTugas.mutate(data, {
@@ -90,30 +101,6 @@ const TugasGuru = () => {
 
 	const handleOptionChange = (option: string) => {
 		setSelectedOption(option);
-	};
-
-	const handleDeleteCard = (cardId: number) => {
-		// Use SweetAlert to confirm deletion
-		Swal.fire({
-			title: "Are you sure?",
-			text: "You will not be able to recover this card!",
-			icon: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, delete it!",
-		}).then((result) => {
-			if (result.isConfirmed) {
-				// If user confirms, delete the card
-				console.log("Deleting card with ID:", cardId);
-				// Add your delete logic here
-				// For example, you can call a function to delete the card from the list
-				// deleteCard(cardId);
-
-				// Show success message
-				Swal.fire("Deleted!", "Your card has been deleted.", "success");
-			}
-		});
 	};
 
 	const handleShowAddForm = () => {
@@ -203,6 +190,48 @@ const TugasGuru = () => {
 		setisTabletModalOpenAdd(false);
 	};
 
+	// search
+	const [searchTerm, setSearchTerm] = useState("");
+
+	const filteredAssignments = assigmentQueries.data?.filter((item) =>
+		item?.assignmentName.toLowerCase().includes(searchTerm.toLowerCase())
+	);
+
+	const handleSearchChange = (e) => {
+		setSearchTerm(e.target.value);
+	};
+
+	// delete
+	const deleteTugas = useDeleteTugas();
+
+	const handleDeleteTugas = async (id: any) => {
+		const confirmation = await Swal.fire({
+			title: "Anda yakin ingin menghapus tugas ini?",
+			text: "Aksi ini tidak dapat dibatalkan!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Ya, hapus!",
+			cancelButtonText: "Batal",
+		});
+
+		if (confirmation.isConfirmed) {
+			try {
+				await deleteTugas.mutateAsync(id);
+				Swal.fire({
+					icon: "success",
+					title: "Berhasil",
+					text: "Mapel Berhasil dihapus!",
+					confirmButtonText: "Ok",
+				});
+			} catch (error) {
+				console.error("Gagal menghapus mapel:", error);
+				// Tangani kesalahan, misalnya dengan menampilkan pesan kepada pengguna
+			}
+		}
+	};
+
 	return (
 		<div>
 			<Navigation />
@@ -215,7 +244,7 @@ const TugasGuru = () => {
 						</div>
 
 						<div className="mt-5 flex justify-between gap-4 mb-2">
-							<form className="max-w-xs">
+							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
 								<label
 									htmlFor="default-search"
 									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -245,6 +274,8 @@ const TugasGuru = () => {
 										id="default-search"
 										className="block md:w-80 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										placeholder="Cari..."
+										value={searchTerm}
+										onChange={handleSearchChange}
 										required
 									/>
 								</div>
@@ -329,9 +360,12 @@ const TugasGuru = () => {
 							)}
 						</div>
 
-						<div className="overflow-y-auto overflow-clip max-h-[calc(100vh-200px)]">
+						<div
+							className="overflow-y-auto overflow-clip max-h-[calc(100vh-195px)]"
+							style={{ scrollbarWidth: "none" }}
+						>
 							<div className="mt-4 flex flex-col gap-3">
-								{assigmentQueries.data?.map((items) => (
+								{filteredAssignments?.map((items) => (
 									<div key={items?.id} className="cursor-pointer">
 										<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
 											<div className="flex gap-3">
@@ -402,7 +436,7 @@ const TugasGuru = () => {
 												</Button>
 
 												<Button
-													onClick={() => handleDeleteCard(card.id)}
+													onClick={() => handleDeleteTugas(items.id)}
 													color="failure"
 												>
 													Hapus
@@ -416,7 +450,10 @@ const TugasGuru = () => {
 					</div>
 					{/* right side */}
 					{showAddForm && (
-						<div className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16">
+						<div
+							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							style={{ scrollbarWidth: "none" }}
+						>
 							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
 								<div className="flex justify-between">
 									<p className="text-gray-500 text-xl font-bold">
@@ -459,10 +496,9 @@ const TugasGuru = () => {
 											{...register("courseId")}
 											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										>
-											{/* Check if courseData exists and has the courses property */}
+											<option value="">Pilih Materi</option>
 											{courseData &&
-												courseData.courses &&
-												courseData.courses.map((course) => (
+												courseData.map((course) => (
 													<option key={course.id} value={course.id}>
 														{course.courseName}
 													</option>
@@ -526,15 +562,18 @@ const TugasGuru = () => {
 											Deadline Tugas
 										</label>
 										<input
-											type="date"
+											type="datetime-local"
 											id="nama_tugas"
-											{...register("assignmentDeadline")}
+											{...register("assignmentDeadline", {
+												setValueAs: (value) => value + "Z",
+											})}
 											onChange={handleInputChange}
+											step="1"
 											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 											placeholder="Masukkan Nama Tugas"
 										/>
 									</div>
-									<div className="mb-5">
+									<div className="mb-2">
 										<label
 											htmlFor="nama_tugas"
 											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
@@ -598,7 +637,10 @@ const TugasGuru = () => {
 						</div>
 					)}
 					{showEditForm && (
-						<div className="edit-form">
+						<div
+							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							style={{ scrollbarWidth: "none" }}
+						>
 							<div>
 								<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
 									<div className="flex justify-between">

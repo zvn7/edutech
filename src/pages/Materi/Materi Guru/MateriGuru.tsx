@@ -10,7 +10,7 @@ import {
 import Select from "react-select";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { UploadMateri } from "../../../types/materi";
+import { IMateriGuru, UploadMateri } from "../../../types/materi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -309,12 +309,12 @@ const MateriGuru = ({ id }: { id: string }) => {
 	const queryMapel = useGetMapelByGuru();
 	const { data: dataMapel } = queryMapel;
 
-	const filteredData =
+	const filteredData: IMateriGuru[] =
 		selectedLesson === "semua"
-			? formData?.courses || []
-			: formData?.courses.filter(
-					({ lessonName }) => lessonName === selectedLesson
-			  ) || [];
+			? formData || []
+			: (formData || []).filter(
+					(materi) => materi.lessonName === selectedLesson
+			  );
 
 	const mapelOption = dataMapel?.map((mapel) => ({
 		value: mapel.lessonName,
@@ -347,7 +347,7 @@ const MateriGuru = ({ id }: { id: string }) => {
 
 	const [loading, setLoading] = useState(false);
 
-	const { data: dataCourse } = useCourseById(selectedCourse ?? "");
+	// const { data: dataCourse } = useCourseById(selectedCourse ?? "");
 
 	const handleSubmitEdit = async (e: any) => {
 		e.preventDefault();
@@ -527,7 +527,10 @@ const MateriGuru = ({ id }: { id: string }) => {
 							)}
 						</div>
 
-						<div className="overflow-y-auto max-h-screen">
+						<div
+							className="overflow-y-auto overflow-clip max-h-[calc(100vh-195px)]"
+							style={{ scrollbarWidth: "none" }}
+						>
 							<div className="mt-8 flex flex-col gap-3 ">
 								{filteredData.filter(searchFilter).length > 0 ? (
 									filteredData.filter(searchFilter).map((card) => (
@@ -599,7 +602,7 @@ const MateriGuru = ({ id }: { id: string }) => {
 					</div>
 					{/* right side */}
 					{showAddForm && (
-						<div className="fixed right-4 top-6 w-2/5 max-h-screen overflow-y-auto">
+						<div className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16">
 							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
 								<div className="flex justify-between">
 									<p className="text-gray-500 text-xl font-bold">
@@ -656,15 +659,18 @@ const MateriGuru = ({ id }: { id: string }) => {
 									</div>
 
 									<p className="mt-2">Mata Pelajaran</p>
-									<Select
-										isMulti
+									<select
 										{...register("LessonName")}
-										value={selectedMapel}
-										onChange={handleMapelChange}
-										options={mapelOption}
-										className="react-select-container mt-2"
-										classNamePrefix="react-select"
-									/>
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+									>
+										<option value="">Pilih Mata Pelajaran</option>
+										{dataMapel &&
+											dataMapel.map((mapel) => (
+												<option key={mapel.id} value={mapel.id}>
+													{mapel.lessonName}
+												</option>
+											))}
+									</select>
 
 									<p className="mt-2">Deskripsi</p>
 									<textarea

@@ -3,43 +3,49 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Navigation from "../../../component/Navigation/Navigation";
 import {
-  useCreateAssignmentSubmissions,
-  useEditAssignmentSubmission,
+	useCreatePengumpulan,
 } from "../../../services/mutation";
 import {
-	useAssigmentDetail,
 	useAssignments,
-	useAssignmentsIds,
-	useAssignmentSubmissions,
+	useAssignmentSubmissionsById,
+	useLessonsClassroom,
 } from "../../../services/queries";
 import { Pengumpulan } from "../../../types/pengumpulan";
 import axios from "axios";
+import Swal from "sweetalert2";
 
-const TugasSiswa = () => {
-	const [selectedCard, setSelectedCard] = useState(null);
+const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
+	const [selectedCard, setSelectedCard] = useState<string | null>(null);
 	const [selectedCardId, setSelectedCardId] = useState(null);
 	const [isMobileView, setIsMobileView] = useState<boolean>(false);
 	const [selectedOption, setSelectedOption] = useState("file");
 	const assignmentsIdsQuery = useAssignments();
-	const assignmentsQueries = useAssigmentDetail(assignmentsIdsQuery.data);
-	const assignmentSubmissionsQueries = useAssignmentSubmissions([
-		selectedCardId,
-	]);
-	const createAssignmentSubmissions = useCreateAssignmentSubmissions();
-	const editAssignmentSubmissionMutation = useEditAssignmentSubmission();
-	const assignmentSubmissionsData = assignmentSubmissionsQueries[0].data;
+	const { data: dataTugas } = assignmentsIdsQuery;
+	// const assignmentSubmissionsById = useAssignmentSubmissionsById(id);
+	const { data: dataSubmissions } = useAssignmentSubmissionsById(
+		selectedCard ?? ""
+	);
+
+	// const assignmentSubmissionsQueries = useAssignmentSubmissions([
+	// 	selectedCardId,
+	// ]);
+	// const assignmentSubmissionQuery = useAssignmentSubmissionsIds();
+	// const { data: dataPengumpulan } = assignmentSubmissionQuery;
+	const lessonsQueries = useLessonsClassroom();
+	const { data: formLesson } = lessonsQueries;
+	// const editAssignmentSubmissionMutation = useEditAssignmentSubmission();
+	// const assignmentSubmissionsData = assignmentSubmissionsQueries[0].data;
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { register, handleSubmit } = useForm<Pengumpulan>();
 	// const [assignmentId, setAssignmentId] = useState(null);
 
-  const handleOptionChange = (option: string) => {
-    setSelectedOption(option);
-  };
+	const handleOptionChange = (option: string) => {
+		setSelectedOption(option);
+	};
 
-  // useEffect(() => {
-  // 	// Panggil fungsi untuk mendapatkan assignmentId saat komponen dimuat
-  // 	fetchAssignmentId();
-  // }, []);
+	// useEffect(() => {
+	// 	// Panggil fungsi untuk mendapatkan assignmentId saat komponen dimuat
+	// 	fetchAssignmentId();
+	// }, []);
 
 	// const fetchAssignmentId = async () => {
 	//     try {
@@ -52,137 +58,111 @@ const TugasSiswa = () => {
 	//     }
 	// };
 
-  // const handleFormSubmit = async (formData, id) => {
-  // 	try {
-  // 		// Pastikan assignmentId telah diperoleh sebelum membuat permintaan untuk mengedit pengumpulan tugas
-  // 		if (!id) {
-  // 			console.error("AssignmentId is not available");
-  // 			return;
-  // 		}
-  // 		// Panggil mutasi untuk mengedit pengumpulan tugas dengan assignmentId yang telah diperoleh
-  // 		await editAssignmentSubmissionMutation.mutateAsync({
-  // 			...formData,
-  // 			assignmentId: id,
-  // 		});
-  // 		console.log("Assignment submission edited successfully!");
-  // 	} catch (error) {
-  // 		console.error("Error editing assignment submission:", error);
-  // 	}
-  // };
+	// const handleFormSubmit = async (formData, id) => {
+	// 	try {
+	// 		// Pastikan assignmentId telah diperoleh sebelum membuat permintaan untuk mengedit pengumpulan tugas
+	// 		if (!id) {
+	// 			console.error("AssignmentId is not available");
+	// 			return;
+	// 		}
+	// 		// Panggil mutasi untuk mengedit pengumpulan tugas dengan assignmentId yang telah diperoleh
+	// 		await editAssignmentSubmissionMutation.mutateAsync({
+	// 			...formData,
+	// 			assignmentId: id,
+	// 		});
+	// 		console.log("Assignment submission edited successfully!");
+	// 	} catch (error) {
+	// 		console.error("Error editing assignment submission:", error);
+	// 	}
+	// };
 
-  // Fungsi untuk menangani pengiriman formulir
-  const handleUpdateAssignmentSubmissions = async (formData, assignmentId) => {
-    try {
-      // Dapatkan studentId menggunakan fungsi getStudentIdFromToken
-      const studentId = getStudentIdFromToken();
+	// Fungsi untuk menangani pengiriman formulir
+	const handleUpdateAssignmentSubmissions = async (formData, assignmentId) => {
+		try {
+			// Dapatkan studentId menggunakan fungsi getStudentIdFromToken
+			const studentId = getStudentIdFromToken();
 
-      // Persiapkan data yang akan dikirim ke API
-      let requestBody;
-      if (selectedOption === "file") {
-        requestBody = {
-          fileData: formData.fileData,
-          type: "file",
-        };
-      } else if (selectedOption === "link") {
-        requestBody = {
-          link: formData.link,
-          type: "link",
-        };
-      }
+			// Persiapkan data yang akan dikirim ke API
+			let requestBody;
+			if (selectedOption === "file") {
+				requestBody = {
+					fileData: formData.fileData,
+					type: "file",
+				};
+			} else if (selectedOption === "link") {
+				requestBody = {
+					link: formData.link,
+					type: "link",
+				};
+			}
 
-      // Lakukan pengiriman data ke API
-      const response = await fetch(
-        `http://192.168.139.239:13311/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
+			// Lakukan pengiriman data ke API
+			const response = await fetch(
+				`http://192.168.139.239:13311/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(requestBody),
+				}
+			);
 
-      // Periksa status respons
-      if (!response.ok) {
-        throw new Error("Failed to update assignment submissions");
-      }
+			// Periksa status respons
+			if (!response.ok) {
+				throw new Error("Failed to update assignment submissions");
+			}
 
-      // Handle respons jika perlu
-      const responseData = await response.json();
-      console.log("Assignment submissions updated successfully:", responseData);
+			// Handle respons jika perlu
+			const responseData = await response.json();
+			console.log("Assignment submissions updated successfully:", responseData);
 
-      // Setelah pembaruan berhasil, Anda dapat melakukan tindakan tambahan, seperti memberi notifikasi atau memperbarui tampilan
-    } catch (error) {
-      // Tangani kesalahan jika ada
-      console.error("Error updating assignment submissions:", error);
-    }
-  };
+			// Setelah pembaruan berhasil, Anda dapat melakukan tindakan tambahan, seperti memberi notifikasi atau memperbarui tampilan
+		} catch (error) {
+			// Tangani kesalahan jika ada
+			console.error("Error updating assignment submissions:", error);
+		}
+	};
 
-  const getStudentIdFromToken = () => {
-    // Ambil token dari local storage
-    const token = localStorage.getItem("token");
-    if (token) {
-      const payload = token.split(".")[1];
-      const decodedPayload = JSON.parse(atob(payload));
-      return decodedPayload?.StudentId || null;
-    }
-    return null;
-  };
+	const getStudentIdFromToken = () => {
+		// Ambil token dari local storage
+		const token = localStorage.getItem("token");
+		if (token) {
+			const payload = token.split(".")[1];
+			const decodedPayload = JSON.parse(atob(payload));
+			return decodedPayload?.StudentId || null;
+		}
+		return null;
+	};
 
-  const handleCardClick = async (id: any) => {
-    setIsLoading(true);
-    setSelectedCardId(id);
-    const studentId = getStudentIdFromToken();
-    const assignmentId = id;
+	const handleCardClick = (id: any) => {
+		const clickedCard = dataTugas?.find((item) => item.id === id);
+		setSelectedCard(clickedCard);
+		// Atur nilai input untuk assignmentId saat tugas dipilih
+		setValue("assignmentId", id);
+	};
 
-    // Persiapkan data untuk dikirim ke API
-    const data = {
-      studentId: studentId,
-      assignmentId: assignmentId,
-    };
+	useEffect(() => {
+		const handleResize = () => {
+			// Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
+			setIsMobileView(window.innerWidth < 768);
+		};
 
-    try {
-      // Kirim data ke API
-      await createAssignmentSubmissions.mutate(data);
-      console.log("Data berhasil dikirim ke API:", data);
+		window.addEventListener("resize", handleResize);
 
-      // Panggil fungsi handleUpdateAssignmentSubmissions dengan assignmentId yang diperoleh dari handleCardClick
-      await handleUpdateAssignmentSubmissions(formData, assignmentId);
-    } catch (error) {
-      console.error("Terjadi kesalahan saat mengirim data:", error);
-    }
+		// Pengecekan awal saat komponen dipasang
+		handleResize();
 
-    // Setelah mengirimkan data, perbarui selectedCard
-    setSelectedCard({
-      ...assignmentsQueries.find(({ data }) => data?.id === id)?.data,
-      studentId: studentId,
-      assignmentId: assignmentId,
-    });
+		// Membersihkan event listener saat komponen di-unmount
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
 
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      // Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
-      setIsMobileView(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Pengecekan awal saat komponen dipasang
-    handleResize();
-
-    // Membersihkan event listener saat komponen di-unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  // Fungsi untuk menutup modal
-  const closeModal = () => {
-    setSelectedCard(null);
-  };
+	// Fungsi untuk menutup modal
+	const closeModal = () => {
+		setSelectedCard(null);
+	};
 
 	const formatDate = (dateString: any) => {
 		try {
@@ -233,6 +213,63 @@ const TugasSiswa = () => {
 		}
 	};
 
+	// filter
+	const [selectedLesson, setSelectedLesson] = useState("semua tugas");
+
+	// Event handler untuk mengubah nilai terpilih dari dropdown
+	const handleLessonChange = (e: any) => {
+		setSelectedLesson(e.target.value);
+	};
+
+	const [form, setForm] = useState({
+		assigmentId: "",
+		link: "",
+		FileData: "",
+	});
+
+	const createPengumpulan = useCreatePengumpulan();
+	const { register, handleSubmit, setValue, reset } = useForm<Pengumpulan>();
+
+	const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
+		// Memastikan assignmentId sudah diset
+		if (!data.assignmentId) {
+			console.error("Assignment ID is missing.");
+			return;
+		}
+
+		try {
+			// Lakukan pengiriman data pengumpulan ke API menggunakan method mutate
+			await createPengumpulan.mutateAsync(data);
+
+			// Jika sukses, lakukan tindakan setelah pengumpulan berhasil
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil!",
+				text: "Materi Berhasil ditambahkan!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setSelectedCard(null);
+					reset();
+					setForm({
+						assigmentId: "",
+						link: "",
+						FileData: "",
+					});
+				}
+			});
+		} catch (error) {
+			console.error("Error submitting pengumpulan:", error);
+			// Handle error jika pengiriman data gagal
+			Swal.fire({
+				icon: "error",
+				title: "Error!",
+				text: "Terjadi kesalahan saat menambahkan materi.",
+				confirmButtonText: "Ok",
+			});
+		}
+	};
+
 	return (
 		<div>
 			<Navigation />
@@ -240,82 +277,90 @@ const TugasSiswa = () => {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 					{/* left side */}
 					<div>
-						<div className=" mt-14 flex justify-between">
-							<h1 className="text-3xl font-bold font-mono">Tugas</h1>
+						<div className="mt-14 flex justify-between">
+							<h1 className="text-3xl font-bold">Tugas</h1>
+							<select
+								id="subject"
+								value={selectedLesson}
+								onChange={handleLessonChange}
+								className="capitalize block  py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+							>
+								<option value="">semua tugas</option>
+								{formLesson?.map((item) => (
+									<option key={item?.id} value={item?.uniqueNumberOfLesson}>
+										{item?.lessonName}
+									</option>
+								))}
+							</select>
 						</div>
 
 						<div className="mt-8 flex flex-col gap-3">
-							{assignmentsQueries.map(
-								({ data }) => (
-									console.log(data),
-									(
-										<div
-											key={data?.id}
-											onClick={() => handleCardClick(data?.id)}
-											className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
-										>
-											<div
-												className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
-													selectedCardId === data?.id
-														? "bg-[#fff8e5] rounded-lg"
-														: ""
-												}`}
-											>
-												<div className="flex gap-3">
-													<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+							{dataTugas?.map((items) => (
+								<div
+									key={items?.id}
+									onClick={() => handleCardClick(items?.id)}
+									className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
+								>
+									<div
+										className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
+											selectedCardId === items?.id
+												? "bg-[#fff8e5] rounded-lg"
+												: ""
+										}`}
+									>
+										<div className="flex gap-3">
+											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+												<svg
+													className="w-12 h-12 text-blue-600 dark:text-white"
+													aria-hidden="true"
+													xmlns="http://www.w3.org/2000/svg"
+													fill="currentColor"
+													viewBox="0 0 24 24"
+												>
+													<path
+														fill-rule="evenodd"
+														d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+														clip-rule="evenodd"
+													/>
+												</svg>
+											</div>
+											<div className="flex flex-col">
+												<p className="text-sm font-normal text-gray-500">
+													{items?.lessonName}
+												</p>
+												<h2 className="text-md font-medium">
+													{items?.assignmentName}
+												</h2>
+												<div className="flex flex-wrap gap-2 ">
+													<div className="flex gap-1">
 														<svg
-															className="w-12 h-12 text-blue-600 dark:text-white"
+															className="w-5 h-5 text-gray-500"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
-															fill="currentColor"
+															fill="none"
 															viewBox="0 0 24 24"
 														>
 															<path
-																fill-rule="evenodd"
-																d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-																clip-rule="evenodd"
+																stroke="currentColor"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth="2"
+																d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
 															/>
 														</svg>
-													</div>
-													<div className="flex flex-col">
-														<p className="text-sm font-normal text-gray-500">
-															{data?.lessonName}
-														</p>
-														<h2 className="text-md font-medium">
-															{data?.assignmentName}
-														</h2>
-														<div className="flex flex-wrap gap-2 ">
-															<div className="flex gap-1">
-																<svg
-																	className="w-5 h-5 text-gray-500"
-																	aria-hidden="true"
-																	xmlns="http://www.w3.org/2000/svg"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																>
-																	<path
-																		stroke="currentColor"
-																		strokeLinecap="round"
-																		strokeLinejoin="round"
-																		strokeWidth="2"
-																		d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
-																	/>
-																</svg>
-																<span className="text-sm text-gray-500">
-																	{formatDate(data?.assignmentDate)}
-																</span>
-															</div>
-														</div>
+														<span className="text-sm text-gray-500">
+															{formatDate(items?.assignmentDate)}
+														</span>
 													</div>
 												</div>
-												<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
-													{data?.assignmentStatus}
-												</span>
 											</div>
 										</div>
-									)
-								)
-							)}
+										<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
+											{items?.assignmentSubmissionStatus}
+										</span>
+									</div>
+								</div>
+							))}
 						</div>
 					</div>
 					{/* right side */}
@@ -476,64 +521,47 @@ const TugasSiswa = () => {
 											</div>
 										</Tabs.Item>
 										<Tabs.Item title="Nilai">
-											{assignmentSubmissionsData &&
-												assignmentSubmissionsData.map(
-													(assignmentSubmission, index) => {
-														const { isLoading, error } =
-															assignmentSubmissionsQueries[index];
-                            if (isLoading) return <p>Loading...</p>;
-                            if (error) return <p>Error: {error.message}</p>;
-														return (
-															<div key={index}>
-																<p className="text-md font-bold">
-																	Informasi Tugas
-																</p>
-																<div className="relative overflow-x-auto sm:rounded-lg mt-4">
-																	<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-																		<tbody>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">
-																					Judul Tugas
-																				</td>
-																				<td className="px-6 py-4 float-end">
-																					{selectedCard
-																						? selectedCard.assignmentName
-																						: "Tugas"}
-																				</td>
-																			</tr>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">Status</td>
-																				<td className="px-6 py-4 float-end">
-																					{assignmentSubmission.status
-																						? "Sudah Dikoreksi"
-																						: "Belum Dikoreksi"}
-																				</td>
-																			</tr>
-																			<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-																				<td className="px-6 py-4">Nilai</td>
-																				<td className="px-6 py-4 float-end">
-																					{assignmentSubmission.grade ||
-																						"Belum ada nilai"}
-																				</td>
-																			</tr>
-																		</tbody>
-																	</table>
-																</div>
-																<div>
-																	<p className="text-md font-bold mt-4">
-																		Review Guru
-																	</p>
-																	<div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
-																		<h2 className="p-2 text-orange-500 font-semibold text-sm">
-																			{assignmentSubmission.comment ||
-																				"Belum ada review"}
-																		</h2>
-																	</div>
-																</div>
-															</div>
-														);
-													}
-												)}
+											<div>
+												<p className="text-md font-bold">Informasi Tugas</p>
+												<div className="relative overflow-x-auto sm:rounded-lg mt-4">
+													<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+														<tbody>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Judul Tugas</td>
+																<td className="px-6 py-4 float-end">
+																	{selectedCard
+																		? selectedCard.assignmentName
+																		: "Tugas"}
+																</td>
+															</tr>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Status</td>
+																<td className="px-6 py-4 float-end">
+																	{assignmentSubmission.status
+																		? "Sudah Dikoreksi"
+																		: "Belum Dikoreksi"}
+																</td>
+															</tr>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Nilai</td>
+																<td className="px-6 py-4 float-end">
+																	{assignmentSubmission.grade ||
+																		"Belum ada nilai"}
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												<div>
+													<p className="text-md font-bold mt-4">Review Guru</p>
+													<div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
+														<h2 className="p-2 text-orange-500 font-semibold text-sm">
+															{assignmentSubmission.comment ||
+																"Belum ada review"}
+														</h2>
+													</div>
+												</div>
+											</div>
 										</Tabs.Item>
 									</Tabs>
 								</div>
@@ -570,7 +598,7 @@ const TugasSiswa = () => {
 											<p>
 												{isLoading
 													? "Memuat File ..."
-													: selectedCard.assignmentDescription}
+													: selectedCard?.assignmentDescription}
 											</p>
 											<h1 className="text-2xl font-bold mt-8">Tugas</h1>
 											<div
@@ -633,7 +661,9 @@ const TugasSiswa = () => {
 																	<h2 className="text-center text-orange-500 font-semibold text-sm">
 																		{isLoading
 																			? "Memuat File ..."
-																			: selectedCard.assignmentDeadline}
+																			: formatDate(
+																					selectedCard.assignmentDeadline
+																			  )}
 																	</h2>
 																</div>
 															</td>
@@ -644,10 +674,9 @@ const TugasSiswa = () => {
 											<div>
 												<form
 													action=""
-													onSubmit={handleSubmit(
-														handleUpdateAssignmentSubmissions
-													)}
+													onSubmit={handleSubmit(handleCreatePengumpulanSubmit)}
 												>
+													<input type="hidden" {...register("assignmentId")} />
 													<p className="text-md font-bold mt-4">
 														Pengumpulan Tugas
 													</p>
@@ -705,7 +734,19 @@ const TugasSiswa = () => {
 													)}
 													<button
 														type="submit"
-														className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
+														className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32 ${
+															selectedCard &&
+															selectedCard.assignmentSubmissionStatus ===
+																"Sudah mengerjakan"
+																? "opacity-50 cursor-not-allowed"
+																: ""
+														}`}
+														disabled={
+															selectedCard &&
+															selectedCard.assignmentSubmissionStatus ===
+																"Sudah mengerjakan"
+														}
+														value={"Kirim"}
 													>
 														Kirim
 													</button>
@@ -713,81 +754,50 @@ const TugasSiswa = () => {
 											</div>
 										</Tabs.Item>
 										<Tabs.Item title="Nilai">
-											{assignmentSubmissionsData &&
-												assignmentSubmissionsData.map(
-													(assignmentSubmission, index) => {
-														const assignmentSubmissionQuery =
-															assignmentSubmissionsQueries[index];
-
-														if (!assignmentSubmissionQuery) return null; // Tambahkan pemeriksaan nol di sini
-
-														const { isLoading, error } =
-															assignmentSubmissionQuery;
-
-														if (isLoading) return <p>Loading...</p>;
-														if (error) return <p>Error: {error.message}</p>;
-                            
-                            return (
-                              <div key={index}>
-                                <p className="text-md font-bold">
-                                  Informasi Tugas
-                                </p>
-                                <div className="relative overflow-x-auto sm:rounded-lg mt-4">
-                                  <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    <tbody>
-                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td className="px-6 py-4">
-                                          Judul Tugas
-                                        </td>
-                                        <td className="px-6 py-4 float-end">
-                                          {selectedCard
-                                            ? selectedCard.assignmentName
-                                            : "Tugas"}
-                                        </td>
-                                      </tr>
-                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td className="px-6 py-4">Status</td>
-                                        <td className="px-6 py-4 float-end">
-                                          {assignmentSubmission.status === 1 ||
-                                          assignmentSubmission.status === 2
-                                            ? "Belum Dikoreksi"
-                                            : "Sudah Dikoreksi"}
-                                        </td>
-                                      </tr>
-                                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td className="px-6 py-4">Nilai</td>
-                                        <td className="px-6 py-4 float-end">
-                                          {assignmentSubmission.grade ||
-                                            "Belum ada nilai"}
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                                <div>
-                                  <p className="text-md font-bold mt-4">
-                                    Review Guru
-                                  </p>
-                                  <div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
-                                    <h2 className="p-2 text-orange-500 font-semibold text-sm">
-                                      {assignmentSubmission.comment ||
-                                        "Belum ada review"}
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                        )}
-                    </Tabs.Item>
-                  </Tabs>
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
-    </div>
-  );
+											<div>
+												<p className="text-md font-bold">Informasi Tugas</p>
+												<div className="relative overflow-x-auto sm:rounded-lg mt-4">
+													<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+														<tbody>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Nama Tugas</td>
+																<td className="px-6 py-4 float-end">
+																	{selectedCard.assignmentName}
+																</td>
+															</tr>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Status</td>
+																<td className="px-6 py-4 float-end">
+																	{dataSubmissions?.status}
+																</td>
+															</tr>
+															<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+																<td className="px-6 py-4">Nilai</td>
+																<td className="px-6 py-4 float-end">
+																	{selectedCard.grade}
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												<div>
+													<p className="text-md font-bold mt-4">Review Guru</p>
+													<div className="bg-orange-200 p-1 rounded-2xl border-2 border-orange-400 mt-3">
+														<h2 className="p-2 text-orange-500 font-semibold text-sm">
+															{selectedCard.comment}
+														</h2>
+													</div>
+												</div>
+											</div>
+										</Tabs.Item>
+									</Tabs>
+								</div>
+							</div>
+						))}
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default TugasSiswa;

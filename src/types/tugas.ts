@@ -7,6 +7,8 @@ export interface Tugas {
 	assignmentDescription: string;
 	assignmentFileData: string;
 	assignmentLink: string;
+	lessonName: string;
 	assignmentStatus: string;
+	assignmentSubmissionStatus: string;
 	courseId: string;
 }
