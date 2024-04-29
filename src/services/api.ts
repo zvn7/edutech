@@ -1,3 +1,4 @@
+import { getSchedules } from './api';
 import axios from "axios";
 import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
@@ -116,11 +117,12 @@ export const getMapelClassroom = async () => {
 // delete mapel
 export const deleteMapel = async (id: string) => {
 	try {
-		const response = await axios.delete(`${BASE_URL}/api/Lessons/${id}`, {
+		const response = await axios.put(`${BASE_URL}/api/Lessons/deactivate/${id}`, {},{
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
 		});
+	
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -147,6 +149,21 @@ export const createUserSiswa = async (data: UserSiswa) => {
 		throw new Error("failed to get data");
 	}
 };
+
+// delete siswa
+export const deleteSiswa = async (studentId:string)=>{
+	try {
+		const response = await axios.put(`${BASE_URL}/api/Account/student/delete/${studentId}`,{},{
+			headers:{
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			}
+		})
+		return response.data
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
+}
 
 export const getCourseIds = async () => {
 	return (
@@ -248,7 +265,7 @@ const getClassRoomIdFromToken = (): string | null => {
 	return null;
 };
 
-export const getClassRooms = async (data: Classrooms) => {
+export const getClassRooms = async () => {
 	try {
 		const response = await axios.get<Classrooms[]>(
 			`${BASE_URL}/api/ClassRooms`,
@@ -407,6 +424,15 @@ export const getSchedulesIds = async () => {
 	).data.map((schedules) => schedules);
 };
 
+export const getSchedulesAdmin = async () => {
+	return (
+		await axios.get<Jadwal[]>(`${BASE_URL}/api/Schedules`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
+	).data;
+};
 
 // create jadwal admin
 export const createSchedules = async(data:Jadwal)=>{

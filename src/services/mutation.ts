@@ -10,6 +10,7 @@ import {
   createGuru,
   createSchedules,
   deleteSchedule,
+  deleteSiswa,
 } from "./api";
 import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
@@ -19,7 +20,7 @@ import {
 	createMateri,
 } from "./api";
 import { Pengumpulan } from "../types/pengumpulan";
-import { IMateriGuru, MateriGuru, UploadMateri } from "../types/materi";
+import { IMateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
 
 // login
@@ -187,6 +188,28 @@ export function useDeleteMapel() {
 			await queryClient.invalidateQueries({ queryKey: ["mapel"] });
 		},
 	});
+}
+
+export function useDeleteSiswa(){
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey:['deleteSiswa'],
+		mutationFn:(studentId:string)=>deleteSiswa(studentId),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["siswa"] });
+		},
+	})
 }
 
 export function useCreateAssignmentSubmissions() {

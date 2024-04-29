@@ -1,34 +1,36 @@
-import { useState } from "react";
-import { useGetMapelId } from "../../services/queries";
+import { useEffect, useState } from "react";
+import { useClassrooms, useGetMapelId } from "../../services/queries";
 import { Button, Modal, ModalBody } from "flowbite-react";
 import { useCreateMapel, useDeleteMapel } from "../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IMapel } from "../../types/mapel";
+import { IMapel, Mapel } from "../../types/mapel";
 import Swal from "sweetalert2";
-import Select from "react-select";
-
-interface Jurusan {
-  value: string;
-  label: string;
-}
+import Select, { GroupBase, OptionsOrGroups } from "react-select";
+import axios from "axios";
 
 const TabelMapel = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subject, setSubject] = useState({
     lessonName: "",
-    classNames: [],
+    className: "",
   });
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const createMapelMutation = useCreateMapel();
-  const [selectedJurusan, setSelectedJurusan] = useState<Jurusan[]>([]);
+  const [selectedJurusan, setSelectedJurusan] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [selectedClass, setSelectedClass] = useState("semua");
   const [searchTerm, setSearchTerm] = useState("");
 
   const { register, handleSubmit, reset, setValue, clearErrors } =
     useForm<IMapel>();
+
+  const kelasQuery = useClassrooms();
+  const { data: dataKelas } = kelasQuery;
+
   const mapelQuery = useGetMapelId();
-  const { data, isLoading: isMapelLoading } = mapelQuery;
+  const { data, isLoading: isMapelLoading, refetch: refetchMapel } = mapelQuery;
 
   const handlePageSizeChange = (e: any) => {
     setPageSize(Number(e.target.value));
@@ -38,10 +40,10 @@ const TabelMapel = () => {
     setSelectedClass(e.target.value);
   };
 
-  // const filteredData =
-  //   selectedClass === "semua"
-  //     ? data
-  //     : data?.filter(({ lessonName }) => lessonName === selectedClass) || [];
+  const filteredData =
+    selectedClass === "semua"
+      ? data
+      : data?.filter(({ className }) => className === selectedClass) || [];
 
   const totalPages = Math.ceil((data ? data.length : 0) / pageSize);
 
@@ -58,9 +60,11 @@ const TabelMapel = () => {
   };
 
   const searchFilter = (mapel: any) => {
-    const teacherMatch = mapel.teacherLesson?.some((lesson: any) =>
-      lesson.nameTeacher.toUpperCase().includes(searchTerm.toUpperCase())
-    );
+    // Memeriksa apakah nameTeacher tidak null sebelum menggunakan toLowerCase()
+    const teacherMatch = mapel.nameTeacher
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
     // Pencarian berdasarkan nama mata pelajaran
     const subjectMatch = mapel.lessonName
       .toUpperCase()
@@ -87,13 +91,14 @@ const TabelMapel = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setIsModalOpen(false);
+        setOpenEditModal(false);
         setSubject({
           lessonName: "",
-          classNames: [],
+          className: "",
         });
         reset();
 
-        clearErrors("classNames");
+        clearErrors("className");
         // Reset selectedJurusan
         setSelectedJurusan([]);
       }
@@ -106,26 +111,6 @@ const TabelMapel = () => {
       ...subject,
       [name]: value,
     });
-  };
-
-  const [jurusanOptions] = useState<Jurusan[]>([
-    { value: "TKJ", label: "TKJ" },
-    { value: "TKR", label: "TKR" },
-    { value: "RPL", label: "RPL" },
-  ]);
-
-  const handleJurusanChange = (selectedOptions: any) => {
-    setSelectedJurusan(
-      selectedOptions.map((option: any) => ({
-        value: option.value as string,
-        label: option.label as string,
-      }))
-    );
-
-    setValue(
-      "classNames",
-      selectedOptions.map((option: any) => option.value)
-    );
   };
 
   const handleCreateMapelSubmit: SubmitHandler<IMapel> = (data) => {
@@ -177,6 +162,68 @@ const TabelMapel = () => {
     }
   };
 
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [formUpdate, setFormUpdate] = useState({
+    id: "",
+    lessonName: "",
+    className: "",
+  });
+
+  const handleEdit = async (data: Mapel) => {
+    setFormUpdate({
+      id: data.id,
+      lessonName: data.lessonName || "",
+      className: data.className || "",
+    });
+    setOpenEditModal(true);
+  };
+
+  const handleEditChange = (e: any) => {
+    const { value, name } = e.target;
+    setFormUpdate({
+      ...formUpdate,
+      [name]: value,
+    });
+  };
+  const [loading, setLoading] = useState(false);
+  const submitEdit = async (e: any) => {
+    e.preventDefault();
+
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://192.168.139.239:13311/api/Lessons/${formUpdate.id}`,
+        formUpdate,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      setOpenEditModal(false);
+      if (response.data) {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Mapel Berhasil diperbarui!",
+          confirmButtonText: "Ok",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            refetchMapel();
+            setOpenEditModal(false);
+            setFormUpdate({
+              id: "",
+              lessonName: "",
+              className: "",
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <>
       <div className="shadow-md sm:rounded-lg bg-white">
@@ -193,7 +240,7 @@ const TabelMapel = () => {
                 </option>
               ))}
             </select>
-            {/* 
+
             <select
               value={selectedClass}
               onChange={handleClassChange}
@@ -201,10 +248,10 @@ const TabelMapel = () => {
             >
               <option selected>semua</option>
 
-              {data?.map((item)=>(
-                <option value={item.lessonName}>{item.lessonName}</option>
+              {dataKelas?.map((item) => (
+                <option value={item.className}>{item.className}</option>
               ))}
-            </select> */}
+            </select>
 
             <div className="flex gap-2 items-center">
               <label htmlFor="table-search" className="sr-only">
@@ -263,8 +310,8 @@ const TabelMapel = () => {
           </div>
         </div>
         <div className="relative overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <table className="w-full text-sm text-gray-500">
+            <thead className="text-xs text-left text-gray-900 uppercase bg-gray-100">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   No
@@ -279,13 +326,16 @@ const TabelMapel = () => {
                   Nama guru pengajar
                 </th>
                 <th scope="col" className="px-6 py-3">
+                  status
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Action
                 </th>
               </tr>
             </thead>
             <tbody>
-              {isMapelLoading && (
-                <div className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 text-center">
+              {isMapelLoading ? (
+                <div className="text-center">
                   <div role="status">
                     <svg
                       aria-hidden="true"
@@ -306,82 +356,88 @@ const TabelMapel = () => {
                     <span className="sr-only">Loading...</span>
                   </div>
                 </div>
+              ) : !isMapelLoading &&
+                filteredData &&
+                filteredData.filter(searchFilter).length > 0 ? (
+                filteredData
+                  .filter(searchFilter)
+                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                  .map((mapel, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b hover:bg-gray-50"
+                    >
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap"
+                      >
+                        {index + 1}
+                      </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
+                      >
+                        {mapel.lessonName}
+                      </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
+                      >
+                        {mapel.className}
+                      </td>
+                      <td
+                        scope="row"
+                        className={`px-6 py-4 font-normal whitespace-nowrap capitalize ${
+                          mapel.nameTeacher === "Belum Ada Guru"
+                            ? "text-gray-500"
+                            : "text-gray-900"
+                        }`}
+                      >
+                        {mapel.nameTeacher}
+                      </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
+                      >
+                        <span
+                          className={`font-normal me-2 px-2.5 py-0.5 rounded ${
+                            mapel.lessonStatus === "Aktif"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {mapel.lessonStatus}
+                        </span>
+                      </td>
+                      <td>
+                        <Button.Group>
+                          <Button
+                            color="warning"
+                            onClick={() => handleEdit(mapel)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            color="failure"
+                            onClick={() => handleDelete(mapel.id)}
+                          >
+                            Hapus
+                          </Button>
+                        </Button.Group>
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center p-10">
+                    Tidak ada hasil pencarian yang sesuai.
+                  </td>
+                </tr>
               )}
-
-              {!isMapelLoading &&
-                data &&
-                data.filter(searchFilter).map((mapel, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b hover:bg-gray-50"
-                  >
-                    {index >= currentPage * pageSize &&
-                      index < (currentPage + 1) * pageSize && (
-                        <>
-                          <td
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                          >
-                            {index + 1}
-                          </td>
-                          <td
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
-                          >
-                            {mapel.lessonName}
-                          </td>
-                          <td
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
-                          >
-                            {mapel.classNames.map((item) => (
-                              <>
-                                <td className="py-1 font-medium text-gray-900 whitespace-nowrap capitalize">
-                                  <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded ">
-                                    {item}
-                                  </span>
-                                </td>
-                              </>
-                            ))}
-                          </td>
-                          <td
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
-                          >
-                            {mapel.teacherLesson.map((item) => (
-                              <tr>
-                                <td className="py-2 font-medium text-gray-900 whitespace-nowrap capitalize">
-                                  {item.nameTeacher} -{" "}
-                                  <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded ">
-                                    {item.classNames.join(", ")}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </td>
-                          <td>
-                            <Button.Group>
-                              <Button
-                                color="warning"
-                                // onClick={() => handleEdit(mapel.id)}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                color="failure"
-                                onClick={() => handleDelete(mapel.id)}
-                              >
-                                Hapus
-                              </Button>
-                            </Button.Group>
-                          </td>
-                        </>
-                      )}
-                  </tr>
-                ))}
             </tbody>
           </table>
         </div>
+        {/* pagination */}
         <div className="flex items-center justify-between flex-wrap gap-2 p-4">
           <span className="flex items-center gap-1">
             <div className="capitalize">halaman</div>
@@ -479,23 +535,38 @@ const TabelMapel = () => {
                   e.target.setCustomValidity("")
                 }
               />
+              <span className="text-gray-500 capitalize text-xs">
+                * penulisan mapel: mapel - nama kelas
+              </span>
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                Jurusan
+              <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+              >
+                jurusan
               </label>
-              <Select
-                id="jurusan-select"
-                isMulti
-                {...register("classNames")}
-                value={selectedJurusan}
-                onChange={handleJurusanChange}
-                options={jurusanOptions}
-                className="react-select-container"
-                classNamePrefix="react-select"
+              <select
+                id="category"
+                {...register("className")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 capitalize"
                 required
-              />
+                onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  e.currentTarget.setCustomValidity(
+                    "Pilih kelas tidak boleh kosong!"
+                  )
+                }
+                onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  e.currentTarget.setCustomValidity("")
+                }
+              >
+                <option selected>pilih kelas</option>
+                {dataKelas?.map((item) => (
+                  <option value={item.className}>{item.className}</option>
+                ))}
+              </select>
             </div>
+
             <div className="w-full mt-6">
               <input
                 type="submit"
@@ -518,6 +589,111 @@ const TabelMapel = () => {
       </Modal>
 
       {/* modal edit mapel */}
+      <Modal show={openEditModal} size="md" onClose={closeModal} popup>
+        <Modal.Header className="p-6">
+          <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+            Edit Mata Pelajaran
+          </h3>
+        </Modal.Header>
+        <ModalBody>
+          <div
+            className="space-y-6"
+            // onSubmit={handleSubmit(handleCreateMapelSubmit)}
+          >
+            <div>
+              <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                Mata Pelajaran
+              </label>
+              <input
+                id="matapelajaran"
+                type="text"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                placeholder="Nama Mata Pelajaran"
+                name="lessonName"
+                value={formUpdate.lessonName}
+                onChange={handleEditChange}
+                required
+                onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  e.target.setCustomValidity("Mapel tidak boleh kosong")
+                }
+                onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  e.target.setCustomValidity("")
+                }
+              />
+              <span className="text-gray-500 capitalize text-xs">
+                * penulisan mapel: mapel - nama kelas
+              </span>
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
+                Jurusan
+              </label>
+              <select
+                name="className"
+                value={formUpdate.className}
+                onChange={handleEditChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 capitalize"
+                required
+                onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  e.currentTarget.setCustomValidity(
+                    "Pilih jurusan tidak boleh kosong"
+                  )
+                }
+                onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  e.currentTarget.setCustomValidity("")
+                }
+              >
+                <option value="">pilih jurusan</option>
+                {dataKelas?.map((item) => (
+                  <option key={item.id} value={item.className}>
+                    {item.className}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-full mt-6">
+              <button
+                type="submit"
+                className="flex w-full items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+                disabled={loading}
+                onClick={submitEdit}
+              >
+                {loading ? (
+                  <svg
+                    className="animate-spin w-5 h-5 mr-3"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0112 4.472v3.585l-2.829 2.829zm0 8.446a8.045 8.045 0 01-2.38-2.38l2.38-2.83v5.21zM12 20.528a7.995 7.995 0 01-4-.943v-3.585L9.172 16.7c.258.258.563.465.896.605zm4-1.947l2.829-2.83 2.83 2.83-2.83 2.83v-5.22a8.045 8.045 0 01-2.38 2.38zm2.39-8.38L19.528 12h-5.21l2.83-2.829 2.83 2.829zM12 5.473V1.548A8.045 8.045 0 0115.473 4.39L12 7.863zm-2.829-.707L7.17 4.39A8.045 8.045 0 0110.39 1.548l-1.219 1.218zm1.219 13.123l-1.22 1.219a8.045 8.045 0 012.38 2.38l1.22-1.22zM16.832 16.7l1.219 1.22a8.045 8.045 0 012.38-2.38l-1.218-1.219z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Simpan"
+                )}
+              </button>
+
+              <button
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded w-full mt-2"
+                onClick={closeModal}
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
     </>
   );
 };

@@ -5,18 +5,12 @@ import Select from "react-select";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useLessonsIds } from "../../../../services/queries";
-import { useForm } from "react-hook-form";
-import { UserGuru } from "../../../../types/user";
 
 const EditGuru = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const lessonQueries = useLessonsIds();
   const { data: dataLessons } = lessonQueries;
-
-  console.log(dataLessons);
-
-  const { register, handleSubmit, reset, setValue } = useForm<UserGuru>();
 
   const option = dataLessons?.map((lesson) => ({
     value: lesson.lessonName,
@@ -59,7 +53,7 @@ const EditGuru = () => {
           address: response.data.address || "",
           phoneNumber: response.data.phoneNumber || "",
           nip: response.data.nip || "",
-          lessonTeacher: response.data.lessonTeacher || [],
+          lessonNames: response.data.lessonNames || [],
         });
         return response.data;
       } catch (error) {
@@ -101,7 +95,7 @@ const EditGuru = () => {
       Swal.fire({
         icon: "success",
         title: "Berhasil",
-        text: "Siswa Berhasil diperbarui!",
+        text: "Guru Berhasil diperbarui!",
         confirmButtonText: "Ok",
       }).then((result) => {
         /* Read more about isConfirmed, isDenied below */
@@ -116,17 +110,6 @@ const EditGuru = () => {
     }
   };
 
-  const [iconVisible, setIconVisible] = useState(false);
-  const setHandleMapel = (e: any) => {
-    setSelectedMapel(Array.isArray(e) ? e.map((mapel) => mapel.label) : []);
-  };
-
-  const setHandleJurusan = (e: any) => {
-    setSelectedJurusan(
-      Array.isArray(e) ? e.map((jurusan) => jurusan.label) : []
-    );
-  };
-
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
 
@@ -134,7 +117,7 @@ const EditGuru = () => {
     if (name === "phoneNumber" && value.length === 1 && value !== "0") {
       return; // Mencegah input jika angka pertama bukan 0
     }
-    if (name === "phoneNumber" && value.length > 15) {
+    if (name === "phoneNumber" && value.length > 13) {
       return;
     }
 
@@ -142,10 +125,6 @@ const EditGuru = () => {
       ...formData,
       [name]: value,
     });
-  };
-
-  const setHandleIcon = () => {
-    setIconVisible(!iconVisible);
   };
 
   const handleBatal = () => {
@@ -164,19 +143,6 @@ const EditGuru = () => {
       }
     });
   };
-
-  // const handleMapelChange = (e: any) => {
-  //   setSelectedMapel(
-  //     e.map((option: any) => ({
-  //       value: option.value as string,
-  //       label: option.label as string,
-  //     }))
-  //   );
-  //   setValue(
-  //     "lessonTeacher.0.lessonName",
-  //     e.map((option: any) => option.value)
-  //   );
-  // };
 
   return (
     <div>
@@ -248,85 +214,6 @@ const EditGuru = () => {
                   />
                 </div>
 
-                {/* username dan password */}
-                {/* <div>
-                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                    nama pengguna
-                  </label>
-                  <input
-                    type="text"
-                    name="brand"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                    placeholder="Masukkan nama pengguna"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                    kata sandi
-                  </label>
-                  <div className="relative ">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center ps-3.5">
-                      <button
-                        type="button"
-                        onClick={setHandleIcon}
-                        className="text-gray-400 focus:outline-none hover:text-gray-600"
-                      >
-                        {iconVisible ? (
-                          <svg
-                            className="w-6 h-6 text-gray-600 "
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-6 h-6 text-gray-600 "
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
-                            />
-                            <path
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                    <input
-                      type={iconVisible ? "text" : "password"}
-                      name="price"
-                      id="price"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                      placeholder="kata sandi"
-                      required
-                    />
-                  </div>
-                </div> */}
-
                 {/* mapel & jurusan */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
@@ -334,16 +221,17 @@ const EditGuru = () => {
                   </label>
                   <Select
                     isMulti
-                    value={formData.lessonNames}
+                    value={formData.lessonNames.map((lessonName) => ({
+                      value: lessonName,
+                      label: lessonName,
+                    }))}
                     onChange={(selectedOptions) => {
                       const selectedLessonNames = selectedOptions.map(
                         (option) => option.value
                       );
                       setFormData({
                         ...formData,
-                        lessonTeacher: selectedLessonNames.map(
-                          (lessonName) => ({ lessonName })
-                        ),
+                        lessonNames: selectedLessonNames, // Mengatur nilai lessonNames ke formData
                       });
                     }}
                     options={option}

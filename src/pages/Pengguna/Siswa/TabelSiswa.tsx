@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Button, Modal } from "flowbite-react";
 import { useGetSiswaId, useSiswaDetail } from "../../../services/queries";
 import UploadFile from "./UploadFile";
+import Swal from "sweetalert2";
+import { useDeleteSiswa } from "../../../services/mutation";
 
 const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -119,6 +121,33 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
       siswa.nameStudent.toLowerCase().includes(searchTerm.toLowerCase()) ||
       siswa.className.toUpperCase().includes(searchTerm.toUpperCase())
     );
+  };
+
+  const deleteSiswa = useDeleteSiswa();
+  const handleDelete = async (id: any) => {
+    const confirmation = await Swal.fire({
+      title: "Anda yakin ingin menonaktifkan siswa ini?",
+      text: "Aksi ini tidak dapat dibatalkan!.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+    if (confirmation.isConfirmed) {
+      try {
+        await deleteSiswa.mutateAsync(id);
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Siswa Berhasil dinonaktifkan!",
+          confirmButtonText: "Ok",
+        });
+      } catch (error) {
+        console.log("gagal");
+      }
+    }
   };
 
   return (
@@ -242,8 +271,8 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
               <th className="px-6 py-3">Aksi</th>
             </thead>
             <tbody>
-              {isSiswaLoading && (
-                <div className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 text-center">
+              {isSiswaLoading ? (
+                <div className="text-center">
                   <div role="status">
                     <svg
                       aria-hidden="true"
@@ -264,65 +293,67 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
                     <span className="sr-only">Loading...</span>
                   </div>
                 </div>
-              )}
-
-              {!isSiswaLoading &&
+              ) : !isSiswaLoading &&
                 filteredData &&
+                filteredData.filter(searchFilter).length > 0 ? (
                 filteredData
                   .filter(searchFilter)
-                  .sort((a, b) => a.nameStudent.localeCompare(b.nameStudent))
+                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
                   .map((siswa, index) => (
                     <tr
                       key={siswa.id}
                       className="bg-white border-b hover:bg-gray-50"
                     >
-                      {index >= currentPage * pageSize &&
-                        index < (currentPage + 1) * pageSize && (
-                          <>
-                            <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                              {index + 1}
-                            </td>
+                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                        {index + 1}
+                      </td>
 
-                            <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                              {siswa.nameStudent}
-                            </td>
+                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                        {siswa.nameStudent}
+                      </td>
 
-                            <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                              {siswa.nis}
-                            </td>
-                            <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                              {siswa.className}
-                            </td>
-                            <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                              {siswa.birthPlace},{" "}
-                              {formatBirthDate(
-                                siswa.birthDate || "No birth date available"
-                              )}
-                            </td>
-                            <td>
-                              <Button.Group>
-                                <Button
-                                  color="info"
-                                  onClick={() => handleDetailClick(siswa.id)}
-                                >
-                                  Detail
-                                </Button>
-                                <Link
-                                  to={`/pengguna-siswa/edit-siswa/${siswa.id}`}
-                                >
-                                  <Button
-                                    color="warning"
-                                    className="rounded-s-sm"
-                                  >
-                                    Edit
-                                  </Button>
-                                </Link>
-                              </Button.Group>
-                            </td>
-                          </>
+                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                        {siswa.nis}
+                      </td>
+                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                        {siswa.className}
+                      </td>
+                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                        {siswa.birthPlace},{" "}
+                        {formatBirthDate(
+                          siswa.birthDate || "No birth date available"
                         )}
+                      </td>
+                      <td>
+                        <Button.Group>
+                          <Button
+                            color="info"
+                            onClick={() => handleDetailClick(siswa.id)}
+                          >
+                            Detail
+                          </Button>
+                          <Link to={`/pengguna-siswa/edit-siswa/${siswa.id}`}>
+                            <Button color="warning" className="rounded-none">
+                              Edit
+                            </Button>
+                          </Link>
+                          <Button
+                            color="failure"
+                            onClick={() => handleDelete(siswa.id)}
+                          >
+                            Hapus
+                          </Button>
+                        </Button.Group>
+                      </td>
                     </tr>
-                  ))}
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center p-10">
+                    Tidak ada hasil pencarian yang sesuai.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
