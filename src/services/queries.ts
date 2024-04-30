@@ -17,11 +17,12 @@ import {
   getGuruById,
   getClassRoomsByTeacherId,
   getSchedulesAdmin,
+	getAssignmentSubmissions,
 } from "./api";
 import {
 	getAssignments,
 	getAssignmentsIds,
-	getAssignmentSubmissions,
+	// getAssignmentSubmissions,
 	getAssignmentSubmissionsIds,
 	getAttendances,
 	getAttendancesIds,
@@ -109,11 +110,11 @@ export function useGetGuru() {
 }
 
 // get guru by id
-export function useGuruDetail(id:string){
+export function useGuruDetail(id: string) {
 	return useQuery({
-		queryKey:["guru",id],
-		queryFn:()=>getGuruById(id)
-	})
+		queryKey: ["guru", id],
+		queryFn: () => getGuruById(id),
+	});
 }
 
 // get absensi
@@ -181,18 +182,25 @@ export function useAssignmentSubmissionsIds() {
 	});
 }
 
-export function useAssignmentSubmissions(
-	ids: (number | undefined)[] | undefined
-) {
-	return useQueries({
-		queries: (ids ?? []).map((assignmentId) => {
-			return {
-				queryKey: ["assignmentSubmissions", assignmentId],
-				queryFn: () => getAssignmentSubmissions(assignmentId!),
-			};
-		}),
+export function useAssignmentSubmissionsById(id: string) {
+	return useQuery({
+		queryKey: ["assignmentSubmissionsById", id],
+		queryFn: () => getAssignmentSubmissions(id),
 	});
 }
+
+// export function useAssignmentSubmissions(
+// 	ids: (number | undefined)[] | undefined
+// ) {
+// 	return useQueries({
+// 		queries: (ids ?? []).map((assignmentId) => {
+// 			return {
+// 				queryKey: ["assignmentSubmissions", assignmentId],
+// 				queryFn: () => getAssignmentSubmissions(assignmentId!),
+// 			};
+// 		}),
+// 	});
+// }
 
 export function useLessonsIds() {
 	return useQuery({
@@ -327,11 +335,11 @@ export function useCourseById(id: string) {
 	});
 }
 
-export function useGetClassrooms(){
-    return useQuery({
-        queryKey: ["classrooms"],
-        queryFn: getClassRoomsByTeacherId
-    })
+export function useGetClassrooms() {
+	return useQuery({
+		queryKey: ["classrooms"],
+		queryFn: getClassRoomsByTeacherId,
+	});
 }
 
 export function useClassrooms(){

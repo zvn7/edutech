@@ -12,7 +12,7 @@ import Select from "react-select";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IMateriGuru, UploadMateri } from "../../../types/materi";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const MateriGuru = ({ id }: { id: string }) => {
@@ -211,11 +211,35 @@ const MateriGuru = ({ id }: { id: string }) => {
       setisMobileModalOpenEdit(false);
     }
   };
+  
+	const handleCloseModalFormTablet = () => {
+		if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
+			Swal.fire({
+				title: "Anda yakin ingin meninggalkan halaman?",
+				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak, batalkan",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setisTabletModalOpenAdd(false);
+					setisTabletModalOpenEdit(false);
+				}
+			});
+		} else {
+			setisTabletModalOpenAdd(false);
+			setisTabletModalOpenEdit(false);
+		}
+	};
 
-  const handleShowModalAddFormTablet = () => {
-    setisTabletModalOpenAdd(true);
-    setisTabletModalOpenEdit(false);
-  };
+	const handleShowModalAddFormTablet = () => {
+		setisTabletModalOpenAdd(true);
+		setisTabletModalOpenEdit(false);
+	};
+
 
   const handleShowModalEditFormTablet = (id: string) => {
     setSelectedCourse(id);
@@ -286,12 +310,13 @@ const MateriGuru = ({ id }: { id: string }) => {
   const queryMapel = useGetMapelByGuru();
   const { data: dataMapel } = queryMapel;
 
-  const filteredData =
-    selectedLesson === "semua"
-      ? formData?.courses || []
-      : formData?.courses.filter(
-          ({ lessonName }) => lessonName === selectedLesson
-        ) || [];
+	const filteredData: IMateriGuru[] =
+		selectedLesson === "semua"
+			? formData || []
+			: (formData || []).filter(
+					(materi) => materi.lessonName === selectedLesson
+			  );
+
 
   const mapelOption = dataMapel?.map((mapel) => ({
     value: mapel.lessonName,
@@ -322,7 +347,11 @@ const MateriGuru = ({ id }: { id: string }) => {
     return lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase());
   };
 
+
   const [loading, setLoading] = useState(false);
+
+	// const { data: dataCourse } = useCourseById(selectedCourse ?? "");
+
 
   const { data: dataCourse } = useCourseById(selectedCourse ?? "");
 
@@ -386,218 +415,109 @@ const MateriGuru = ({ id }: { id: string }) => {
                 ))}
               </select>
             </div>
+						<div
+							className="overflow-y-auto overflow-clip max-h-[calc(100vh-195px)]"
+							style={{ scrollbarWidth: "none" }}
+						>
+							<div className="mt-8 flex flex-col gap-3 ">
+								{filteredData.filter(searchFilter).length > 0 ? (
+									filteredData.filter(searchFilter).map((card) => (
+										<div key={card.id} className="cursor-pointer">
+											<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
+												<div className="flex gap-3">
+													<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+														<svg
+															className="w-12 h-12 text-blue-600 dark:text-white"
+															aria-hidden="true"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																fillRule="evenodd"
+																d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+																clipRule="evenodd"
+															/>
+														</svg>
+													</div>
+													<div className="flex flex-col">
+														<p className="text-sm capitalize text-gray-500">
+															{card.lessonName}
+														</p>
+														<p className="text-base font-medium capitalize">
+															{card.courseName}
+														</p>
+														<p className="text-sm capitalize text-gray-500">
+															{card.longClassName}
+														</p>
+													</div>
+												</div>
+												<Button
+													color="warning"
+													onClick={
+														isMobile
+															? () => handleShowModalEditFormMobile(card.id)
+															: isTablet
+															? () => handleShowModalEditFormTablet(card.id)
+															: () => handleShowEditForm(card.id)
+													}
+												>
+													Edit
+												</Button>
+											</div>
+										</div>
+									))
+								) : (
+									<p className="text-center text-gray-400">
+										Tidak ada hasil pencarian yang sesuai.
+									</p>
+								)}
 
-            <div className="mt-5 flex justify-between gap-4">
-              <form className="max-w-xs">
-                <label
-                  htmlFor="default-search"
-                  className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-                >
-                  Search
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-                    <svg
-                      className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="search"
-                    id="default-search"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="capitalize block md:w-96 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Cari materi disini..."
-                    required
-                  />
-                </div>
-              </form>
-              {isMobile && (
-                <button
-                  type="button"
-                  onClick={handleShowModalAddFormMobile}
-                  className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Materi
-                </button>
-              )}
-              {isTablet && (
-                <button
-                  type="button"
-                  onClick={handleShowModalAddFormTablet}
-                  className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Materi
-                </button>
-              )}
-              {!isMobile && !isTablet && (
-                <button
-                  type="button"
-                  onClick={handleShowAddForm}
-                  className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Materi
-                </button>
-              )}
-            </div>
+								{filteredData.length === 0 && searchTerm.length === 0 && (
+									<p className="text-center text-gray-400">
+										Tidak ada data yang sesuai dengan pilihan pelajaran yang
+										dipilih.
+									</p>
+								)}
 
-            <div className="mt-8 flex flex-col gap-3">
-              {filteredData.filter(searchFilter).length > 0 ? (
-                filteredData.filter(searchFilter).map((card) => (
-                  <div key={card.id} className="cursor-pointer">
-                    <div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
-                      <div className="flex gap-3">
-                        <div className="bg-blue-100 rounded-lg h-14 flex items-center">
-                          <svg
-                            className="w-12 h-12 text-blue-600 dark:text-white"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <div className="flex flex-col">
-                          <p className="text-sm capitalize text-gray-500">
-                            {card.lessonName}
-                          </p>
-                          <p className="text-base font-medium capitalize">
-                            {card.courseName}
-                          </p>
-                          <p className="text-sm capitalize text-gray-500">
-                            {card.longClassName}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        color="warning"
-                        onClick={
-                          isMobile
-                            ? () => handleShowModalEditFormMobile(card.id)
-                            : isTablet
-                            ? () => handleShowModalEditFormTablet(card.id)
-                            : () => handleShowEditForm(card.id)
-                        }
-                      >
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-400">
-                  Tidak ada hasil pencarian yang sesuai.
-                </p>
-              )}
-
-              {filteredData.length === 0 && searchTerm.length === 0 && (
-                <p className="text-center text-gray-400">
-                  Tidak ada data yang sesuai dengan pilihan pelajaran yang
-                  dipilih.
-                </p>
-              )}
-            </div>
-          </div>
-          {/* right side */}
-          {/* add form */}
-          {showAddForm && (
-            <div>
-              <div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
-                <div className="flex justify-between">
-                  <p className="text-gray-500 text-xl font-bold">
-                    Upload Materi
-                  </p>
-                  <button
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={handleCloseForms}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
-                  <hr className="my-3" />
-
+								{/* {filteredData.length === 0 && searchTerm.length > 0 && (
+								<p className="text-center text-gray-400">
+									Tidak ada hasil pencarian yang sesuai.
+								</p>
+							)} */}
+							</div>
+						</div>
+					</div>
+					{/* right side */}
+					{showAddForm && (
+						<div className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16">
+							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
+								<div className="flex justify-between">
+									<p className="text-gray-500 text-xl font-bold">
+										Upload Materi
+									</p>
+									<button
+										className="text-gray-500 hover:text-gray-700"
+										onClick={handleCloseForms}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+								</div>
+								<form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
+									<hr className="my-3" />
                   <div>
                     <label
                       htmlFor="name"
@@ -624,29 +544,30 @@ const MateriGuru = ({ id }: { id: string }) => {
                       }
                     />
                   </div>
+									<p className="mt-2">Mata Pelajaran</p>
+									<select
+										{...register("LessonName")}
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+									>
+										<option value="">Pilih Mata Pelajaran</option>
+										{dataMapel &&
+											dataMapel.map((mapel) => (
+												<option key={mapel.id} value={mapel.id}>
+													{mapel.lessonName}
+												</option>
+											))}
+									</select>
 
-                  <p className="mt-2">Mata Pelajaran</p>
-                  <Select
-                    isMulti
-                    {...register("LessonName")}
-                    value={selectedMapel}
-                    onChange={handleMapelChange}
-                    options={mapelOption}
-                    className="react-select-container mt-2"
-                    classNamePrefix="react-select"
-                  />
-
-                  <p className="mt-2">Deskripsi</p>
-                  <textarea
-                    className="mt-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-                    id="comment"
-                    value={form.Description}
-                    {...register(`Description`)}
-                    onChange={handleInputChange}
-                    placeholder="Masukkan deskripsi tugas disini..."
-                    required
-                    rows={4}
-                  />
+									<p className="mt-2">Deskripsi</p>
+									<textarea
+										className="mt-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+										id="Description"
+										{...register(`Description`, { required: true })}
+										onChange={handleInputChange}
+										placeholder="Masukkan deskripsi tugas disini..."
+										required
+										rows={4}
+									/>
 
                   {/* Modul */}
                   <p className="mt-2">Modul</p>
@@ -679,87 +600,86 @@ const MateriGuru = ({ id }: { id: string }) => {
                     </div>
                   </div>
 
-                  {/* File atau link input */}
-                  {selectedOption === "file" && (
-                    <div id="fileUpload" className="mt-4">
-                      <FileInput id="file" />
-                    </div>
-                  )}
-                  {selectedOption === "link" && (
-                    <div id="linkInput" className="mt-4">
-                      <TextInput
-                        id="link"
-                        type="text"
-                        value={form.LinkCourse}
-                        {...register("LinkCourse")}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan url atau link yang valid disini"
-                      />
-                    </div>
-                  )}
+									{/* File atau link input */}
+									{selectedOption === "file" && (
+										<div id="fileUpload" className="mt-4">
+											<FileInput id="file" />
+										</div>
+									)}
+									{selectedOption === "link" && (
+										<div id="linkInput" className="mt-4">
+											<TextInput
+												id="link"
+												type="text"
+												{...register("LinkCourse")}
+												onChange={handleInputChange}
+												placeholder="Masukkan url atau link yang valid disini"
+											/>
+										</div>
+									)}
 
-                  {/* Tombol submit */}
-                  <input
-                    type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-                  />
-                </form>
-              </div>
-            </div>
-          )}
-          {/* edit form */}
-          {showEditForm && (
-            <div>
-              <div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
-                <div className="flex justify-between">
-                  <p className="text-gray-500 text-xl font-bold">Edit Materi</p>
-                  <button
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={handleCloseForms}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <hr className="my-3" />
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-                  >
-                    nama materi
-                  </label>
-                  <input
-                    type="text"
-                    name="courseName"
-                    value={formUpdate.courseName}
-                    onChange={handleInputEditChange}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-                    placeholder="Masukkan nama lengkap"
-                    required
-                    onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      e.target.setCustomValidity(
-                        "Nama Lengkap tidak boleh kosong"
-                      )
-                    }
-                    onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      e.target.setCustomValidity("")
-                    }
-                  />
-                </div>
-
+									{/* Tombol submit */}
+									<input
+										type="submit"
+										disabled={createMateri.isPending}
+										value={createMateri.isPending ? "Menyimpan..." : "Simpan"}
+										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
+									/>
+								</form>
+							</div>
+						</div>
+					)}
+					{showEditForm && (
+						<div>
+							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
+								<div className="flex justify-between">
+									<p className="text-gray-500 text-xl font-bold">Edit Materi</p>
+									<button
+										className="text-gray-500 hover:text-gray-700"
+										onClick={handleCloseForms}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+								</div>
+								<hr className="my-3" />
+								<div>
+									<label
+										htmlFor="name"
+										className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+									>
+										nama materi
+									</label>
+									<input
+										type="text"
+										name="courseName"
+										value={formUpdate.courseName}
+										onChange={handleInputEditChange}
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+										placeholder="Masukkan nama lengkap"
+										required
+										onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+											e.target.setCustomValidity(
+												"Nama Lengkap tidak boleh kosong"
+											)
+										}
+										onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+											e.target.setCustomValidity("")
+										}
+									/>
+								</div>
                 <p className="mt-2">Mata Pelajaran</p>
                 <Select
                   isMulti

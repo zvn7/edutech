@@ -216,16 +216,31 @@ export const getAssigmentByTeacherId = async () => {
 };
 
 export const getAssigmentByClassroomId = async () => {
-	return (
-		await axios.get<Tugas[]>(
+	// return (
+	// 	await axios.get<Tugas[]>(
+	// 		`${BASE_URL}/api/Assignments/getAssignmentByClassRoomId`,
+	// 		{
+	// 			headers: {
+	// 				Authorization: `Bearer ${localStorage.getItem("token")}`,
+	// 			},
+	// 		}
+	// 	)
+	// ).data.map((assignments) => assignments);
+
+	try {
+		const response = await axios.get<Tugas[]>(
 			`${BASE_URL}/api/Assignments/getAssignmentByClassRoomId`,
 			{
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
 				},
 			}
-		)
-	).data.map((assignments) => assignments.id);
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to fetch teacherinfo:", error);
+		throw new Error("Failed to fetch teacherinfo");
+	}
 };
 
 // export const getAssignmentByTeacherId = async () => {
@@ -252,6 +267,35 @@ export const getAssignments = async (id: string) => {
 	} catch (error) {
 		console.error("Failed to fetch assignments:", error);
 		throw new Error("Failed to fetch assignments");
+	}
+};
+
+export const createTugas = async (data: Tugas) => {
+	try {
+		const response = await axios.post(`${BASE_URL}/api/Assignments`, data, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to post materi:", error);
+	}
+};
+
+export const deleteTugas = async (id: string) => {
+	try {
+		const response = await axios.delete(`${BASE_URL}/api/Assignments/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to delete data");
 	}
 };
 
@@ -289,32 +333,32 @@ export const getAssignmentSubmissionsIds = async () => {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
 		})
-	).data.map((assignmentSubmissions) => assignmentSubmissions.id);
+	).data.map((assignmentSubmissions) => assignmentSubmissions);
 };
 
-export const getAssignmentSubmissions = async (assignmentId: number) => {
-	try {
-		const classRoomId = getClassRoomIdFromToken();
-		if (!classRoomId) {
-			throw new Error("ClassRoomId not found in token");
-		}
+// export const getAssignmentSubmissions = async (assignmentId: number) => {
+// 	try {
+// 		const classRoomId = getClassRoomIdFromToken();
+// 		if (!classRoomId) {
+// 			throw new Error("ClassRoomId not found in token");
+// 		}
 
-		const response = await axios.get<Pengumpulan[]>(
-			`${BASE_URL}/api/AssignmentSubmissions/${classRoomId}/${assignmentId}`,
-			{
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
-			}
-		);
-		console.log(response.data);
+// 		const response = await axios.get<Pengumpulan[]>(
+// 			`${BASE_URL}/api/AssignmentSubmissions/${classRoomId}/${assignmentId}`,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 		);
+// 		console.log(response.data);
 
-		return response.data;
-	} catch (error) {
-		console.error("Failed to fetch assignment submissions:", error);
-		throw new Error("Failed to fetch assignment submissions");
-	}
-};
+// 		return response.data;
+// 	} catch (error) {
+// 		console.error("Failed to fetch assignment submissions:", error);
+// 		throw new Error("Failed to fetch assignment submissions");
+// 	}
+// };
 
 export const createAssignmentSubmissions = async (data: Pengumpulan) => {
 	try {
@@ -361,30 +405,30 @@ const getStudentIdFromToken = (): string | null => {
 	return null;
 };
 
-export const editAssignmentSubmission = async (data: any) => {
-	try {
-		const assignmentId = data.id;
-		const studentId = getStudentIdFromToken();
-		if (!studentId) {
-			throw new Error("StudentId not found in token");
-		}
-		const response = await axios.put(
-			`${BASE_URL}/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
-			data,
-			{
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
-			}
-		);
-		console.log(response.data);
+// export const editAssignmentSubmission = async (data: any) => {
+// 	try {
+// 		const assignmentId = data.id;
+// 		const studentId = getStudentIdFromToken();
+// 		if (!studentId) {
+// 			throw new Error("StudentId not found in token");
+// 		}
+// 		const response = await axios.put(
+// 			`${BASE_URL}/api/AssignmentSubmissions/student/${studentId}/assignment/${assignmentId}`,
+// 			data,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 		);
+// 		console.log(response.data);
 
-		return response.data;
-	} catch (error) {
-		console.error("Failed to edit assignment submission:", error);
-		throw new Error("Failed to edit assignment submission");
-	}
-};
+// 		return response.data;
+// 	} catch (error) {
+// 		console.error("Failed to edit assignment submission:", error);
+// 		throw new Error("Failed to edit assignment submission");
+// 	}
+// };
 
 export const getLessonsIds = async () => {
 	try {
@@ -392,11 +436,11 @@ export const getLessonsIds = async () => {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
-		})
-		return response.data
+		});
+		return response.data;
 	} catch (error) {
 		console.log(error);
-		throw new Error("Failed to get data");		
+		throw new Error("Failed to get data");
 	}
 };
 
@@ -435,19 +479,19 @@ export const getSchedulesAdmin = async () => {
 };
 
 // create jadwal admin
-export const createSchedules = async(data:Jadwal)=>{
+export const createSchedules = async (data: Jadwal) => {
 	try {
-		const response = await axios.post(`${BASE_URL}/api/schedules`,data,{
-			headers:{
+		const response = await axios.post(`${BASE_URL}/api/schedules`, data, {
+			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
-		})
-		return response.data
+		});
+		return response.data;
 	} catch (error) {
 		console.error("Failed to post assignments:", error);
 		throw new Error("Failed to post assignments");
 	}
-}
+};
 
 // hapus jadwal
 export const deleteSchedule = async (id: string) => {
@@ -535,7 +579,7 @@ export const getAttendances = async (id: number) => {
 export const getCourseClassroom = async () => {
 	try {
 		const response = await axios.get<CourseClassroom>(
-			`${BASE_URL}/api/Courses/studentcourseclassroom`,
+			`${BASE_URL}/api/Courses/getCourseByClassRoomId`,
 			{
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -637,8 +681,6 @@ export const editSiswa = async (id: string, data: UserSiswa) => {
 	}
 };
 
-
-
 // get absensi siswa
 export const getAbsensi = async () => {
 	try {
@@ -656,8 +698,8 @@ export const getAbsensi = async () => {
 
 export const getTeacherinfo = async () => {
 	try {
-		const response = await axios.get<IMateriGuru>(
-			`${BASE_URL}/api/Courses/teachercourses`,
+		const response = await axios.get<IMateriGuru[]>(
+			`${BASE_URL}/api/Courses/getCourseByTeacherId`,
 			{
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -780,28 +822,35 @@ export const getCourseById = async (id: string) => {
 };
 
 // get guru by id
-export const getGuruById = async (id: string)=>{
+export const getGuruById = async (id: string) => {
 	try {
-		const response = await axios.get<UserGuru>(`${BASE_URL}/api/Account/teacher/${id}`, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
+		const response = await axios.get<UserGuru>(
+			`${BASE_URL}/api/Account/teacher/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
 		return response.data;
 	} catch (error) {
 		console.log(error);
 		throw new Error("Failed to get data");
 	}
-}
+};
 
 // create guru
 export const createGuru = async (data: UserGuru) => {
 	try {
-		const response = await axios.post(`${BASE_URL}/api/Account/register/teacher`, data, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
+		const response = await axios.post(
+			`${BASE_URL}/api/Account/register/teacher`,
+			data,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
 		console.log(response.data);
 		return response.data;
 	} catch (error) {
@@ -811,3 +860,36 @@ export const createGuru = async (data: UserGuru) => {
 };
 
 // akhir api guru
+
+// pengumpulan
+export const createPengumpulan = async (data: Pengumpulan) => {
+	try {
+		const response = await axios.post(`${BASE_URL}/api/AssignmentSubmissions`, data, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to post pengumpulan:", error);
+	}
+};
+
+export const getAssignmentSubmissions = async (id: string) => {
+	try {
+		const response = await axios.get<Pengumpulan>(
+			`${BASE_URL}/api/AssignmentSubmissions/getSubmissionForStudentByAssignmentId/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to fetch assignment submissions:", error);
+		throw new Error("Failed to fetch assignment submissions");
+	}
+};

@@ -18,21 +18,16 @@ export interface CourseClassroom {
 }
 
 export interface IMateriGuru {
-	teacherId: string;
-	courses: [
-		{
-			id: string;
-			nameTeacher: string;
-			courseName: string;
-			description: string;
-			fileName: string;
-			linkCourse: string;
-			className: string;
-			fileData: string;
-			lessonName: string;
-			longClassName: string;
-		}
-	];
+	id: string;
+	nameTeacher: string;
+	lessonName: string;
+	courseName: string;
+	description: string;
+	fileName: string;
+	linkCourse: string;
+	className: string;
+	longClassName: string;
+	fileData: string;
 }
 
 export interface UploadMateri {

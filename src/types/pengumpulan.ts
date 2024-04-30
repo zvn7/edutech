@@ -1,9 +1,10 @@
 export interface Pengumpulan {
-	id: number;
+	id: string;
 	assignmentId: number;
 	classroomId: number;
 	submissionTime: string;
-	status: number;
+	status: string;
+	submissionTimeStatus: string
 	link: string;
 	grade: number;
 	comment: string;

@@ -11,6 +11,9 @@ import {
   createSchedules,
   deleteSchedule,
   deleteSiswa,
+  createTugas,
+  deleteTugas,
+  createPengumpulan,
 } from "./api";
 import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
@@ -22,6 +25,7 @@ import {
 import { Pengumpulan } from "../types/pengumpulan";
 import { IMateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
+import { Tugas } from "../types/tugas";
 
 // login
 export function useLogin() {
@@ -244,37 +248,37 @@ export function useCreateAssignmentSubmissions() {
 	});
 }
 
-export function useEditAssignmentSubmission() {
-	const queryClient = useQueryClient();
+// export function useEditAssignmentSubmission() {
+// 	const queryClient = useQueryClient();
 
-	return useMutation({
-		mutationKey: ["assignmentSubmission"],
-		mutationFn: (data: Pengumpulan) => editAssignmentSubmission(data),
+// 	return useMutation({
+// 		mutationKey: ["assignmentSubmission"],
+// 		mutationFn: (data: Pengumpulan) => editAssignmentSubmission(data),
 
-		onMutate: () => {
-			console.log("Mutate");
-		},
+// 		onMutate: () => {
+// 			console.log("Mutate");
+// 		},
 
-		onError: () => {
-			console.log("Error");
-		},
+// 		onError: () => {
+// 			console.log("Error");
+// 		},
 
-		onSuccess: () => {
-			console.log("Success");
-		},
+// 		onSuccess: () => {
+// 			console.log("Success");
+// 		},
 
-		onSettled: async (_, error, variables) => {
-			console.log("Settled");
-			if (error) {
-				console.log(error);
-			} else {
-				await queryClient.invalidateQueries({
-					queryKey: ["assignment", variables.assignmentId], // Menggunakan assignmentId sebagai bagian dari queryKey
-				});
-			}
-		},
-	});
-}
+// 		onSettled: async (_, error, variables) => {
+// 			console.log("Settled");
+// 			if (error) {
+// 				console.log(error);
+// 			} else {
+// 				await queryClient.invalidateQueries({
+// 					queryKey: ["assignment", variables.assignmentId], // Menggunakan assignmentId sebagai bagian dari queryKey
+// 				});
+// 			}
+// 		},
+// 	});
+// }
 
 // create materi
 export function useCreateMateri() {
@@ -343,4 +347,71 @@ export function useCreateUserGuru(){
             await queryClient.invalidateQueries({ queryKey: ["userguru"] });
         },
     })
+}
+
+// create tugas
+export function useCreateTugas() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ["createTugas"],
+		mutationFn: (data: Tugas) => createTugas(data),
+		onMutate: () => {
+			console.log("Mutate");
+		},
+		onError: () => {
+			console.log("Error");
+		},
+		onSettled: () => {
+			console.log("Settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("Success", data);
+			await queryClient.invalidateQueries({ queryKey: ["assignmentsByClassroomId"] });
+		},
+	});
+}
+
+export function useDeleteTugas() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["deleteTugas"],
+		mutationFn: (id: string) => deleteTugas(id),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["assignmentsByTeacherId"] });
+		},
+	});
+}
+
+// pengumpulan tugas
+
+export function useCreatePengumpulan() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ["createPengumpulan"],
+		mutationFn: (data: Pengumpulan) => createPengumpulan(data),
+		onMutate: () => {
+			console.log("Mutate");
+		},
+		onError: () => {
+			console.log("Error");
+		},
+		onSettled: () => {
+			console.log("Settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("Success", data);
+			await queryClient.invalidateQueries({ queryKey: ["assignmentsByClassroomId"] });
+		},
+	});
 }

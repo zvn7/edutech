@@ -198,7 +198,7 @@ const Navigation = () => {
           <Dropdown
             arrowIcon={false}
             inline
-            label={<Avatar alt="User settings" img="/img/user.png" rounded />}
+            label={<Avatar alt="User" img="/img/user.jpg" rounded />}
           >
             {/* role admin */}
             <div>

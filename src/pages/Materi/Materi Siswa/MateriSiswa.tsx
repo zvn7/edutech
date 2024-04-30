@@ -3,9 +3,7 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { Tabs } from "flowbite-react";
 import {
 	useCourseClassroom,
-	useLessons,
 	useLessonsClassroom,
-	useLessonsIds,
 } from "../../../services/queries";
 import axios from "axios";
 
@@ -101,7 +99,7 @@ const MateriSiswa = () => {
     }
   };
 
-  const filteredCourses = formData?.courses.filter(
+  const filteredCourses = formData?.filter(
     (course) =>
       selectedSubject === "" || course.uniqueNumberOfLesson === selectedSubject
   );
@@ -113,7 +111,7 @@ const MateriSiswa = () => {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 					<div>
 						<div className="mt-14 flex justify-between">
-							<h1 className="text-3xl font-bold font-mono">Materi</h1>
+							<h1 className="text-3xl font-bold">Materi</h1>
 							<select
 								id="subject"
 								className="block  py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
@@ -131,7 +129,7 @@ const MateriSiswa = () => {
 
 						<div className="mt-8 flex flex-col gap-3">
 							{filteredCourses && (
-								<div key={formData.id} className="cursor-pointer rounded-lg ">
+								<div className="cursor-pointer rounded-lg ">
 									{filteredCourses.map((course) => (
 										<div
 											key={course.id}
