@@ -141,12 +141,12 @@ const TambahJadwalAdmin = () => {
                       ))}
                     </select>
                   </div>
-                  <div>
+                  {/* <div>
                     <label
                       htmlFor="category"
                       className="block mb-2 text-sm font-medium text-blue-700 capitalize"
                     >
-                      kelas
+                      jurusan
                     </label>
                     <select
                       id="category"
@@ -165,11 +165,11 @@ const TambahJadwalAdmin = () => {
                       <option selected>pilih kelas</option>
                       {dataJadwal
                         ?.find((lesson) => lesson.lessonName === selectedLesson)
-                        ?.classNames.map((item) => (
+                        ?.className.map((item) => (
                           <option value={item}>{item}</option>
                         ))}
                     </select>
-                  </div>
+                  </div> */}
                   <div>
                     <label
                       htmlFor="category"

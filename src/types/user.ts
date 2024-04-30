@@ -20,6 +20,8 @@ export interface UserGuru {
   id: string;
   status: string;
   nameTeacher: string;
+  userName:string,
+  password:string,
   birthDate: string;
   birthPlace: string;
   address: string;

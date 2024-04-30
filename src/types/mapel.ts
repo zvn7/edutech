@@ -1,20 +1,16 @@
-export interface IMapel{
-    id:number,
-    lessonName:string,
-    uniqueNumberOfLesson:string
-    classNames :[],
-    teacherLesson:[
-        {
-            nameTeacher:string,
-            classNames :[],
-        }
-    ]
+export interface IMapel {
+  id: string;
+  lessonName: string;
+  uniqueNumberOfLesson: string;
+  className: string;
+  nameTeacher: string;
+  lessonStatus:string;
 }
 
 export interface Mapel {
-	id: number;
-	lessonName: string;
-	uniqueNumberOfLesson: string;
-    className :[],
+  id: string;
+  lessonName: string;
+  uniqueNumberOfLesson: string;
+  className: string;
+  lessonStatus:string;
 }
-

@@ -14,8 +14,9 @@ import {
 	getSiswaIds,
 	getTeacherinfo,
 	getUserInfo,
-	getGuruById,
-	getClassRoomsByTeacherId,
+  getGuruById,
+  getClassRoomsByTeacherId,
+  getSchedulesAdmin,
 	getAssignmentSubmissions,
 } from "./api";
 import {
@@ -235,6 +236,12 @@ export function useSchedulesIds() {
 	});
 }
 
+export function useSchedulesAdmin(){
+	return useQuery({
+		queryKey: ["schedulesAdmin"],
+		queryFn : getSchedulesAdmin
+	})
+}
 // export function useSchedules(ids: (number | undefined)[] | undefined) {
 // 	return useQueries({
 // 		queries: (ids ?? []).map((id) => {
@@ -333,4 +340,11 @@ export function useGetClassrooms() {
 		queryKey: ["classrooms"],
 		queryFn: getClassRoomsByTeacherId,
 	});
+}
+
+export function useClassrooms(){
+	return useQuery({
+		queryKey: ["classrooms"],
+		queryFn: getClassRooms
+	})
 }

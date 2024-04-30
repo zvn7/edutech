@@ -193,35 +193,7 @@ const EditJadwalAdmin = () => {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700">
-                      kelas
-                    </label>
-                    <select
-                      name="className" // Menambahkan properti name
-                      value={formData.className || selectedClass}
-                      onChange={handleClassChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 capitalize"
-                      required
-                      onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        e.currentTarget.setCustomValidity(
-                          "Pilih kelas tidak boleh kosong!"
-                        )
-                      }
-                      onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        e.currentTarget.setCustomValidity("")
-                      }
-                    >
-                      <option selected>pilih kelas</option>
-                      {dataJadwal
-                        ?.find((lesson) => lesson.lessonName === selectedLesson)
-                        ?.classNames.map((item) => (
-                          <option key={item} value={item}>
-                            {item}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
+
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
                       hari

@@ -37,13 +37,15 @@ const TambahGuru = () => {
     classNames: [],
   });
 
+  const [formattedNip, setFormattedNip] = useState("");
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
+
     // Memastikan bahwa nomor telepon dimulai dengan angka 0
     if (name === "phoneNumber" && value.length === 1 && value !== "0") {
       return; // Mencegah input jika angka pertama bukan 0
     }
-    if (name === "phoneNumber" && value.length > 15) {
+    if (name === "phoneNumber" && value.length > 13) {
       return;
     }
     setFormData({
@@ -52,14 +54,44 @@ const TambahGuru = () => {
     });
   };
 
+  const handleInputNip = (e: any) => {
+    const { value, name } = e.target;
+    const inputValue = value.replace(/\D/g, "");
+
+    // Menerapkan format spasi setelah 8 dan 14 karakter
+    let formattedValue = "";
+    for (let i = 0; i < inputValue.length; i++) {
+      if (i === 8 || i === 14 || i === 15) {
+        formattedValue += " ";
+      }
+      formattedValue += inputValue[i];
+    }
+
+    // Memperbarui nilai input yang sudah diformat
+    setFormattedNip(formattedValue);
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+  const handlePasswordValidation = (e: any) => {
+    const password = e.target.value;
+
+    // Regex untuk memvalidasi bahwa password harus mengandung minimal satu huruf besar,
+    // mengandung kata 'Edu', dan mengandung karakter '#'
+    const passwordRegex = /^(?=.*[A-Z])(?=.*Edu)(?=.*[#]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      e.target.setCustomValidity(
+        'Password harus mengandung minimal satu huruf besar, mengandung kata "Edu", dan mengandung karakter "#"'
+      );
+    } else {
+      e.target.setCustomValidity("");
+    }
+  };
+
   const createGuruMutation = useCreateUserGuru();
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const { register, setValue, handleSubmit, reset } = useForm<UserGuru>();
   const navigate = useNavigate();
 
   const handleCreateGuruSubmit: SubmitHandler<UserGuru> = (data) => {
@@ -102,12 +134,9 @@ const TambahGuru = () => {
     setSelectedMapel(Array.isArray(e) ? e.map((mapel) => mapel.label) : []);
   };
 
-  const setHandleJurusanChange = (selectedOptions) => {
-    // Mengonversi nilai selectedOptions ke format yang diharapkan oleh formData.lessonNames
-    const selectedMapel = selectedOptions.map((option) => ({
-      value: option.value,
-      label: option.label,
-    }));
+  const setHandleJurusanChange = (selectedOptions: any) => {
+    // Mengonversi nilai selectedOptions ke format yang diharapkan oleh backend
+    const selectedMapel = selectedOptions.map((option: any) => option.value);
     setValue("lessonNames", selectedMapel); // Mengatur nilai lessonNames dengan setValue
   };
 
@@ -115,24 +144,12 @@ const TambahGuru = () => {
     setIconVisible(!iconVisible);
   };
 
-  const getClassOptions = () => {
-    if (!dataClassrooms) return [];
-
-    // Membuat opsi kelas dari dataClassrooms
-    const classOptions = dataClassrooms.map((classroom) => ({
-      value: classroom.id,
-      label: classroom.className, // Anda harus menyesuaikan dengan nama properti yang sesuai
-    }));
-
-    return classOptions;
-  };
-
   const getLessonOptions = () => {
     if (!dataLessons) return [];
 
     // Membuat opsi pelajaran dari dataLessons
     const lessonOptions = dataLessons.map((lesson) => ({
-      value: lesson.id,
+      value: lesson.lessonName,
       label: lesson.lessonName, // Hanya menampilkan lessonName dalam label
     }));
 
@@ -190,8 +207,17 @@ const TambahGuru = () => {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
                       placeholder="Masukkan nama lengkap"
                       required
+                      onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity(
+                          "Nama Lengkap tidak boleh kosong"
+                        )
+                      }
+                      onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity("")
+                      }
                     />
                   </div>
+                  {/* nip */}
                   <div>
                     <label
                       htmlFor="name"
@@ -201,15 +227,23 @@ const TambahGuru = () => {
                     </label>
                     <input
                       type="text"
-                      value={formData.nip}
+                      value={formattedNip}
                       {...register("nip")}
-                      onChange={handleInputChange}
+                      onChange={handleInputNip}
+                      name="nip"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
                       placeholder="Masukkan NIP"
                       required
+                      minLength={17} // Set minimum length to accommodate for spaces
+                      maxLength={21} // Maximum length with spaces
+                      onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity("Nip tidak boleh kosong")
+                      }
+                      onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity("")
+                      }
                     />
                   </div>
-
                   {/* username dan password */}
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
@@ -223,6 +257,14 @@ const TambahGuru = () => {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                       placeholder="Masukkan nama pengguna"
                       required
+                      onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity(
+                          "Nama Pengguna tidak boleh kosong"
+                        )
+                      }
+                      onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        e.target.setCustomValidity("")
+                      }
                     />
                   </div>
                   <div>
@@ -283,13 +325,13 @@ const TambahGuru = () => {
                         value={formData.password}
                         {...register("password")}
                         onChange={handleInputChange}
+                        onBlur={handlePasswordValidation}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                         placeholder="kata sandi"
                         required
                       />
                     </div>
                   </div>
-
                   {/* mapel & jurusan */}
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
@@ -303,27 +345,6 @@ const TambahGuru = () => {
                       className="text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full capitalize"
                     />
                   </div>
-
-                  {/* <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
-                      jurusan
-                    </label>
-                    <Select
-                      value={formData.classNames}
-                      {...register("classNames")}
-                      onChange={(selectedOptions) => {
-                        setFormData({
-                          ...formData,
-                          classNames: selectedOptions,
-                        });
-                      }}
-                      options={getClassOptions()}
-                      placeholder="pilih jurusan..."
-                      isMulti
-                      className=" text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full capitalize"
-                    />
-                  </div> */}
-
                   {/* tempat & tgl lahir */}
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
@@ -379,7 +400,6 @@ const TambahGuru = () => {
                       <option value="2">Perempuan</option>
                     </select>
                   </div>
-
                   {/* alamat & no tlp */}
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
@@ -407,6 +427,9 @@ const TambahGuru = () => {
                       placeholder="masukkan nomor telepon"
                       required
                     />
+                    <span className="text-gray-500 capitalize text-xs">
+                      * nomor telepon diawali angka 0 dan max 15 angka
+                    </span>
                   </div>
                   <div className="flex gap-2 items-center">
                     <input
