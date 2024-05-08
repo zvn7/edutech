@@ -245,29 +245,6 @@ const MateriGuru = () => {
 		}
 	};
 
-  const handleCloseModalFormTablet = () => {
-    if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
-      Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setisTabletModalOpenAdd(false);
-          setisTabletModalOpenEdit(false);
-        }
-      });
-    } else {
-      setisTabletModalOpenAdd(false);
-      setisTabletModalOpenEdit(false);
-    }
-  };
-
 	const handleShowModalEditFormTablet = (data: IMateriGuru) => {
 		setFormUpdate({
 			id: data.id,
@@ -313,20 +290,19 @@ const MateriGuru = () => {
 		);
 	};
 
-
 	return (
 		<div>
 			<Navigation />
 			<div className="p-4 sm:ml-64">
-				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
 					{/* left side */}
 					<div>
-						<div className="mt-16 flex justify-between items-center mb-2">
+						<div className="flex items-center justify-between mt-16 mb-2">
 							<h1 className="text-3xl font-bold capitalize">Materi</h1>
 							<select
 								value={selectedLesson}
 								onChange={handleLessonChange}
-								className="border border-gray-300 bg-white p-1 rounded-lg capitalize"
+								className="p-1 capitalize bg-white border border-gray-300 rounded-lg"
 							>
 								<option selected>semua</option>
 								{dataMapel?.map((item) => (
@@ -335,7 +311,7 @@ const MateriGuru = () => {
 							</select>
 						</div>
 
-						<div className="mt-5 flex justify-between gap-4 mb-2">
+						<div className="flex justify-between gap-4 mt-5 mb-2">
 							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
 								<label
 									htmlFor="default-search"
@@ -344,7 +320,7 @@ const MateriGuru = () => {
 									Search
 								</label>
 								<div className="relative">
-									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
+									<div className="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-2">
 										<svg
 											className="w-3 h-3 text-gray-500 dark:text-gray-400"
 											aria-hidden="true"
@@ -364,7 +340,7 @@ const MateriGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+										className="block w-56 p-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg md:w-80 ps-7 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										placeholder="Cari..."
 										value={searchTerm}
 										onChange={handleSearchChange}
@@ -376,7 +352,7 @@ const MateriGuru = () => {
 								<button
 									type="button"
 									onClick={handleShowModalAddFormMobile}
-									className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 								>
 									<svg
 										className="w-5 h-5 text-white dark:text-white"
@@ -402,7 +378,7 @@ const MateriGuru = () => {
 								<button
 									type="button"
 									onClick={handleShowModalAddFormTablet}
-									className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 								>
 									<svg
 										className="w-5 h-5 text-white dark:text-white"
@@ -428,7 +404,7 @@ const MateriGuru = () => {
 								<button
 									type="button"
 									onClick={handleShowAddForm}
-									className="justify-between px-4 py-2 text-sm font-medium text-center flex gap-2 items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 								>
 									<svg
 										className="w-5 h-5 text-white dark:text-white"
@@ -456,13 +432,13 @@ const MateriGuru = () => {
 							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
 							style={{ scrollbarWidth: "none" }}
 						>
-							<div className="mt-6 flex flex-col gap-3 ">
+							<div className="flex flex-col gap-3 mt-6 ">
 								{filteredData.filter(searchFilter).length > 0 ? (
 									filteredData.filter(searchFilter).map((card) => (
 										<div key={card.id} className="cursor-pointer">
-											<div className="flex justify-between items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
+											<div className="flex items-center justify-between gap-2 p-3 bg-white rounded-lg shadow-sm">
 												<div className="flex gap-3">
-													<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+													<div className="flex items-center bg-blue-100 rounded-lg h-14">
 														<svg
 															className="w-12 h-12 text-blue-600 dark:text-white"
 															aria-hidden="true"
@@ -478,13 +454,13 @@ const MateriGuru = () => {
 														</svg>
 													</div>
 													<div className="flex flex-col">
-														<p className="text-sm capitalize text-gray-500">
+														<p className="text-sm text-gray-500 capitalize">
 															{card.lessonName}
 														</p>
 														<p className="text-base font-medium capitalize">
 															{card.courseName}
 														</p>
-														<p className="text-sm capitalize text-gray-500">
+														<p className="text-sm text-gray-500 capitalize">
 															{card.longClassName}
 														</p>
 													</div>
@@ -510,14 +486,14 @@ const MateriGuru = () => {
 									</p>
 								)}
 
-                {filteredData.length === 0 && searchTerm.length === 0 && (
-                  <p className="text-center text-gray-400">
-                    Tidak ada data yang sesuai dengan pilihan pelajaran yang
-                    dipilih.
-                  </p>
-                )}
+								{filteredData.length === 0 && searchTerm.length === 0 && (
+									<p className="text-center text-gray-400">
+										Tidak ada data yang sesuai dengan pilihan pelajaran yang
+										dipilih.
+									</p>
+								)}
 
-                {/* {filteredData.length === 0 && searchTerm.length > 0 && (
+								{/* {filteredData.length === 0 && searchTerm.length > 0 && (
 								<p className="text-center text-gray-400">
 									Tidak ada hasil pencarian yang sesuai.
 								</p>
@@ -528,12 +504,12 @@ const MateriGuru = () => {
 					{/* right side */}
 					{showAddForm && (
 						<div
-							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							className="fixed w-2/5 h-screen pb-16 overflow-y-auto right-4 top-6"
 							style={{ scrollbarWidth: "none" }}
 						>
-							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
+							<div className="p-3 bg-white border rounded-lg shadow-sm mt-14">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">
+									<p className="text-xl font-bold text-gray-500">
 										Upload Materi
 									</p>
 									<button
@@ -542,7 +518,7 @@ const MateriGuru = () => {
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -565,19 +541,19 @@ const MateriGuru = () => {
 					)}
 					{showEditForm && (
 						<div
-							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							className="fixed w-2/5 h-screen pb-16 overflow-y-auto right-4 top-6"
 							style={{ scrollbarWidth: "none" }}
 						>
-							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
+							<div className="p-3 bg-white border rounded-lg shadow-sm mt-14">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">Edit Materi</p>
+									<p className="text-xl font-bold text-gray-500">Edit Materi</p>
 									<button
 										className="text-gray-500 hover:text-gray-700"
 										onClick={handleCloseForms}
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -600,10 +576,10 @@ const MateriGuru = () => {
 						</div>
 					)}
 					{isMobileModalOpenAdd && (
-						<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-							<div className="bg-white p-4 rounded-lg w-full sm:max-w-md">
+						<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+							<div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">
+									<p className="text-xl font-bold text-gray-500">
 										Upload Materi
 									</p>
 									<button
@@ -612,7 +588,7 @@ const MateriGuru = () => {
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -635,17 +611,17 @@ const MateriGuru = () => {
 						</div>
 					)}
 					{isMobileModalOpenEdit && (
-						<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-							<div className="bg-white p-4 rounded-lg w-full sm:max-w-md">
+						<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+							<div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">Edit Materi</p>
+									<p className="text-xl font-bold text-gray-500">Edit Materi</p>
 									<button
 										className="text-gray-500 hover:text-gray-700"
 										onClick={handleCloseModalFormMobile}
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -668,10 +644,10 @@ const MateriGuru = () => {
 						</div>
 					)}
 					{isTabletModalOpenAdd && (
-						<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-							<div className="bg-white p-4 rounded-lg w-full sm:max-w-md">
+						<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+							<div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">
+									<p className="text-xl font-bold text-gray-500">
 										Upload Materi
 									</p>
 									<button
@@ -680,7 +656,7 @@ const MateriGuru = () => {
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -703,17 +679,17 @@ const MateriGuru = () => {
 						</div>
 					)}
 					{isTabletModalOpenEdit && (
-						<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-							<div className="bg-white p-4 rounded-lg w-full sm:max-w-md">
+						<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+							<div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
 								<div className="flex justify-between">
-									<p className="text-gray-500 text-xl font-bold">Edit Materi</p>
+									<p className="text-xl font-bold text-gray-500">Edit Materi</p>
 									<button
 										className="text-gray-500 hover:text-gray-700"
 										onClick={handleCloseModalFormTablet}
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-6 w-6"
+											className="w-6 h-6"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
