@@ -14,6 +14,10 @@ import {
   createTugas,
   deleteTugas,
   createPengumpulan,
+  createTodo,
+  editTodo,
+  deleteTodo,
+  editTodoCheck,
 } from "./api";
 import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
@@ -26,6 +30,7 @@ import { Pengumpulan } from "../types/pengumpulan";
 import { IMateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
 import { Tugas } from "../types/tugas";
+import { ToDoList } from "../types/todolist";
 
 // login
 export function useLogin() {
@@ -297,7 +302,7 @@ export function useCreateMateri() {
 		},
 		onSuccess: async (data: any) => {
 			console.log("Success", data);
-			await queryClient.invalidateQueries({ queryKey: ["course"] });
+			await queryClient.invalidateQueries({ queryKey: ["teacherinfo"] });
 		},
 	});
 }
@@ -366,7 +371,7 @@ export function useCreateTugas() {
 		},
 		onSuccess: async (data: any) => {
 			console.log("Success", data);
-			await queryClient.invalidateQueries({ queryKey: ["assignmentsByClassroomId"] });
+			await queryClient.invalidateQueries({ queryKey: ["assignmentsByTeacherId"] });
 		},
 	});
 }
@@ -412,6 +417,98 @@ export function useCreatePengumpulan() {
 		onSuccess: async (data: any) => {
 			console.log("Success", data);
 			await queryClient.invalidateQueries({ queryKey: ["assignmentsByClassroomId"] });
+		},
+	});
+}
+
+// create todo
+export function useCreateTodo() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["createTodo"],
+		mutationFn: (data: ToDoList) => createTodo(data),
+
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["todo"] });
+		},
+	});
+}
+
+export function useEditTodo() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["editTodo"],
+		mutationFn: ({ id, data }: { id: string; data: ToDoList }) =>
+			editTodo(id, data),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["todo"] });
+		},
+	});
+}
+
+export function useEditTodoCheck() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["editTodo"],
+		mutationFn: ({ id, data }: { id: string; data: ToDoList }) =>
+			editTodoCheck(id, data),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["todo"] });
+		},
+	});
+}
+
+export function useDeleteTodo() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["deleteTodo"],
+		mutationFn: (id: string) => deleteTodo(id),
+		onMutate: () => {
+			console.log("mutate");
+		},
+		onError: () => {
+			console.log("error");
+		},
+		onSettled: () => {
+			console.log("settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("success", data);
+			await queryClient.invalidateQueries({ queryKey: ["todo"] });
 		},
 	});
 }

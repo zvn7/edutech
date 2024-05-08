@@ -18,6 +18,7 @@ export interface CourseClassroom {
 }
 
 export interface IMateriGuru {
+	courseId: string;
 	id: string;
 	nameTeacher: string;
 	lessonName: string;
@@ -34,7 +35,7 @@ export interface UploadMateri {
 	id: string;
 	CourseName: string;
 	Description: string;
-	FileData: string;
+	FileData: File | string;
 	LinkCourse: string;
 	LessonName: string;
 	TeacherId: string;
@@ -47,7 +48,6 @@ export interface EditMateri {
 	FileData: string;
 	LinkCourse: string;
 	LessonName: string;
-	TeacherId: string;
 }
 
 export interface DetailMateri {

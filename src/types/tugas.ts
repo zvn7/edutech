@@ -1,5 +1,6 @@
 export interface Tugas {
 	id: string;
+	assignmentId: string;
 	assignmentName: string;
 	assignmentFileName: string;
 	assignmentDate: string;
@@ -11,4 +12,6 @@ export interface Tugas {
 	assignmentStatus: string;
 	assignmentSubmissionStatus: string;
 	courseId: string;
+	courseName: string;
+	typeOfSubmission: number;
 }

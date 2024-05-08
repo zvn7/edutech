@@ -40,7 +40,7 @@ const BerandaGuru = () => {
 						<h1 className="font-bold text-xl mb-3">Materi Terbaru</h1>
 						{formData && (
 							<div>
-								{formData.courses.slice(0, 5).map((course, index) => (
+								{formData.slice(0, 5).map((course, index) => (
 									<div key={index}>
 										<div className="flex items-center  rounded-lg shadow-sm p-3 gap-2 bg-white mb-2">
 											<div className="flex gap-3">

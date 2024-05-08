@@ -18,6 +18,9 @@ import {
   getClassRoomsByTeacherId,
   getSchedulesAdmin,
 	getAssignmentSubmissions,
+	getCountTeacher,
+	getCToDoLists,
+	getToDoLists,
 } from "./api";
 import {
 	getAssignments,
@@ -314,7 +317,7 @@ export function useTeacherinfo() {
 // 	});
 // }
 
-export function useGetMapelByGuru() {
+export function useGetLessonByGuru() {
 	return useQuery({
 		queryKey: ["lessonByTeacher"],
 		queryFn: getLessonByTeacherId,
@@ -346,5 +349,19 @@ export function useClassrooms(){
 	return useQuery({
 		queryKey: ["classrooms"],
 		queryFn: getClassRooms
+	})
+}
+
+export function useCount(){
+	return useQuery({
+		queryKey: ["count"],
+		queryFn: getCountTeacher
+	})
+}
+
+export function useTodo(){
+	return useQuery({
+		queryKey: ["todo"],
+		queryFn: getToDoLists
 	})
 }

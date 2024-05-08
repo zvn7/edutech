@@ -2,14 +2,14 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { Button, FileInput, Modal, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import {
-	useAssignmentsByTeacherId,
-	useTeacherinfo,
-} from "../../../services/queries";
-import { useCreateTugas, useDeleteTugas } from "../../../services/mutation";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { Tugas } from "../../../types/tugas";
-import { useNavigate } from "react-router-dom";
+import { useAssignmentsByTeacherId } from "../../../services/queries";
+import { useDeleteTugas } from "../../../services/mutation";
+import TugasEdit from "./TugasEdit";
+import TugasAdd from "./TugasAdd";
+import TugasAddMobile from "./TugasAddMobile";
+import TugasEditMobile from "./TugasEditMobile";
+import TugasAddTablet from "./TugasAddTablet";
+import TugasEditTablet from "./TugasEditTablet";
 
 const TugasGuru = () => {
 	const [showAddForm, setShowAddForm] = useState(false);
@@ -22,10 +22,6 @@ const TugasGuru = () => {
 	const [isMobile, setIsMobile] = useState(false);
 	const [isTablet, setIsTablet] = useState(false);
 	const assigmentQueries = useAssignmentsByTeacherId();
-	const createTugas = useCreateTugas();
-	const { register, handleSubmit, setValue, reset } = useForm<Tugas>();
-	const courseQueries = useTeacherinfo();
-	const { data: courseData } = courseQueries;
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -42,62 +38,6 @@ const TugasGuru = () => {
 			window.removeEventListener("resize", handleResize); // Bersihkan event listener saat komponen di-unmount
 		};
 	}, []);
-
-	const [form, setForm] = useState({
-		assigmentName: "",
-		assigmentDate: "",
-		assigmentDeadline: "",
-		assigmentDescription: "",
-		assigmentFileData: "",
-		assigmentLink: "",
-		courseId: "",
-	});
-
-	const handleInputChange = (e: any) => {
-		const { value, name } = e.target;
-		setForm({
-			...form,
-			[name]: value,
-		});
-		// Mendapatkan nilai dari input datetime-local
-	};
-
-	function handleDateTimeChange(event: any) {
-		const localDate = new Date(event.target.value);
-		const utcDate = new Date(
-			localDate.getTime() + localDate.getTimezoneOffset() * 60000
-		);
-		// utcDate sekarang dalam format UTC
-		// Lakukan sesuatu dengan utcDate, seperti menyimpannya ke state
-		console.log("data utcDate", utcDate);
-	}
-
-	const handleCreateTugasSubmit: SubmitHandler<Tugas> = (data) => {
-		createTugas.mutate(data, {
-			onSuccess: () => {
-				Swal.fire({
-					icon: "success",
-					title: "Tugas Berhasil",
-					text: "Tugas Berhasil Berhasil",
-					confirmButtonText: "Ok",
-				}).then((result) => {
-					if (result.isConfirmed) {
-						setShowAddForm(false);
-						reset();
-						setForm({
-							assigmentName: "",
-							assigmentDate: "",
-							assigmentDeadline: "",
-							assigmentDescription: "",
-							assigmentFileData: "",
-							assigmentLink: "",
-							courseId: "",
-						});
-					}
-				});
-			},
-		});
-	};
 
 	const handleOptionChange = (option: string) => {
 		setSelectedOption(option);
@@ -125,7 +65,10 @@ const TugasGuru = () => {
 		}
 	};
 
-	const handleShowEditForm = () => {
+	const [taskIdToEdit, setTaskIdToEdit] = useState(null);
+
+	const handleShowEditForm = (taskId: any) => {
+		console.log("ID aa:", taskId);
 		if (showAddForm) {
 			Swal.fire({
 				title: "Anda yakin ingin meninggalkan halaman?",
@@ -139,10 +82,14 @@ const TugasGuru = () => {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					setShowAddForm(false);
+					setTaskIdToEdit(taskId);
+					// Set ID tugas yang akan diedit ke dalam state
 					setShowEditForm(true);
 				}
 			});
 		} else {
+			// Set ID tugas yang akan diedit ke dalam state
+			setTaskIdToEdit(taskId);
 			setShowEditForm(!showEditForm);
 		}
 	};
@@ -175,9 +122,37 @@ const TugasGuru = () => {
 		setisMobileModalOpenEdit(false);
 	};
 
-	const handleShowModalEditFormMobile = () => {
-		setisMobileModalOpenEdit(true);
-		setisMobileModalOpenAdd(false);
+	const handleShowModalEditFormMobile = (taskId: any) => {
+		console.log("ID aa:", taskId);
+		if (showAddForm) {
+			Swal.fire({
+				title: "Anda yakin ingin meninggalkan halaman?",
+				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak, batalkan",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					isMobileModalOpenAdd
+						? setisMobileModalOpenAdd(false)
+						: setisMobileModalOpenAdd(false);
+					// Set ID tugas yang akan diedit ke dalam state
+					setTaskIdToEdit(taskId);
+					isMobileModalOpenEdit
+						? setisMobileModalOpenEdit(false)
+						: setisMobileModalOpenEdit(true);
+				}
+			});
+		} else {
+			// Set ID tugas yang akan diedit ke dalam state
+			setTaskIdToEdit(taskId);
+			isMobileModalOpenEdit
+				? setisMobileModalOpenEdit(false)
+				: setisMobileModalOpenEdit(!isMobileModalOpenEdit);
+		}
 	};
 
 	const handleShowModalAddFormTablet = () => {
@@ -185,9 +160,31 @@ const TugasGuru = () => {
 		setisTabletModalOpenEdit(false);
 	};
 
-	const handleShowModalEditFormTablet = () => {
-		setisTabletModalOpenEdit(true);
-		setisTabletModalOpenAdd(false);
+	const handleShowModalEditFormTablet = (taskId: any) => {
+		console.log("ID aa:", taskId);
+		if (showAddForm) {
+			Swal.fire({
+				title: "Anda yakin ingin meninggalkan halaman?",
+				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak, batalkan",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setShowAddForm(false);
+					// Set ID tugas yang akan diedit ke dalam state
+					setTaskIdToEdit(taskId);
+					setShowEditForm(true);
+				}
+			});
+		} else {
+			// Set ID tugas yang akan diedit ke dalam state
+			setTaskIdToEdit(taskId);
+			setShowEditForm(!isTabletModalOpenEdit);
+		}
 	};
 
 	// search
@@ -205,6 +202,8 @@ const TugasGuru = () => {
 	const deleteTugas = useDeleteTugas();
 
 	const handleDeleteTugas = async (id: any) => {
+		console.log(id);
+
 		const confirmation = await Swal.fire({
 			title: "Anda yakin ingin menghapus tugas ini?",
 			text: "Aksi ini tidak dapat dibatalkan!",
@@ -361,12 +360,12 @@ const TugasGuru = () => {
 						</div>
 
 						<div
-							className="overflow-y-auto overflow-clip max-h-[calc(100vh-195px)]"
+							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
 							style={{ scrollbarWidth: "none" }}
 						>
 							<div className="mt-4 flex flex-col gap-3">
 								{filteredAssignments?.map((items) => (
-									<div key={items?.id} className="cursor-pointer">
+									<div key={items?.assignmentId} className="cursor-pointer">
 										<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
 											<div className="flex gap-3">
 												<div className="bg-blue-100 rounded-lg h-14 flex items-center">
@@ -426,17 +425,29 @@ const TugasGuru = () => {
 													color="warning"
 													onClick={
 														isMobile
-															? handleShowModalEditFormMobile
+															? () =>
+																	handleShowModalEditFormMobile(
+																		items.assignmentId
+																	)
 															: isTablet
-															? handleShowModalEditFormTablet
-															: handleShowEditForm
+															? () =>
+																	handleShowModalEditFormTablet(
+																		items.assignmentId
+																	)
+															: () => handleShowEditForm(items.assignmentId)
 													}
 												>
 													Edit
 												</Button>
+												{/* <Button
+													color="warning"
+													onClick={() => handleShowEditForm(items.assignmentId)}
+												>
+													Edit
+												</Button> */}
 
 												<Button
-													onClick={() => handleDeleteTugas(items.id)}
+													onClick={() => handleDeleteTugas(items.assignmentId)}
 													color="failure"
 												>
 													Hapus
@@ -480,159 +491,10 @@ const TugasGuru = () => {
 									</button>
 								</div>
 								<hr className="my-3" />
-								<form
-									className="max-w-full mt-4"
-									onSubmit={handleSubmit(handleCreateTugasSubmit)}
-								>
-									<div className="mb-5">
-										<label
-											htmlFor="materi"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Materi
-										</label>
-										<select
-											id="countries"
-											{...register("courseId")}
-											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										>
-											<option value="">Pilih Materi</option>
-											{courseData &&
-												courseData.map((course) => (
-													<option key={course.id} value={course.id}>
-														{course.courseName}
-													</option>
-												))}
-										</select>
-									</div>
-									<div className="mb-5">
-										<label
-											htmlFor="nama_tugas"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Nama Tugas
-										</label>
-										<input
-											type="text"
-											{...register("assignmentName")}
-											onChange={handleInputChange}
-											id="nama_tugas"
-											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="Masukkan Nama Tugas"
-										/>
-									</div>
-									<div className="mb-5">
-										<label
-											htmlFor="nama_tugas"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Deskripsi Tugas
-										</label>
-										<textarea
-											id="message"
-											rows={4}
-											className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="Masukkan Deskripsi Tugas"
-											defaultValue={""}
-											{...register("assignmentDescription")}
-											onChange={handleInputChange}
-										/>
-									</div>
-									<div className="mb-5">
-										<label
-											htmlFor="nama_tugas"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Tanggal Tugas
-										</label>
-										<input
-											type="date"
-											id="nama_tugas"
-											{...register("assignmentDate")}
-											onChange={handleInputChange}
-											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="Masukkan Nama Tugas"
-										/>
-									</div>
-									<div className="mb-5">
-										<label
-											htmlFor="nama_tugas"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Deadline Tugas
-										</label>
-										<input
-											type="datetime-local"
-											id="nama_tugas"
-											{...register("assignmentDeadline", {
-												setValueAs: (value) => value + "Z",
-											})}
-											onChange={handleInputChange}
-											step="1"
-											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="Masukkan Nama Tugas"
-										/>
-									</div>
-									<div className="mb-2">
-										<label
-											htmlFor="nama_tugas"
-											className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-										>
-											Detail Tugas
-										</label>
-										<div className="flex gap-5">
-											<div
-												className="flex items-center gap-2"
-												onClick={() => handleOptionChange("file")}
-											>
-												<input
-													type="radio"
-													id="file"
-													name="submissionOption"
-													value="file"
-													checked={selectedOption === "file"}
-												/>
-												<label htmlFor="file">File</label>
-											</div>
-											<div
-												className="flex items-center gap-2"
-												onClick={() => handleOptionChange("link")}
-											>
-												<input
-													type="radio"
-													id="link"
-													name="submissionOption"
-													value="link"
-													checked={selectedOption === "link"}
-												/>
-												<label htmlFor="link">Link</label>
-											</div>
-										</div>
-										{selectedOption === "file" && (
-											<div id="fileUpload" className="mt-4">
-												<FileInput id="file" />
-											</div>
-										)}
-										{selectedOption === "link" && (
-											<div id="linkInput" className="mt-4">
-												<TextInput
-													id="link"
-													type="text"
-													{...register("assignmentLink")}
-													onChange={handleInputChange}
-													placeholder="Masukkan url atau link yang valid disini"
-													required
-												/>
-											</div>
-										)}
-									</div>
-									<input
-										type="submit"
-										disabled={createTugas.isPending}
-										value={createTugas.isPending ? "Menyimpan..." : "Simpan"}
-										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-									/>
-								</form>
+								<TugasAdd
+									setShowAddForm={setShowAddForm}
+									handleCloseForms={handleCloseForms}
+								/>
 							</div>
 						</div>
 					)}
@@ -668,138 +530,11 @@ const TugasGuru = () => {
 										</button>
 									</div>
 									<hr className="my-3" />
-									<form className="max-w-full mt-4">
-										<div className="mb-5">
-											<label
-												htmlFor="materi"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Materi
-											</label>
-											<select
-												id="countries"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											>
-												<option>Materi</option>
-												<option>Desain</option>
-												<option>Tools</option>
-											</select>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Nama Tugas
-											</label>
-											<input
-												type="text"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deskripsi Tugas
-											</label>
-											<textarea
-												id="message"
-												rows={4}
-												className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Deskripsi Tugas"
-												defaultValue={""}
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Tanggal Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deadline Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Detail Tugas
-											</label>
-											<div className="flex gap-5">
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("file")}
-												>
-													<input
-														type="radio"
-														id="file"
-														name="submissionOption"
-														value="file"
-														checked={selectedOption === "file"}
-													/>
-													<label htmlFor="file">File</label>
-												</div>
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("link")}
-												>
-													<input
-														type="radio"
-														id="link"
-														name="submissionOption"
-														value="link"
-														checked={selectedOption === "link"}
-													/>
-													<label htmlFor="link">Link</label>
-												</div>
-											</div>
-											{selectedOption === "file" && (
-												<div id="fileUpload" className="mt-4">
-													<FileInput id="file" />
-												</div>
-											)}
-											{selectedOption === "link" && (
-												<div id="linkInput" className="mt-4">
-													<TextInput
-														id="link"
-														type="text"
-														placeholder="Masukkan url atau link yang valid disini"
-														required
-													/>
-												</div>
-											)}
-										</div>
-										<button
-											type="submit"
-											className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-										>
-											Kirim
-										</button>
-									</form>
+									{/* Tambahkan logika untuk menampilkan formulir edit berdasarkan ID yang disimpan */}
+									<TugasEdit
+										id={taskIdToEdit}
+										setShowEditForm={setShowEditForm}
+									/>
 								</div>
 							</div>
 						</div>
@@ -813,138 +548,10 @@ const TugasGuru = () => {
 							<Modal.Header>Tambah Tugas</Modal.Header>
 							<Modal.Body>
 								<div className="add-form">
-									<form className="max-w-full">
-										<div className="mb-5">
-											<label
-												htmlFor="materi"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Materi
-											</label>
-											<select
-												id="countries"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											>
-												<option>Materi</option>
-												<option>Desain</option>
-												<option>Tools</option>
-											</select>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Nama Tugas
-											</label>
-											<input
-												type="text"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deskripsi Tugas
-											</label>
-											<textarea
-												id="message"
-												rows={4}
-												className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Deskripsi Tugas"
-												defaultValue={""}
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Tanggal Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deadline Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Detail Tugas
-											</label>
-											<div className="flex gap-5">
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("file")}
-												>
-													<input
-														type="radio"
-														id="file"
-														name="submissionOption"
-														value="file"
-														checked={selectedOption === "file"}
-													/>
-													<label htmlFor="file">File</label>
-												</div>
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("link")}
-												>
-													<input
-														type="radio"
-														id="link"
-														name="submissionOption"
-														value="link"
-														checked={selectedOption === "link"}
-													/>
-													<label htmlFor="link">Link</label>
-												</div>
-											</div>
-											{selectedOption === "file" && (
-												<div id="fileUpload" className="mt-4">
-													<FileInput id="file" />
-												</div>
-											)}
-											{selectedOption === "link" && (
-												<div id="linkInput" className="mt-4">
-													<TextInput
-														id="link"
-														type="text"
-														placeholder="Masukkan url atau link yang valid disini"
-														required
-													/>
-												</div>
-											)}
-										</div>
-										<button
-											type="submit"
-											className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-										>
-											Kirim
-										</button>
-									</form>
+									<TugasAddMobile
+										setisTabletModalOpenAdd={setisTabletModalOpenAdd}
+										handleCloseForms={handleCloseForms}
+									/>
 								</div>
 							</Modal.Body>
 						</Modal>
@@ -955,142 +562,12 @@ const TugasGuru = () => {
 							show={isMobileModalOpenEdit}
 							onClose={() => setisMobileModalOpenEdit(false)}
 						>
-							<Modal.Header>Tambah Tugas</Modal.Header>
+							<Modal.Header>Edit Tugas</Modal.Header>
 							<Modal.Body>
-								<div className="add-form">
-									<form className="max-w-full">
-										<div className="mb-5">
-											<label
-												htmlFor="materi"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Materi
-											</label>
-											<select
-												id="countries"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											>
-												<option>Materi</option>
-												<option>Desain</option>
-												<option>Tools</option>
-											</select>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Nama Tugas
-											</label>
-											<input
-												type="text"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deskripsi Tugas
-											</label>
-											<textarea
-												id="message"
-												rows={4}
-												className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Deskripsi Tugas"
-												defaultValue={""}
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Tanggal Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deadline Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Detail Tugas
-											</label>
-											<div className="flex gap-5">
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("file")}
-												>
-													<input
-														type="radio"
-														id="file"
-														name="submissionOption"
-														value="file"
-														checked={selectedOption === "file"}
-													/>
-													<label htmlFor="file">File</label>
-												</div>
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("link")}
-												>
-													<input
-														type="radio"
-														id="link"
-														name="submissionOption"
-														value="link"
-														checked={selectedOption === "link"}
-													/>
-													<label htmlFor="link">Link</label>
-												</div>
-											</div>
-											{selectedOption === "file" && (
-												<div id="fileUpload" className="mt-4">
-													<FileInput id="file" />
-												</div>
-											)}
-											{selectedOption === "link" && (
-												<div id="linkInput" className="mt-4">
-													<TextInput
-														id="link"
-														type="text"
-														placeholder="Masukkan url atau link yang valid disini"
-														required
-													/>
-												</div>
-											)}
-										</div>
-										<button
-											type="submit"
-											className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-										>
-											Kirim
-										</button>
-									</form>
-								</div>
+								<TugasEditMobile
+									id={taskIdToEdit}
+									setisMobileModalOpenEdit={setisMobileModalOpenEdit}
+								/>
 							</Modal.Body>
 						</Modal>
 					)}
@@ -1103,138 +580,10 @@ const TugasGuru = () => {
 							<Modal.Header>Tambah Tugas</Modal.Header>
 							<Modal.Body>
 								<div className="add-form">
-									<form className="max-w-full">
-										<div className="mb-5">
-											<label
-												htmlFor="materi"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Materi
-											</label>
-											<select
-												id="countries"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											>
-												<option>Materi</option>
-												<option>Desain</option>
-												<option>Tools</option>
-											</select>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Nama Tugas
-											</label>
-											<input
-												type="text"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deskripsi Tugas
-											</label>
-											<textarea
-												id="message"
-												rows={4}
-												className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Deskripsi Tugas"
-												defaultValue={""}
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Tanggal Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deadline Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Detail Tugas
-											</label>
-											<div className="flex gap-5">
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("file")}
-												>
-													<input
-														type="radio"
-														id="file"
-														name="submissionOption"
-														value="file"
-														checked={selectedOption === "file"}
-													/>
-													<label htmlFor="file">File</label>
-												</div>
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("link")}
-												>
-													<input
-														type="radio"
-														id="link"
-														name="submissionOption"
-														value="link"
-														checked={selectedOption === "link"}
-													/>
-													<label htmlFor="link">Link</label>
-												</div>
-											</div>
-											{selectedOption === "file" && (
-												<div id="fileUpload" className="mt-4">
-													<FileInput id="file" />
-												</div>
-											)}
-											{selectedOption === "link" && (
-												<div id="linkInput" className="mt-4">
-													<TextInput
-														id="link"
-														type="text"
-														placeholder="Masukkan url atau link yang valid disini"
-														required
-													/>
-												</div>
-											)}
-										</div>
-										<button
-											type="submit"
-											className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-										>
-											Kirim
-										</button>
-									</form>
+									<TugasAddTablet
+										setisTabletModalOpenAdd={setisTabletModalOpenAdd}
+										handleCloseForms={handleCloseForms}
+									/>
 								</div>
 							</Modal.Body>
 						</Modal>
@@ -1248,138 +597,10 @@ const TugasGuru = () => {
 							<Modal.Header>Tambah Tugas</Modal.Header>
 							<Modal.Body>
 								<div className="add-form">
-									<form className="max-w-full">
-										<div className="mb-5">
-											<label
-												htmlFor="materi"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Materi
-											</label>
-											<select
-												id="countries"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											>
-												<option>Materi</option>
-												<option>Desain</option>
-												<option>Tools</option>
-											</select>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Nama Tugas
-											</label>
-											<input
-												type="text"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deskripsi Tugas
-											</label>
-											<textarea
-												id="message"
-												rows={4}
-												className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Deskripsi Tugas"
-												defaultValue={""}
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Tanggal Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Deadline Tugas
-											</label>
-											<input
-												type="date"
-												id="nama_tugas"
-												className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-												placeholder="Masukkan Nama Tugas"
-											/>
-										</div>
-										<div className="mb-5">
-											<label
-												htmlFor="nama_tugas"
-												className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-											>
-												Detail Tugas
-											</label>
-											<div className="flex gap-5">
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("file")}
-												>
-													<input
-														type="radio"
-														id="file"
-														name="submissionOption"
-														value="file"
-														checked={selectedOption === "file"}
-													/>
-													<label htmlFor="file">File</label>
-												</div>
-												<div
-													className="flex items-center gap-2"
-													onClick={() => handleOptionChange("link")}
-												>
-													<input
-														type="radio"
-														id="link"
-														name="submissionOption"
-														value="link"
-														checked={selectedOption === "link"}
-													/>
-													<label htmlFor="link">Link</label>
-												</div>
-											</div>
-											{selectedOption === "file" && (
-												<div id="fileUpload" className="mt-4">
-													<FileInput id="file" />
-												</div>
-											)}
-											{selectedOption === "link" && (
-												<div id="linkInput" className="mt-4">
-													<TextInput
-														id="link"
-														type="text"
-														placeholder="Masukkan url atau link yang valid disini"
-														required
-													/>
-												</div>
-											)}
-										</div>
-										<button
-											type="submit"
-											className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-										>
-											Kirim
-										</button>
-									</form>
+									<TugasEditTablet
+										id={taskIdToEdit}
+										setisTabletModalOpenEdit={setisTabletModalOpenEdit}
+									/>
 								</div>
 							</Modal.Body>
 						</Modal>
