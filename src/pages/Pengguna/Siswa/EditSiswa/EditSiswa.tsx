@@ -30,7 +30,7 @@ const EditSiswa = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.139.239:13311/api/Account/student/${id}`,
+          `http://192.168.66.239:13311/api/Account/student/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -67,7 +67,7 @@ const EditSiswa = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://192.168.139.239:13311/api/Account/edit/student/${id}`,
+        `http://192.168.66.239:13311/api/Account/edit/student/${id}`,
         formData,
         {
           headers: {

@@ -192,7 +192,7 @@ const TabelMapel = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://192.168.139.239:13311/api/Lessons/${formUpdate.id}`,
+        `http://192.168.66.239:13311/api/Lessons/${formUpdate.id}`,
         formUpdate,
         {
           headers: {

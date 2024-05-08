@@ -17,6 +17,7 @@ export interface Ikelas {
 
 export interface Classrooms{
     id:string,
+	classRoomId:string,
     className:string,
     longClassName:string,
     uniqueNumberOfClassRoom:string

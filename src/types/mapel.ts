@@ -14,3 +14,9 @@ export interface Mapel {
   className: string;
   lessonStatus:string;
 }
+
+export interface MapelTeacher {
+  lessonId:string,
+  lessonName:string,
+  uniqueNumberOfLesson: string;
+}

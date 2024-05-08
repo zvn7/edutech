@@ -1,395 +1,688 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import {
-	createColumnHelper,
-	flexRender,
-	getCoreRowModel,
-	getPaginationRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
+  useAssignmentsByTeacherId,
+  useGetMapelByGuru,
+  useListAssignment,
+} from "../../services/queries";
+import { Tabs } from "flowbite-react";
+import { HiUserCircle } from "react-icons/hi";
+import { MdDashboard } from "react-icons/md";
 import { Link } from "react-router-dom";
-
-type Nilai = {
-	namaSiswa: string;
-	tugas: string;
-	nilai: string;
-	tanggalPengumpulan: string;
-};
-
-const defaultData: Nilai[] = [
-	{
-		namaSiswa: "John Doe",
-		tugas: "Tugas 1",
-		nilai: "80",
-		tanggalPengumpulan: "2024-03-15",
-	},
-	{
-		namaSiswa: "Jane Smith",
-		tugas: "Tugas 2",
-		nilai: "70",
-		tanggalPengumpulan: "2024-03-16",
-	},
-	{
-		namaSiswa: "Alice Johnson",
-		tugas: "Tugas 3",
-		nilai: "90",
-		tanggalPengumpulan: "2024-03-17",
-	},
-	{
-		namaSiswa: "John Doe",
-		tugas: "Tugas 1",
-		nilai: "80",
-		tanggalPengumpulan: "2024-03-15",
-	},
-	{
-		namaSiswa: "Jane Smith",
-		tugas: "Tugas 2",
-		nilai: "70",
-		tanggalPengumpulan: "2024-03-16",
-	},
-	{
-		namaSiswa: "Alice Johnson",
-		tugas: "Tugas 3",
-		nilai: "90",
-		tanggalPengumpulan: "2024-03-17",
-	},
-	{
-		namaSiswa: "John Doe",
-		tugas: "Tugas 1",
-		nilai: "80",
-		tanggalPengumpulan: "2024-03-15",
-	},
-	{
-		namaSiswa: "Jane Smith",
-		tugas: "Tugas 2",
-		nilai: "70",
-		tanggalPengumpulan: "2024-03-16",
-	},
-	{
-		namaSiswa: "Alice Johnson",
-		tugas: "Tugas 3",
-		nilai: "90",
-		tanggalPengumpulan: "2024-03-17",
-	},
-	{
-		namaSiswa: "John Doe",
-		tugas: "Tugas 1",
-		nilai: "80",
-		tanggalPengumpulan: "2024-03-15",
-	},
-	{
-		namaSiswa: "Jane Smith",
-		tugas: "Tugas 2",
-		nilai: "70",
-		tanggalPengumpulan: "2024-03-16",
-	},
-	{
-		namaSiswa: "Alice Johnson",
-		tugas: "Tugas 3",
-		nilai: "90",
-		tanggalPengumpulan: "2024-03-17",
-	},
-];
-
-const columnHelper = createColumnHelper<Nilai>();
+import { components } from "react-select";
 
 const TabelPenilaian = () => {
-	const [data, setData] = useState(() => [...defaultData]);
+  const [selectedLesson, setSelectedLesson] = useState(() => {
+    return localStorage.getItem("selectedLesson") || "";
+  });
+  const [selectedAssignment, setSelectedAssignment] = useState(() => {
+    return localStorage.getItem("selectedAssignment") || "";
+  });
+  const [pageSize, setPagesize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
-	const columns = [
-		columnHelper.accessor("nilai", {
-			id: "index",
-			header: () => "ID",
-			cell: (info) => info.row.index + 1,
-			footer: (info) => info.column.id,
-		}),
-		columnHelper.accessor("namaSiswa", {
-			header: "Nama Siswa",
-			footer: (info) => info.column.id,
-		}),
-		columnHelper.accessor("tugas", {
-			header: "Tugas",
-			footer: (info) => info.column.id,
-		}),
-		columnHelper.accessor("tanggalPengumpulan", {
-			header: "Tanggal Pengumpulan",
-			footer: (info) => info.column.id,
-		}),
-		columnHelper.accessor("nilai", {
-			header: "Nilai",
-			footer: (info) => info.column.id,
-		}),
-		columnHelper.accessor("nilai", {
-			header: "Action",
-			footer: (info) => info.column.id,
-			cell: (info) => (
-				<Link to="/penilaian/koreksi">
-					<button className="bg-blue-500 text-white  py-1 px-2 rounded">
-						Koreksi
-					</button>
-				</Link>
-			),
-		}),
-	];
+  // untuk belum dikumpulkan
+  const [totalSize, setTotalSize] = useState(10);
+  const [dataPage, setDataPage] = useState(0);
 
-	const table = useReactTable({
-		data,
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		debugTable: true,
-	});
+  const handlePageSizeChange = (event: any) => {
+    setPagesize(event.target.value);
+  };
 
-	const [state, setState] = useState(table.initialState);
+  const handelTotalSizeChange = (event: any) => {
+    setTotalSize(event.target.value);
+  };
 
-	// Override the state managers for the table to your own
-	table.setOptions((prev) => ({
-		...prev,
-		state,
-		onStateChange: setState,
+  const mapelQuery = useGetMapelByGuru();
+  const { data: dataMapel, isLoading: mapelIsLoading } = mapelQuery;
 
-		debugTable: state.pagination.pageIndex > 2,
-	}));
+  const tugasQuery = useAssignmentsByTeacherId();
+  const { data: dataTugas, isLoading: tugasIsLoading } = tugasQuery;
 
-	return (
-		<>
-			<div className="shadow-md sm:rounded-lg bg-white">
-				<div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between">
-					<div className="flex gap-2 items-center flex-wrap">
-						<select
-							value={table.getState().pagination.pageSize}
-							onChange={(e) => {
-								table.setPageSize(Number(e.target.value));
-							}}
-							className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
-						>
-							{[10, 20, 30, 40, 50].map((pageSize) => (
-								<option key={pageSize} value={pageSize}>
-									{pageSize} data
-								</option>
-							))}
-						</select>
+  const assignmentQuery = useListAssignment(selectedLesson, selectedAssignment);
+  const { data: assignmentData, isLoading: assignmentIsLoading } =
+    assignmentQuery;
 
-						<div className="flex gap-2 items-center">
-							<label htmlFor="table-search" className="sr-only">
-								Search
-							</label>
-							<div className="relative">
-								<div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
-									<svg
-										className="w-5 h-5 text-gray-500 dark:text-gray-400"
-										aria-hidden="true"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											fillRule="evenodd"
-											d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-											clipRule="evenodd"
-										/>
-									</svg>
-								</div>
-								<input
-									type="text"
-									id="table-search"
-									className="block p-1.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-56 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 capitalize"
-									placeholder="Cari jadwal disini..."
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div className="relative overflow-x-auto">
-					<table className="w-full uppertext-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-						<thead className="text-xs text-gray-900 uppercase bg-gray-100 ">
-							{table.getHeaderGroups().map((headerGroup) => (
-								<tr key={headerGroup.id}>
-									{headerGroup.headers.map((header) => (
-										<th key={header.id} scope="col" className="px-6 py-3">
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext()
-												)}
-										</th>
-									))}
-								</tr>
-							))}
-						</thead>
-						<tbody>
-							{table.getRowModel().rows.map((row) => (
-								<tr key={row.id} className="bg-white border-b hover:bg-gray-50">
-									{row.getVisibleCells().map((cell) => (
-										<td
-											key={cell.id}
-											className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
-										>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext()
-											)}
-										</td>
-									))}
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-				<div className="flex items-center justify-between flex-wrap gap-2 p-4">
-					<span className="flex items-center gap-1">
-						<div className="capitalize">halaman</div>
-						<strong className="capitalize">
-							{table.getState().pagination.pageIndex + 1} dari{" "}
-							{table.getPageCount()}
-						</strong>
-					</span>
-					<div className="flex gap-2 items-center">
-						<nav aria-label="Page navigation example">
-							<ul className="flex items-center -space-x-px h-10 text-base">
-								<li>
-									<button
-										className="flex items-center justify-center px-4 h-9 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 "
-										onClick={() => table.setPageIndex(0)}
-										disabled={!table.getCanPreviousPage()}
-									>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M5 1 1 5l4 4"
-											/>
-										</svg>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M5 1 1 5l4 4"
-											/>
-										</svg>
-									</button>
-								</li>
-								<li>
-									<button
-										className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white "
-										onClick={() => table.previousPage()}
-										disabled={!table.getCanPreviousPage()}
-									>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M5 1 1 5l4 4"
-											/>
-										</svg>
-									</button>
-								</li>
-								<li>
-									<input
-										type="number"
-										defaultValue={table.getState().pagination.pageIndex + 1}
-										onChange={(e) => {
-											const page = e.target.value
-												? Number(e.target.value) - 1
-												: 0;
-											table.setPageIndex(page);
-										}}
-										className="flex items-center justify-center w-14 text-center h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 "
-										placeholder="1"
-									/>
-								</li>
-								<li>
-									<button
-										className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-										onClick={() => table.nextPage()}
-										disabled={!table.getCanNextPage()}
-									>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="m1 9 4-4-4-4"
-											/>
-										</svg>
-									</button>
-								</li>
-								<li>
-									<button
-										className="flex items-center justify-center px-4 h-9 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
-										onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-										disabled={!table.getCanNextPage()}
-									>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="m1 9 4-4-4-4"
-											/>
-										</svg>
-										<svg
-											className="w-3 h-3 rtl:rotate-180"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 6 10"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="m1 9 4-4-4-4"
-											/>
-										</svg>
-									</button>
-								</li>
-							</ul>
-						</nav>
-					</div>
-				</div>
-			</div>
-		</>
-	);
+  const totalPages = Math.ceil(
+    (assignmentData?.assignmentSubmissionList
+      ? assignmentData?.assignmentSubmissionList.length
+      : 0) / pageSize
+  );
+
+  const dataTotal = Math.ceil(
+    (assignmentData?.notYetSubmit ? assignmentData?.notYetSubmit.length : 0) /
+      totalSize
+  );
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+    setDataPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+    setDataPage((prevPage) => Math.min(prevPage + 1, dataTotal - 1));
+  };
+
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
+    setDataPage(Math.max(0, Math.min(pageNumber, dataTotal - 1)));
+  };
+  const handleLessonChange = (event: any) => {
+    setSelectedLesson(event.target.value);
+    localStorage.setItem("selectedLesson", event.target.value);
+  };
+
+  const handleAssignmentChange = (event: any) => {
+    setSelectedAssignment(event.target.value);
+    localStorage.setItem("selectedAssignment", event.target.value);
+  };
+
+  useEffect(() => {
+    const lastSelectedLesson = localStorage.getItem("selectedLesson");
+    if (lastSelectedLesson) {
+      setSelectedLesson(lastSelectedLesson);
+    }
+    const lastSelectedAssignment = localStorage.getItem("selectedAssignment");
+    if (lastSelectedAssignment) {
+      setSelectedAssignment(lastSelectedAssignment);
+    }
+  }, []);
+
+  const searchFilter = (pengumpulan: any) => {
+    return pengumpulan.studentName
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+  };
+
+  const searchFilterData = (penilaian: any) => {
+    return (
+      penilaian.studentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      penilaian.submissionTimeStatus
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+  };
+  return (
+    <>
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="bg-[#68b3f1] p-3 rounded-2xl flex gap-2 items-center">
+          <svg
+            className="w-8 h-8 text-white dark:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.408-5.5a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2h-.01ZM10 10a1 1 0 1 0 0 2h1v3h-1a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-1v-4a1 1 0 0 0-1-1h-2Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-white font-semibold text-sm w-full capitalize">
+              Tugas Belum Dinilai
+              <span className="ml-2 mr-2 underline">
+                {assignmentData?.notAlreadyGrades}
+              </span>
+              siswa
+            </h2>
+          </div>
+        </div>
+        <div className="bg-[#68b3f1] p-3 rounded-2xl flex gap-2 items-center">
+          <svg
+            className="w-8 h-8 text-white dark:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.408-5.5a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2h-.01ZM10 10a1 1 0 1 0 0 2h1v3h-1a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-1v-4a1 1 0 0 0-1-1h-2Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-white font-semibold text-sm w-full capitalize">
+              Tugas Sudah Dinilai
+              <span className="ml-2 mr-2 underline">
+                {assignmentData?.alreadyGrades}
+              </span>
+              siswa
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <div className="shadow-md sm:rounded-lg bg-white">
+            <div className="p-4">
+              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+                <label htmlFor="countries" className="text-gray-700 mr-4">
+                  Mapel
+                  {/* <sup className="text-red-500 ml-1">*</sup> */}
+                </label>
+                <select
+                  id="countries"
+                  value={selectedLesson}
+                  onChange={handleLessonChange}
+                  className="border-none bg-transparent w-full"
+                >
+                  <option selected>Pilih Mapel</option>
+                  {dataMapel?.map((item) => (
+                    <option value={item.lessonId}>{item.lessonName}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+                <label
+                  htmlFor="countries"
+                  className="text-gray-700 dark:text-white mr-4"
+                >
+                  Tugas
+                  {/* <sup className="text-red-500 ml-1">*</sup> */}
+                </label>
+                <select
+                  id="countries"
+                  value={selectedAssignment}
+                  onChange={handleAssignmentChange}
+                  className="border-none bg-transparent w-full"
+                >
+                  <option selected>Pilih Tugas</option>
+
+                  {dataTugas
+                    ?.filter((lesson) => lesson.lessonId === selectedLesson)
+                    .map((assignment) => (
+                      <option
+                        key={assignment.assignmentId}
+                        value={assignment.assignmentId}
+                      >
+                        {assignment.assignmentName}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+            <div className="p-4">
+              <Tabs aria-label="Default tabs" style="default">
+                <Tabs.Item
+                  active
+                  title="Sudah Mengumpulkan"
+                  icon={HiUserCircle}
+                >
+                  <div className="mr-2 mb-4 flex gap-2 justify-between">
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <select
+                        value={pageSize}
+                        onChange={handlePageSizeChange}
+                        className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
+                      >
+                        {[10, 20, 30, 40, 50].map((pageSize) => (
+                          <option key={pageSize} value={pageSize}>
+                            {pageSize} data
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="table-search" className="sr-only">
+                          Search
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                            <svg
+                              className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                              aria-hidden="true"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="text"
+                            id="table-search"
+                            className="block p-1.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-56 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 capitalize"
+                            placeholder="Cari nama siswa & status pengumpulan disini"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative overflow-x-auto">
+                    <table className="w-full uppertext-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                      <thead className="text-xs text-gray-900 uppercase bg-gray-100 ">
+                        <th className="px-6 py-3">no</th>
+                        <th className="px-6 py-3">nama siswa</th>
+                        <th className="px-6 py-3">tugas</th>
+                        <th className="px-6 py-3">tanggal pengumpulan</th>
+                        <th className="px-6 py-3">nilai</th>
+                        <th className="px-6 py-3 text-center">
+                          status pengumpulan
+                        </th>
+                        <th className="px-6 py-3 text-center">aksi</th>
+                      </thead>
+                      <tbody>
+                        {assignmentIsLoading ? (
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <tr
+                              key={index}
+                              className="bg-white border-b animate-pulse"
+                            >
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]" />
+                              </td>
+                            </tr>
+                          ))
+                        ) : assignmentData &&
+                          assignmentData.assignmentSubmissionList.length > 0 ? (
+                          assignmentData?.assignmentSubmissionList.filter(
+                            searchFilterData
+                          ).length > 0 ? (
+                            assignmentData?.assignmentSubmissionList
+                              .filter(searchFilterData)
+                              .slice(
+                                currentPage * pageSize,
+                                (currentPage + 1) * pageSize
+                              )
+                              .map((submission, index) => (
+                                <tr className="bg-white border-b hover:bg-gray-50">
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                    {index + 1}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                    {submission.studentName}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                    {submission.assignmentName}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                    {new Intl.DateTimeFormat("id-ID", {
+                                      day: "numeric",
+                                      month: "long",
+                                      year: "numeric",
+                                    }).format(
+                                      new Date(submission.submissionTime)
+                                    )}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                    {submission.grade === 0
+                                      ? "-"
+                                      : submission.grade}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize text-center">
+                                    <span
+                                      className={`text-xs font-medium me-2 px-2.5 py-1.5 rounded ${
+                                        submission.submissionTimeStatus ===
+                                        "Terlambat"
+                                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                      }`}
+                                    >
+                                      {submission.submissionTimeStatus ===
+                                      "Terlambat"
+                                        ? "Terlambat"
+                                        : "Tepat Waktu"}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize text-center">
+                                    <Link
+                                      to={`/penilaian/koreksi/${submission.id}`}
+                                    >
+                                      <button className="text-white font-normal p-2 rounded-lg bg-blue-500">
+                                        koreksi
+                                      </button>
+                                    </Link>
+                                  </td>
+                                </tr>
+                              ))
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan={6}
+                                className="text-center py-4 capitalize"
+                              >
+                                data tidak ditemukan
+                              </td>
+                            </tr>
+                          )
+                        ) : assignmentData &&
+                          Number(
+                            assignmentData.assignmentSubmissionList.length
+                          ) === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="text-center py-4 capitalize"
+                            >
+                              Belum ada data pengumpulan
+                            </td>
+                          </tr>
+                        ) : (
+                          <>
+                            <tr>
+                              <td
+                                colSpan={6}
+                                className="text-center py-4 capitalize"
+                              >
+                                Tidak ada tugas dan mapel yang terpilih
+                              </td>
+                            </tr>
+                          </>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex items-center justify-between flex-wrap gap-2 p-4">
+                    <span className="flex items-center gap-1">
+                      <div className="capitalize">halaman</div>
+                      <strong className="capitalize">
+                        {currentPage + 1} dari {totalPages}
+                      </strong>
+                    </span>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 0}
+                        className="mr-2 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+                      >
+                        <svg
+                          className="w-3 h-3 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 1 1 5l4 4"
+                          />
+                        </svg>
+                      </button>
+                      {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => goToPage(index)}
+                          className={`mr-2 px-4 py-2 h-10 ${
+                            currentPage === index
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200 text-gray-800"
+                          } rounded`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages - 1}
+                        className="ml-1 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+                      >
+                        <svg
+                          className="w-3 h-3 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="m1 9 4-4-4-4"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </Tabs.Item>
+                <Tabs.Item title="Belum Mengumpulkan" icon={MdDashboard}>
+                  <div className="mr-2 mb-4 flex gap-2 justify-between">
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <select
+                        value={totalSize}
+                        onChange={handelTotalSizeChange}
+                        className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
+                      >
+                        {[10, 20, 30, 40, 50].map((totalSize) => (
+                          <option key={totalSize} value={totalSize}>
+                            {totalSize} data
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="table-search" className="sr-only">
+                          Search
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                            <svg
+                              className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                              aria-hidden="true"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="text"
+                            id="table-search"
+                            className="block p-1.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-56 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 capitalize"
+                            placeholder="Cari nama siswa disini..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative overflow-x-auto">
+                    <table className="w-full uppertext-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                      <thead className="text-xs text-gray-900 uppercase bg-gray-100 ">
+                        <th className="px-6 py-3">no</th>
+                        <th className="px-6 py-3">nama siswa</th>
+                        <th className="px-6 py-3 text-center">tugas</th>
+                        <th className="px-6 py-3 text-center">
+                          tanggal pengumpulan
+                        </th>
+                      </thead>
+                      <tbody>
+                        {assignmentIsLoading ? (
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <tr
+                              key={index}
+                              className="bg-white border-b animate-pulse"
+                            >
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
+                              </td>
+                              <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5" />
+                              </td>
+                            </tr>
+                          ))
+                        ) : assignmentData &&
+                          assignmentData?.studentNotYetSubmit.length > 0 ? (
+                          assignmentData?.studentNotYetSubmit.filter(
+                            searchFilter
+                          ).length > 0 ? (
+                            assignmentData?.studentNotYetSubmit
+                              .filter(searchFilter)
+                              .slice(
+                                dataPage * totalSize,
+                                (dataPage + 1) * totalSize
+                              )
+                              .map((submission, index) => (
+                                <tr className="bg-white border-b hover:bg-gray-50">
+                                  <td className="px-6 py-4 font-normal text-gray-900 capitalize">
+                                    {index + 1}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900  capitalize">
+                                    {submission.studentName}
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize text-center">
+                                    -
+                                  </td>
+                                  <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize text-center">
+                                    -
+                                  </td>
+                                </tr>
+                              ))
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan={6}
+                                className="text-center py-4 capitalize"
+                              >
+                                data tidak ditemukan
+                              </td>
+                            </tr>
+                          )
+                        ) : assignmentData &&
+                          Number(assignmentData?.studentNotYetSubmit.length) ===
+                            0 ? (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="text-center py-4 capitalize"
+                            >
+                              Belum ada data pengumpulan
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="text-center py-4 capitalize"
+                            >
+                              Tidak ada tugas dan mapel yang terpilih
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex items-center justify-between flex-wrap gap-2 p-4">
+                    <span className="flex items-center gap-1">
+                      <div className="capitalize">halaman</div>
+                      <strong className="capitalize">
+                        {dataPage + 1} dari {dataTotal}
+                      </strong>
+                    </span>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={goToPreviousPage}
+                        disabled={dataPage === 0}
+                        className="mr-2 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+                      >
+                        <svg
+                          className="w-3 h-3 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 1 1 5l4 4"
+                          />
+                        </svg>
+                      </button>
+                      {Array.from({ length: dataTotal }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => goToPage(index)}
+                          className={`mr-2 px-4 py-2 h-10 ${
+                            dataPage === index
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200 text-gray-800"
+                          } rounded`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={goToNextPage}
+                        disabled={dataPage === dataTotal - 1}
+                        className="ml-1 px-4 py-2 h-10 bg-gray-200 text-gray-800 rounded"
+                      >
+                        <svg
+                          className="w-3 h-3 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 6 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="m1 9 4-4-4-4"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </Tabs.Item>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default TabelPenilaian;

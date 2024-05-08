@@ -18,6 +18,8 @@ import {
   getClassRoomsByTeacherId,
   getSchedulesAdmin,
 	getAssignmentSubmissions,
+	getListAssignment,
+	getAttendancesCalculate,
 } from "./api";
 import {
 	getAssignments,
@@ -346,5 +348,21 @@ export function useClassrooms(){
 	return useQuery({
 		queryKey: ["classrooms"],
 		queryFn: getClassRooms
+	})
+}
+
+// get list tugas
+export function useListAssignment(lessonId: string, assignmentId: string) {
+	return useQuery({
+		queryKey:["listAssignment", lessonId, assignmentId],
+		queryFn:()=> getListAssignment(lessonId, assignmentId)
+	})
+}
+
+// get jumlah absensi
+export function useAttendacesCalculate(uniqueNumberOfClassRoom:string, year:string, month:string){
+	return useQuery({
+		queryKey:["attendancesCalculate", uniqueNumberOfClassRoom, year, month],
+		queryFn:()=> getAttendancesCalculate(uniqueNumberOfClassRoom, year, month)
 	})
 }

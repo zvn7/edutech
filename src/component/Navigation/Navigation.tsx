@@ -107,8 +107,9 @@ const Navigation = () => {
         // Lakukan logout jika pengguna menekan tombol "Ya, Logout!"
         // Misalnya, panggil fungsi logout atau navigasi ke halaman login
         localStorage.removeItem("token");
+        localStorage.removeItem("selectedAssignment");
+        localStorage.removeItem("selectedLesson");
         navigate("/");
-        console.log("Anda telah logout!");
       }
     });
   };
@@ -119,7 +120,7 @@ const Navigation = () => {
     const fetchUserLogin = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.139.239:13311/api/Account/userinfo",
+          "http://192.168.66.239:13311/api/Account/userinfo",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -134,7 +135,7 @@ const Navigation = () => {
 
     fetchUserLogin();
   }, []);
-  
+
   const getClassName = (className: string) => {
     switch (className) {
       case "TKJ":

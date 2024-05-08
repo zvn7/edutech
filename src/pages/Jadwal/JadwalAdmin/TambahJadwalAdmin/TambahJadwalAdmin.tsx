@@ -45,7 +45,7 @@ const TambahJadwalAdmin = () => {
   const navigate = useNavigate();
   const handleCreateJadwalSubmit: SubmitHandler<Jadwal> = (data) => {
     createJadwalMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: () => {  
         Swal.fire({
           icon: "success",
           title: "Berhasil",

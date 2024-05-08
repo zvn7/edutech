@@ -37,6 +37,7 @@ export interface UserSiswa{
   id:string,
   nis:string,
   nameStudent: string,
+  status:string,
   password:string,
   birthDate:string,
   birthPlace: string,

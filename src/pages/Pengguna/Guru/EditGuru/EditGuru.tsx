@@ -37,7 +37,7 @@ const EditGuru = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.139.239:13311/api/Account/teacher/${id}`,
+          `http://192.168.66.239:13311/api/Account/teacher/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -83,7 +83,7 @@ const EditGuru = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://192.168.139.239:13311/api/Account/teacher/${id}`,
+        `http://192.168.66.239:13311/api/Account/teacher/${id}`,
         formData,
         {
           headers: {

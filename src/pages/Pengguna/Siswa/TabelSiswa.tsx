@@ -6,7 +6,8 @@ import UploadFile from "./UploadFile";
 import Swal from "sweetalert2";
 import { useDeleteSiswa } from "../../../services/mutation";
 
-const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
+const TabelSiswa = (
+  { id }: { id: (string | undefined)[] }) => {
   const [openModal, setOpenModal] = useState(false);
   const [openModalExcel, setOpenModalExcel] = useState(false);
   const [pageSize, setPageSize] = useState(10);
