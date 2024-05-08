@@ -13,8 +13,9 @@ const TabelAbsensi = () => {
   const [selectedClass, setSelectedClass] = useState("003");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const absensiQuery = useGetAbsensi();
-  const { data, isLoading: isAbsensiLoading } = absensiQuery;
+
+	const absensiQuery = useGetAbsensi();
+	const { data, isLoading: isAbsensiLoading } = absensiQuery;
 
   const kelasQuery = useClassrooms();
   const { data: dataKelas, isLoading: isKelasLoading } = kelasQuery;
@@ -85,29 +86,29 @@ const TabelAbsensi = () => {
             uniqueNumberOfClassRoom === selectedClass
         ) || [];
 
-  const totalPages = Math.ceil(
-    (filteredData ? filteredData.length : 0) / pageSize
-  );
+	const totalPages = Math.ceil(
+		(filteredData ? filteredData.length : 0) / pageSize
+	);
 
-  const handlePageSizeChange = (e: any) => {
-    setPageSize(Number(e.target.value));
-  };
+	const handlePageSizeChange = (e: any) => {
+		setPageSize(Number(e.target.value));
+	};
 
-  const handleClassChange = (e: any) => {
-    setSelectedClass(e.target.value);
-  };
+	const handleClassChange = (e: any) => {
+		setSelectedClass(e.target.value);
+	};
 
-  const goToPreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
+	const goToPreviousPage = () => {
+		setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+	};
 
-  const goToNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
-  };
+	const goToNextPage = () => {
+		setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+	};
 
-  const goToPage = (pageNumber: number) => {
-    setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
-  };
+	const goToPage = (pageNumber: number) => {
+		setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
+	};
 
   const searchFilter = (absensi: any) => {
     return absensi.nameStudent.toLowerCase().includes(searchTerm.toLowerCase());
@@ -419,6 +420,7 @@ const TabelAbsensi = () => {
                         <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
                           <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
                         </td>
+
                         {Array.from(
                           { length: datesInMonth.length },
                           (_, index) => (

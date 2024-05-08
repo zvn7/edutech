@@ -20,6 +20,9 @@ import {
 	getAssignmentSubmissions,
 	getListAssignment,
 	getAttendancesCalculate,
+	getCountTeacher,
+	getCToDoLists,
+	getToDoLists,
 } from "./api";
 import {
 	getAssignments,
@@ -316,7 +319,7 @@ export function useTeacherinfo() {
 // 	});
 // }
 
-export function useGetMapelByGuru() {
+export function useGetLessonByGuru() {
 	return useQuery({
 		queryKey: ["lessonByTeacher"],
 		queryFn: getLessonByTeacherId,
@@ -364,5 +367,19 @@ export function useAttendacesCalculate(uniqueNumberOfClassRoom:string, year:stri
 	return useQuery({
 		queryKey:["attendancesCalculate", uniqueNumberOfClassRoom, year, month],
 		queryFn:()=> getAttendancesCalculate(uniqueNumberOfClassRoom, year, month)
+  })
+}
+
+export function useCount(){
+	return useQuery({
+		queryKey: ["count"],
+		queryFn: getCountTeacher
+	})
+}
+
+export function useTodo(){
+	return useQuery({
+		queryKey: ["todo"],
+		queryFn: getToDoLists
 	})
 }

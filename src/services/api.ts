@@ -1,4 +1,5 @@
 import { getAttendances } from './api';
+import { getSchedules } from "./api";
 import axios from "axios";
 import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
@@ -17,6 +18,9 @@ import { Jadwal } from "../types/jadwal";
 import { Kehadiran } from "../types/kehadiran";
 import { Ikelas, Classrooms } from '../types/kelas';
 import react from '@vitejs/plugin-react';
+import { Ikelas, Classrooms } from "../types/kelas";
+import { CountTeacher } from "../types/countTeacher";
+import { ToDoList } from "../types/todolist";
 
 const BASE_URL = "http://192.168.66.239:13311";
 
@@ -118,12 +122,16 @@ export const getMapelClassroom = async () => {
 // delete mapel
 export const deleteMapel = async (id: string) => {
 	try {
-		const response = await axios.put(`${BASE_URL}/api/Lessons/deactivate/${id}`, {},{
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
-	
+		const response = await axios.put(
+			`${BASE_URL}/api/Lessons/deactivate/${id}`,
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -152,27 +160,34 @@ export const createUserSiswa = async (data: UserSiswa) => {
 };
 
 // delete siswa
-export const deleteSiswa = async (studentId:string)=>{
+export const deleteSiswa = async (studentId: string) => {
 	try {
-		const response = await axios.put(`${BASE_URL}/api/Account/student/delete/${studentId}`,{},{
-			headers:{
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
+		const response = await axios.put(
+			`${BASE_URL}/api/Account/student/delete/${studentId}`,
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			}
-		})
-		return response.data
+		);
+		return response.data;
 	} catch (error) {
 		console.log(error);
 		throw new Error("Failed to get data");
 	}
-}
+};
 
 export const getCourseIds = async () => {
 	return (
-		await axios.get<IMateriGuru[]>(`${BASE_URL}/api/Courses`, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		})
+		await axios.get<IMateriGuru[]>(
+			`${BASE_URL}/api/Courses/getCourseByTeacherId`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		)
 	).data.map((course) => course);
 };
 
@@ -288,11 +303,15 @@ export const createTugas = async (data: Tugas) => {
 
 export const deleteTugas = async (id: string) => {
 	try {
-		const response = await axios.delete(`${BASE_URL}/api/Assignments/${id}`, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
+		const response = await axios.put(
+			`${BASE_URL}/api/Assignments/deactivate/${id}`,
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -579,7 +598,7 @@ export const getAttendances = async (id: number) => {
 
 export const getCourseClassroom = async () => {
 	try {
-		const response = await axios.get<CourseClassroom>(
+		const response = await axios.get<CourseClassroom[]>(
 			`${BASE_URL}/api/Courses/getCourseByClassRoomId`,
 			{
 				headers: {
@@ -716,7 +735,7 @@ export const getTeacherinfo = async () => {
 
 export const createMateri = async (data: UploadMateri) => {
 	try {
-		const response = await axios.post(`${BASE_URL}/api/Courses`, data, {
+		const response = await axios.post(`${BASE_URL}/api/Courses/`, data, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -865,12 +884,16 @@ export const createGuru = async (data: UserGuru) => {
 // pengumpulan
 export const createPengumpulan = async (data: Pengumpulan) => {
 	try {
-		const response = await axios.post(`${BASE_URL}/api/AssignmentSubmissions`, data, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
+		const response = await axios.post(
+			`${BASE_URL}/api/AssignmentSubmissions`,
+			data,
+			{
+				headers: {
+					"Content-Type": "multipart/form-data",
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
 		console.log(response.data);
 		return response.data;
 	} catch (error) {
@@ -957,3 +980,103 @@ export const getAttendancesCalculate = async(uniqueNumberOfClassRoom:string, yea
 		throw new Error("Failed to get data");
 	}
 }
+
+// get count teacher
+export const getCountTeacher = async () => {
+	try {
+		const response = await axios.get<CountTeacher>(
+			`${BASE_URL}/api/Account/calculateTeacherStudent`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to fetch count teacher", error);
+		throw new Error("Failed to fetch count teacher");
+	}
+};
+
+// get Todo list
+export const getToDoLists = async () => {
+	try {
+		const response = await axios.get<ToDoList[]>(`${BASE_URL}/api/ToDoLists`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.error("Failed to fetch count teacher", error);
+		throw new Error("Failed to fetch count teacher");
+	}
+};
+
+// create Todo List
+export const createTodo = async (data: ToDoList) => {
+	try {
+		const response = await axios.post(`${BASE_URL}/api/ToDoLists`, data, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.error("Failed to post pengumpulan:", error);
+	}
+};
+
+// edit Todo List
+export const editTodo = async (id: string, data: ToDoList) => {
+	try {
+		const response = await axios.put<ToDoList>(
+			`${BASE_URL}/api/ToDoLists/${id}`,
+			data,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Terjadi Kesalahan ketika ");
+		throw new Error("Failed to edit data");
+	}
+};
+
+export const editTodoCheck = async (id: string, data: ToDoList) => {
+	try {
+		const response = await axios.put<ToDoList>(
+			`${BASE_URL}/api/ToDoLists/ceklis/${id}`,
+			data,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Terjadi Kesalahan ketika ");
+		throw new Error("Failed to edit data");
+	}
+};
+
+// delete Todo List
+export const deleteTodo = async (id: string) => {
+	try {
+		const response = await axios.delete(`${BASE_URL}/api/ToDoLists/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to delete data");
+	}
+};
