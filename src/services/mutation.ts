@@ -14,6 +14,7 @@ import {
   createTugas,
   deleteTugas,
   createPengumpulan,
+  createAbsensi,
   createTodo,
   editTodo,
   deleteTodo,
@@ -30,6 +31,7 @@ import { Pengumpulan } from "../types/pengumpulan";
 import { IMateriGuru, UploadMateri } from "../types/materi";
 import { Jadwal } from '../types/jadwal';
 import { Tugas } from "../types/tugas";
+import { Absensi, CreateAbsensi } from "../types/absensi";
 import { ToDoList } from "../types/todolist";
 
 // login
@@ -418,6 +420,28 @@ export function useCreatePengumpulan() {
 			console.log("Success", data);
 			await queryClient.invalidateQueries({ queryKey: ["assignmentsByClassroomId"] });
 		},
+	});
+}
+
+// create absensi
+export function useCreateAbsensi() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ["createAbsensi"],
+		mutationFn: (data: CreateAbsensi) => createAbsensi(data),
+		onMutate: () => {
+			console.log("Mutate");
+		},
+		onError: () => {
+			console.log("Error");
+		},
+		onSettled: () => {
+			console.log("Settled");
+		},
+		onSuccess: async (data: any) => {
+			console.log("Success", data);
+			await queryClient.invalidateQueries({ queryKey: ["attendances"] });
+     },
 	});
 }
 

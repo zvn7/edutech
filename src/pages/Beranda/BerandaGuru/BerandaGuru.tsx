@@ -88,7 +88,7 @@ const BerandaGuru = () => {
 						<h1 className="font-bold text-xl mb-3">Daftar Tugas</h1>
 						{assigmentQueries.data?.slice(0, 5).map((items) => (
 							<div key={items?.id}>
-								<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-1">
+								<div className="flex items-center  rounded-lg shadow-sm p-3 gap-2 bg-white">
 									<div className="flex gap-3">
 										<div className="bg-blue-100 rounded-lg h-14 flex items-center">
 											<svg

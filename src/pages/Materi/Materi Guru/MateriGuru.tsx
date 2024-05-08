@@ -91,7 +91,6 @@ const MateriGuru = () => {
 
 	const handleShowEditForm = async (data: IMateriGuru) => {
 		console.log(data);
-
 		// Jika sedang menampilkan form tambah
 		if (showAddForm) {
 			// Tampilkan SweetAlert untuk konfirmasi
@@ -246,10 +245,28 @@ const MateriGuru = () => {
 		}
 	};
 
-	const handleShowModalAddFormTablet = () => {
-		setisTabletModalOpenAdd(true);
-		setisTabletModalOpenEdit(false);
-	};
+  const handleCloseModalFormTablet = () => {
+    if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
+      Swal.fire({
+        title: "Anda yakin ingin meninggalkan halaman?",
+        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, lanjutkan",
+        cancelButtonText: "Tidak, batalkan",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setisTabletModalOpenAdd(false);
+          setisTabletModalOpenEdit(false);
+        }
+      });
+    } else {
+      setisTabletModalOpenAdd(false);
+      setisTabletModalOpenEdit(false);
+    }
+  };
 
 	const handleShowModalEditFormTablet = (data: IMateriGuru) => {
 		setFormUpdate({
@@ -295,6 +312,7 @@ const MateriGuru = () => {
 			lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
 		);
 	};
+
 
 	return (
 		<div>
@@ -492,14 +510,14 @@ const MateriGuru = () => {
 									</p>
 								)}
 
-								{filteredData.length === 0 && searchTerm.length === 0 && (
-									<p className="text-center text-gray-400">
-										Tidak ada data yang sesuai dengan pilihan pelajaran yang
-										dipilih.
-									</p>
-								)}
+                {filteredData.length === 0 && searchTerm.length === 0 && (
+                  <p className="text-center text-gray-400">
+                    Tidak ada data yang sesuai dengan pilihan pelajaran yang
+                    dipilih.
+                  </p>
+                )}
 
-								{/* {filteredData.length === 0 && searchTerm.length > 0 && (
+                {/* {filteredData.length === 0 && searchTerm.length > 0 && (
 								<p className="text-center text-gray-400">
 									Tidak ada hasil pencarian yang sesuai.
 								</p>

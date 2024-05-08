@@ -24,6 +24,7 @@ import ProfilGuru from "./pages/Profile/ProfilGuru/ProfilGuru";
 import BerandaAdmin from "./pages/Beranda/BerandaAdmin/BerandaAdmin";
 import BerandaGuru from "./pages/Beranda/BerandaGuru/BerandaGuru";
 import JadwalSiswa from "./pages/Jadwal/JadwalSiswa/JadwalSiswa";
+import ProtectedRoute from "./hoc/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -32,99 +33,195 @@ const router = createBrowserRouter([
   },
   {
     path: "/beranda-siswa",
-    element: <BerandaSiswa />,
+    element: (
+      <ProtectedRoute>
+        <BerandaSiswa />,
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/beranda-guru",
-    element: <BerandaGuru />,
+    element: (
+      <ProtectedRoute>
+        <BerandaGuru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/beranda-admin",
-    element: <BerandaAdmin />,
+    element: (
+      <ProtectedRoute>
+        <BerandaAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/tugas-siswa",
-    element: <TugasSiswa />,
+    element: (
+      <ProtectedRoute>
+        <TugasSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/tugas-guru",
-    element: <TugasGuru />,
+    element: (
+      <ProtectedRoute>
+        <TugasGuru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/materi-siswa",
-    element: <MateriSiswa />,
+    element: (
+      <ProtectedRoute>
+        <MateriSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/materi-guru",
-    element: <MateriGuru />,
+    element: (
+      <ProtectedRoute>
+        <MateriGuru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/penilaian",
-    element: <Penilaian />,
+    element: (
+      <ProtectedRoute>
+        <Penilaian />
+      </ProtectedRoute>
+    ),
   },
   {
-    path: "/penilaian/koreksi",
-    element: <Koreksi />,
+    path: "/penilaian/koreksi/:id",
+    element: (
+      <ProtectedRoute>
+        <Koreksi />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/mapel",
-    element: <Mapel />,
+    element: (
+      <ProtectedRoute>
+        <Mapel />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/rekap-absensi",
-    element: <AbsensiAdmin />,
+    element: (
+      <ProtectedRoute>
+        <AbsensiAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/data-absensi",
-    element: <HasilAbsensiAdmin />,
+    element: (
+      <ProtectedRoute>
+        <HasilAbsensiAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/jadwal-admin",
-    element: <JadwalAdmin />,
+    element: (
+      <ProtectedRoute>
+        <JadwalAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/jadwal-siswa",
-    element: <JadwalSiswa />,
+    element: (
+      <ProtectedRoute>
+        <JadwalSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/jadwal-admin/tambah-jadwal",
-    element: <TambahJadwalAdmin />,
+    element: (
+      <ProtectedRoute>
+        <TambahJadwalAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/jadwal-admin/edit-jadwal/:id",
-    element: <EditJadwalAdmin />,
+    element: (
+      <ProtectedRoute>
+        <EditJadwalAdmin />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-guru",
-    element: <Guru />,
+    element: (
+      <ProtectedRoute>
+        <Guru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-guru/tambah-guru",
-    element: <TambahGuru />,
+    element: (
+      <ProtectedRoute>
+        <TambahGuru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-guru/edit-guru/:id",
-    element: <EditGuru />,
+    element: (
+      <ProtectedRoute>
+        <EditGuru />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-siswa",
-    element: <Siswa />,
+    element: (
+      <ProtectedRoute>
+        <Siswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-siswa/tambah-siswa",
-    element: <TambahSiswa />,
+    element: (
+      <ProtectedRoute>
+        <TambahSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/pengguna-siswa/edit-siswa/:id",
-    element: <EditSiswa />,
+    element: (
+      <ProtectedRoute>
+        <EditSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/profile-siswa",
-    element: <ProfilSiswa />,
+    element: (
+      <ProtectedRoute>
+        <ProfilSiswa />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/profile-guru",
-    element: <ProfilGuru />,
+    element: (
+      <ProtectedRoute>
+        <ProfilGuru />
+      </ProtectedRoute>
+    ),
   },
 ]);
 export default router;

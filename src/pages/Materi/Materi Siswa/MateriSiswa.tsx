@@ -2,25 +2,25 @@ import { useState, useEffect } from "react";
 import Navigation from "../../../component/Navigation/Navigation";
 import { Tabs } from "flowbite-react";
 import {
-	useCourseClassroom,
-	useLessonsClassroom,
+  useCourseClassroom,
+  useLessonsClassroom,
 } from "../../../services/queries";
 import axios from "axios";
 
 const MateriSiswa = () => {
-	const [selectedCard, setSelectedCard] = useState(null);
-	const [selectedCardId, setSelectedCardId] = useState(null);
-	const [isMobileView, setIsMobileView] = useState<boolean>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	// const courseIdsQuery = useCourseIds();
-	// const courseQueries = useCourse(courseIdsQuery.data);
-	// const lessonsIdsQuery = useLessonsIds();
-	const lessonsQueries = useLessonsClassroom();
-	const { data: formLesson } = lessonsQueries;
-	const [selectedSubject, setSelectedSubject] = useState("");
-	const courseClassroom = useCourseClassroom();
-	const { data: formData } = courseClassroom;
-	console.log("formData", formData);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [isMobileView, setIsMobileView] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const courseIdsQuery = useCourseIds();
+  // const courseQueries = useCourse(courseIdsQuery.data);
+  // const lessonsIdsQuery = useLessonsIds();
+  const lessonsQueries = useLessonsClassroom();
+  const { data: formLesson } = lessonsQueries;
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const courseClassroom = useCourseClassroom();
+  const { data: formData } = courseClassroom;
+  console.log("formData", formData);
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -73,7 +73,6 @@ const MateriSiswa = () => {
 			alert("No file available to download");
 			return;
 		}
-
 		try {
 			const response = await axios.get(
 				`http://192.168.66.239:13311/api/Courses/download/${id}`,

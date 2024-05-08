@@ -1,9 +1,10 @@
+import { getAttendances } from './api';
 import { getSchedules } from "./api";
 import axios from "axios";
 import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
-import { IMapel } from "../types/mapel";
-import { Absensi } from "../types/absensi";
+import { IMapel, MapelTeacher } from "../types/mapel";
+import { Absensi, AttendancesCalculate, CreateAbsensi } from "../types/absensi";
 import {
 	CourseClassroom,
 	DetailMateri,
@@ -15,6 +16,8 @@ import { Pengumpulan } from "../types/pengumpulan";
 import { Mapel } from "../types/mapel";
 import { Jadwal } from "../types/jadwal";
 import { Kehadiran } from "../types/kehadiran";
+import { Ikelas, Classrooms } from '../types/kelas';
+import react from '@vitejs/plugin-react';
 import { Ikelas, Classrooms } from "../types/kelas";
 import { CountTeacher } from "../types/countTeacher";
 import { ToDoList } from "../types/todolist";
@@ -787,7 +790,7 @@ export const getGuru = async () => {
 // get lesson by id guru
 export const getLessonByTeacherId = async () => {
 	try {
-		const response = await axios.get<Mapel[]>(
+		const response = await axios.get<MapelTeacher[]>(
 			`${BASE_URL}/api/Lessons/lessonTeacherId`,
 			{
 				headers: {
@@ -914,6 +917,69 @@ export const getAssignmentSubmissions = async (id: string) => {
 		throw new Error("Failed to fetch assignment submissions");
 	}
 };
+
+// export const createGuru = async (data: UserGuru) => {
+// 	try {
+// 		const response = await axios.post(
+// 			`${BASE_URL}/api/Account/register/teacher`,
+// 			data,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 		);
+// 		console.log(response.data);
+// 		return response.data;
+// 	} catch (error) {
+// 		console.error("Terjadi Kesalahan ketika ");
+// 		throw new Error("Failed to post data");
+// 	}
+// };
+// create absensi
+export const createAbsensi = async ( data:CreateAbsensi)=>{
+	try {
+		const response = await axios.post(`${BASE_URL}/api/Attendances`, data, {
+			headers:{
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem("token")}`,}
+		})
+		console.log(response.data);
+		return response.data
+	} catch (error:any) {
+		throw new Error(error.response.data);
+	}
+}
+
+
+// get list tugas
+export const getListAssignment = async (lessonId: string, assignmentId: string) =>{
+	try {
+		const response = await axios.get<AssignmentSubmissionData>(`${BASE_URL}/api/AssignmentSubmissions/GetListSubmissionForTeacherGrades?LessonId=${lessonId}&AssignmentId=${assignmentId}`,{
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
+		return response.data
+	} catch (error:any) {
+		throw new Error(error.response.data);	
+	}
+}
+
+// get jumlah absensi
+export const getAttendancesCalculate = async(uniqueNumberOfClassRoom:string, year:string, month:string) =>{
+	try {
+		const response = await axios.get<AttendancesCalculate>(`${BASE_URL}/api/Attendances/calculate?uniqueNumberOfClassRoom=${uniqueNumberOfClassRoom}&year=${year}&month=${month}`,{
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
+		return response.data
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to get data");
+	}
+}
 
 // get count teacher
 export const getCountTeacher = async () => {

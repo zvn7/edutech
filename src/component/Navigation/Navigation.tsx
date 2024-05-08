@@ -93,47 +93,48 @@ const Navigation = () => {
 
 	const navigate = useNavigate();
 
-	const handleLogout = () => {
-		Swal.fire({
-			title: "Konfirmasi Logout",
-			text: "Anda yakin ingin keluar?",
-			icon: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#d33",
-			cancelButtonColor: "#3085d6",
-			confirmButtonText: "Ya, Logout!",
-		}).then((result) => {
-			if (result.isConfirmed) {
-				// Lakukan logout jika pengguna menekan tombol "Ya, Logout!"
-				// Misalnya, panggil fungsi logout atau navigasi ke halaman login
-				localStorage.removeItem("token");
-				navigate("/");
-				console.log("Anda telah logout!");
-			}
-		});
-	};
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Konfirmasi Logout",
+      text: "Anda yakin ingin keluar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, Logout!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Lakukan logout jika pengguna menekan tombol "Ya, Logout!"
+        // Misalnya, panggil fungsi logout atau navigasi ke halaman login
+        localStorage.removeItem("token");
+        localStorage.removeItem("selectedAssignment");
+        localStorage.removeItem("selectedLesson");
+        navigate("/");
+      }
+    });
+  };
 
 	const [dataUser, setDataUser] = useState<any | null>([]);
+  
+  useEffect(() => {
+    const fetchUserLogin = async () => {
+      try {
+        const response = await axios.get(
+          "http://192.168.66.239:13311/api/Account/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDataUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-	useEffect(() => {
-		const fetchUserLogin = async () => {
-			try {
-				const response = await axios.get(
-					"http://192.168.66.239:13311/api/Account/userinfo",
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`,
-						},
-					}
-				);
-				setDataUser(response.data);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-
-		fetchUserLogin();
-	}, []);
+    fetchUserLogin();
+  }, []);
 
 	const getClassName = (className: string) => {
 		switch (className) {
