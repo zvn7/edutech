@@ -9,9 +9,6 @@ import { Tabs } from "flowbite-react";
 import { HiUserCircle } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { components } from "react-select";
-
-
 
 const TabelPenilaian = () => {
 	const [selectedLesson, setSelectedLesson] = useState(() => {

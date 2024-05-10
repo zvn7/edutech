@@ -3,347 +3,348 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCount, useTodo } from "../../../services/queries";
 import {
-	useCreateTodo,
-	useDeleteTodo,
-	useEditTodo,
-	useEditTodoCheck,
+  useCreateTodo,
+  useDeleteTodo,
+  useEditTodo,
+  useEditTodoCheck,
 } from "../../../services/mutation";
 import { editTodo, editTodoCheck } from "../../../services/api";
 import Swal from "sweetalert2";
 
 interface TodoItem {
-	id: string;
-	text: string;
-	completed: boolean;
+  id: string;
+  text: string;
+  completed: boolean;
 }
 const BerandaAdmin = () => {
-	// State untuk menyimpan ID tugas yang sedang diedit
-	const [editingId, setEditingId] = useState(null);
+  // State untuk menyimpan ID tugas yang sedang diedit
+  const [editingId, setEditingId] = useState(null);
 
-	// State untuk menyimpan deskripsi tugas yang sedang diedit
-	const [editDescription, setEditDescription] = useState("");
-	const [todos, setTodos] = useState<TodoItem[]>([]);
-	const [newTodo, setNewTodo] = useState("");
-	const countQueries = useCount();
-	const { data: countData } = countQueries;
-	const todoQueries = useTodo();
-	const { data: todoData } = todoQueries;
+  // State untuk menyimpan deskripsi tugas yang sedang diedit
+  const [editDescription, setEditDescription] = useState("");
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [newTodo, setNewTodo] = useState("");
+  const countQueries = useCount();
+  const { data: countData } = countQueries;
+  const todoQueries = useTodo();
+  const { data: todoData } = todoQueries;
 
-	// Fungsi mutasi untuk menambah tugas baru
-	const createTodoMutation = useCreateTodo();
+  // Fungsi mutasi untuk menambah tugas baru
+  const createTodoMutation = useCreateTodo();
 
-	// Fungsi mutasi untuk mengedit tugas
-	const editTodoMutation = useEditTodo();
+  // Fungsi mutasi untuk mengedit tugas
+  const editTodoMutation = useEditTodo();
 
-	// Fungsi mutasi untuk mengedit tugas
-	const editTodoCheckMutation = useEditTodoCheck();
+  // Fungsi mutasi untuk mengedit tugas
+  const editTodoCheckMutation = useEditTodoCheck();
 
-	// Fungsi mutasi untuk menghapus tugas
-	const deleteTodoMutation = useDeleteTodo();
+  // Fungsi mutasi untuk menghapus tugas
+  const deleteTodoMutation = useDeleteTodo();
 
-	// Menggunakan state untuk menyimpan nilai checkbox
-	const [isChecked, setIsChecked] = useState(false);
-	const [checkedItems, setCheckedItems] = useState({});
+  // Menggunakan state untuk menyimpan nilai checkbox
+  const [isChecked, setIsChecked] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
 
-	// Fungsi untuk menambah atau mengedit tugas
-	const addOrEditTodo = async () => {
-		try {
-			if (editingId !== null) {
-				await editTodoMutation.mutate(
-					{
-						id: editingId,
-						data: {
-							description: editDescription,
-							status: checkedItems[editingId] ? 1 : 0,
-						}, // Mengambil nilai status dari checkedItems
-					},
-					{
-						onSuccess: () => {
-							quertClient.invalidateQueries({ queryKey: ["todo"] });
-							setEditDescription("");
-							setEditingId(null);
-						},
-					}
-				);
-			} else {
-				// Jika sedang dalam mode tambah, panggil fungsi createTodoMutation.mutateAsync
-				await createTodoMutation.mutateAsync({
-					description: editDescription,
-					status: isChecked ? 1 : 0,
-				});
-			}
-			// Reset nilai editDescription, editingId, dan isChecked setelah operasi selesai
-			setEditDescription("");
-			setEditingId(null);
-			setIsChecked(false);
-		} catch (error) {
-			console.error("Error adding/editing todo:", error);
-		}
-	};
+  // Fungsi untuk menambah atau mengedit tugas
+  const addOrEditTodo = async () => {
+    try {
+      if (editingId !== null) {
+        await editTodoMutation.mutate(
+          {
+            id: editingId,
+            data: {
+              description: editDescription,
+              status: checkedItems[editingId] ? 1 : 0,
+            }, // Mengambil nilai status dari checkedItems
+          },
+          {
+            onSuccess: () => {
+              quertClient.invalidateQueries({ queryKey: ["todo"] });
+              setEditDescription("");
+              setEditingId(null);
+            },
+          }
+        );
+      } else {
+        // Jika sedang dalam mode tambah, panggil fungsi createTodoMutation.mutateAsync
+        await createTodoMutation.mutateAsync({
+          description: editDescription,
+          status: isChecked ? 1 : 0,
+        });
+      }
+      // Reset nilai editDescription, editingId, dan isChecked setelah operasi selesai
+      setEditDescription("");
+      setEditingId(null);
+      setIsChecked(false);
+    } catch (error) {
+      console.error("Error adding/editing todo:", error);
+    }
+  };
 
-	const handleCheckboxChange = async (id) => {
-		try {
-			// Periksa status tugas sebelumnya
-			const previousStatus = todos.find((todo) => todo.id === id)?.status;
+  const handleCheckboxChange = async (id: any) => {
+    try {
+      // Periksa status tugas sebelumnya
+      const previousStatus = todos.find((todo) => todo.id === id)?.status;
 
-			// Perbarui status tugas menjadi 1 jika sebelumnya belum dicentang, dan 0 jika sudah dicentang
-			const newStatus = previousStatus === 1 ? 0 : 1;
+      // Perbarui status tugas menjadi 1 jika sebelumnya belum dicentang, dan 0 jika sudah dicentang
+      const newStatus = previousStatus === 1 ? 0 : 1;
 
-			// Update status tugas di state
-			const updatedTodos = todos.map((todo) => {
-				if (todo.id === id) {
-					return { ...todo, status: newStatus };
-				}
-				return todo;
-			});
-			setTodos(updatedTodos);
+      // Update status tugas di state
+      const updatedTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, status: newStatus };
+        }
+        return todo;
+      });
+      setTodos(updatedTodos);
 
-			// Kirim perubahan status ke server menggunakan fungsi editTodoCheck
-			await editTodoCheckMutation.mutateAsync({
-				id: id,
-				data: {
-					status: newStatus,
-				},
-			});
-		} catch (error) {
-			console.error("Error updating todo status:", error);
-		}
-	};
+      // Kirim perubahan status ke server menggunakan fungsi editTodoCheck
+      await editTodoCheckMutation.mutateAsync({
+        id: id,
+        data: {
+          status: newStatus,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating todo status:", error);
+    }
+  };
 
-	// Fungsi untuk menghapus tugas
-	// const removeTodo = async (id) => {
-	// 	try {
-	// 		// Tampilkan SweetAlert untuk konfirmasi penghapusan
-	// 		const confirmed = await Swal.fire({
-	// 			title: "Apakah Anda yakin?",
-	// 			text: "Anda tidak akan dapat mengembalikan tugas ini!",
-	// 			icon: "warning",
-	// 			showCancelButton: true,
-	// 			confirmButtonColor: "#3085d6",
-	// 			cancelButtonColor: "#d33",
-	// 			confirmButtonText: "Ya, hapus saja!",
-	// 			position: "top-end"
-	// 		});
+  // Fungsi untuk menghapus tugas
+  // const removeTodo = async (id) => {
+  // 	try {
+  // 		// Tampilkan SweetAlert untuk konfirmasi penghapusan
+  // 		const confirmed = await Swal.fire({
+  // 			title: "Apakah Anda yakin?",
+  // 			text: "Anda tidak akan dapat mengembalikan tugas ini!",
+  // 			icon: "warning",
+  // 			showCancelButton: true,
+  // 			confirmButtonColor: "#3085d6",
+  // 			cancelButtonColor: "#d33",
+  // 			confirmButtonText: "Ya, hapus saja!",
+  // 			position: "top-end"
+  // 		});
 
-	// 		// Jika pengguna mengonfirmasi penghapusan, lanjutkan dengan penghapusan tugas
-	// 		if (confirmed.isConfirmed) {
-	// 			// Panggil fungsi mutasi untuk menghapus tugas berdasarkan ID
-	// 			await deleteTodoMutation.mutateAsync(id);
-	// 			// Tampilkan pesan SweetAlert untuk memberi tahu pengguna bahwa tugas telah dihapus
-	// 			await Swal.fire("Terhapus!", "Tugas telah dihapus.", "success");
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("Error deleting todo:", error);
-	// 		// Tampilkan pesan SweetAlert untuk memberi tahu pengguna bahwa ada kesalahan saat menghapus tugas
-	// 		await Swal.fire(
-	// 			"Error!",
-	// 			"Terdapat kesalahan saat menghapus tugas.",
-	// 			"error"
-	// 		);
-	// 	}
-	// };
+  // 		// Jika pengguna mengonfirmasi penghapusan, lanjutkan dengan penghapusan tugas
+  // 		if (confirmed.isConfirmed) {
+  // 			// Panggil fungsi mutasi untuk menghapus tugas berdasarkan ID
+  // 			await deleteTodoMutation.mutateAsync(id);
+  // 			// Tampilkan pesan SweetAlert untuk memberi tahu pengguna bahwa tugas telah dihapus
+  // 			await Swal.fire("Terhapus!", "Tugas telah dihapus.", "success");
+  // 		}
+  // 	} catch (error) {
+  // 		console.error("Error deleting todo:", error);
+  // 		// Tampilkan pesan SweetAlert untuk memberi tahu pengguna bahwa ada kesalahan saat menghapus tugas
+  // 		await Swal.fire(
+  // 			"Error!",
+  // 			"Terdapat kesalahan saat menghapus tugas.",
+  // 			"error"
+  // 		);
+  // 	}
+  // };
 
-	const removeTodo = async (id) => {
-		try {
-			// Memanggil fungsi mutasi untuk menghapus tugas berdasarkan ID
-			await deleteTodoMutation.mutateAsync(id);
-		} catch (error) {
-			console.error("Error deleting todo:", error);
-		}
-	};
+  const removeTodo = async (id: any) => {
+    try {
+      // Memanggil fungsi mutasi untuk menghapus tugas berdasarkan ID
+      await deleteTodoMutation.mutateAsync(id);
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
 
-	const activeStudentCount = countData ? countData.activeStudentCount : 0;
-	const activeTeacherCount = countData ? countData.activeTeacherCount : 0;
-	return (
-		<div>
-			<Navigation />
-			<div className="p-4 sm:ml-64">
-				<div className="mt-14">
-					<h1 className="text-3xl font-bold font-mono capitalize">Beranda</h1>
-					<h3 className="text-lg font-sans font-semibold mt-3 capitalize">
-						selamat datang, Admin
-					</h3>
-				</div>
-				<div className="mt-6">
-					<div className="flex flex-row gap-2">
-						<div className="flex flex-col lg:w-1/2 sm:w-full gap-2">
-							<div className="flex flex-wrap gap-2">
-								{/* guru */}
-								<div className="w-full sm:w-full lg:w-[300px] bg-[#dfe0f5] p-4 rounded-md">
-									<div className="flex items-center justify-between gap-2 mb-3">
-										<div className="bg-white rounded-full">
-											<svg
-												className="w-24 h-24 text-gray-800"
-												aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg"
-												width="24"
-												height="24"
-												fill="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													fill-rule="evenodd"
-													d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z"
-													clip-rule="evenodd"
-												/>
-											</svg>
-										</div>
-										<div>
-											<h1 className=" capitalize text-lg text-end">
-												jumlah guru
-											</h1>
-											<h2 className="text-[40px] font-semibold capitalize">
-												{activeTeacherCount} {}
-												<span className="text-[35px] text-gray-700  capitalize">
-													Guru
-												</span>
-											</h2>
-										</div>
-									</div>
-									<div className="flex items-center">
-										<Link to="/HalamanPenggunaGuru" className="w-full">
-											<button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
-												<span>lihat selengkapnya</span>
-											</button>
-										</Link>
-									</div>
-								</div>
-								{/* siswa */}
-								<div className="w-full sm:w-full lg:w-[300px] bg-[#f7eee1] p-4 rounded-md">
-									<div className="flex items-center justify-between gap-2 mb-3">
-										<div className="bg-white rounded-full">
-											<svg
-												className="w-24 h-24 text-gray-800"
-												aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg"
-												width="24"
-												height="24"
-												fill="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													fill-rule="evenodd"
-													d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z"
-													clip-rule="evenodd"
-												/>
-											</svg>
-										</div>
-										<div>
-											<h1 className=" capitalize text-lg text-end">
-												jumlah siswa
-											</h1>
-											<h2 className="text-[40px] font-semibold capitalize">
-												{activeStudentCount} {}
-												<span className="text-[35px] text-gray-700  capitalize">
-													siswa
-												</span>
-											</h2>
-										</div>
-									</div>
-									<div className="flex items-center">
-										<Link to="/HalamanPenggunaSiswa" className="w-full">
-											<button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
-												<span>lihat selengkapnya</span>
-											</button>
-										</Link>
-									</div>
-								</div>
-							</div>
-							{/* Info Rekap */}
-							<div className="w-full lg:w-[608px] sm:w-full bg-white h-60 relative overflow-y-auto p-3 rounded-md shadow-sm mt-4 lg:mt-0">
-								<div className="flex justify-between items-center">
-									<h1 className="text-lg font-bold capitalize">
-										Informasi Rekap Absensi
-									</h1>
-								</div>
-								<div className="flex items-center justify-between gap-4 mt-4">
-									<p className="text-base ">Teknik Komputer dan Jaringan</p>
-									<span className="px-2 py-1 bg-yellow-500 text-white text-sm rounded-lg">
-										Belum Rekap
-									</span>
-								</div>
-							</div>
-						</div>
-						<div className="flex flex-col sm:w-full lg:w-1/2 gap-2">
-							{/* To Do List */}
-							<div className="w-full bg-white p-4 rounded-md overflow-y-auto">
-								<div className="flex justify-between items-center">
-									<h1 className="text-lg font-semibold capitalize">
-										To Do List
-									</h1>
-								</div>
+  const activeStudentCount = countData ? countData.activeStudentCount : 0;
+  const activeTeacherCount = countData ? countData.activeTeacherCount : 0;
 
-								<div className="flex gap-2 items-center mt-4">
-									<input
-										type="text"
-										name="description"
-										placeholder="Tambah tugas baru..."
-										className="flex-grow p-2 border border-gray-300 rounded-md"
-										value={editDescription}
-										onChange={(e) => setEditDescription(e.target.value)}
-									/>
-									<button
-										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
-										type="button"
-										onClick={addOrEditTodo}
-									>
-										{editingId !== null ? "Simpan" : "Tambah"}
-									</button>
-								</div>
+  return (
+    <div>
+      <Navigation />
+      <div className="p-4 sm:ml-64">
+        <div className="mt-14">
+          <h1 className="text-3xl font-bold font-mono capitalize">Beranda</h1>
+          <h3 className="text-lg font-sans font-semibold mt-3 capitalize">
+            selamat datang, Admin
+          </h3>
+        </div>
+        <div className="mt-6">
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-col lg:w-1/2 sm:w-full gap-2">
+              <div className="flex flex-wrap gap-2">
+                {/* guru */}
+                <div className="w-full sm:w-full lg:w-[300px] bg-[#dfe0f5] p-4 rounded-md">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="bg-white rounded-full">
+                      <svg
+                        className="w-24 h-24 text-gray-800"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h1 className=" capitalize text-lg text-end">
+                        jumlah guru
+                      </h1>
+                      <h2 className="text-[40px] font-semibold capitalize">
+                        {activeTeacherCount} {}
+                        <span className="text-[35px] text-gray-700  capitalize">
+                          Guru
+                        </span>
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Link to="/pengguna-guru" className="w-full">
+                      <button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
+                        <span>lihat selengkapnya</span>
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+                {/* siswa */}
+                <div className="w-full sm:w-full lg:w-[300px] bg-[#f7eee1] p-4 rounded-md">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="bg-white rounded-full">
+                      <svg
+                        className="w-24 h-24 text-gray-800"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h1 className=" capitalize text-lg text-end">
+                        jumlah siswa
+                      </h1>
+                      <h2 className="text-[40px] font-semibold capitalize">
+                        {activeStudentCount} {}
+                        <span className="text-[35px] text-gray-700  capitalize">
+                          siswa
+                        </span>
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Link to="/pengguna-siswa" className="w-full">
+                      <button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
+                        <span>lihat selengkapnya</span>
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              {/* Info Rekap */}
+              <div className="w-full lg:w-[608px] sm:w-full bg-white h-60 relative overflow-y-auto p-3 rounded-md shadow-sm mt-4 lg:mt-0">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-lg font-bold capitalize">
+                    Informasi Rekap Absensi
+                  </h1>
+                </div>
+                <div className="flex items-center justify-between gap-4 mt-4">
+                  <p className="text-base ">Teknik Komputer dan Jaringan</p>
+                  <span className="px-2 py-1 bg-yellow-500 text-white text-sm rounded-lg">
+                    Belum Rekap
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col sm:w-full lg:w-1/2 gap-2">
+              {/* To Do List */}
+              <div className="w-full bg-white p-4 rounded-md overflow-y-auto">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-lg font-semibold capitalize">
+                    To Do List
+                  </h1>
+                </div>
 
-								<div className="mt-3">
-									<ul>
-										{todoData?.map((todo) => (
-											<li
-												key={todo.id}
-												className="flex items-center justify-between gap-2"
-											>
-												<div className="flex items-center gap-2">
-													<input
-														type="checkbox"
-														checked={todo.status === 0}
-														onChange={() => handleCheckboxChange(todo.id)}
-													/>
-													<span
-														className={todo.status === 0 ? "line-through" : ""}
-														onClick={() => {
-															setEditingId(todo.id);
-															setEditDescription(todo.description);
-														}}
-													>
-														{todo.description}
-													</span>
-												</div>
-												<button onClick={() => removeTodo(todo.id)}>
-													<svg
-														className="w-5 h-5 text-gray-800 dark:text-white"
-														aria-hidden="true"
-														xmlns="http://www.w3.org/2000/svg"
-														width="24"
-														height="24"
-														fill="none"
-														viewBox="0 0 24 24"
-													>
-														<path
-															stroke="currentColor"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth="2"
-															d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-														/>
-													</svg>
-												</button>
-											</li>
-										))}
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+                <div className="flex gap-2 items-center mt-4">
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="Tambah tugas baru..."
+                    className="flex-grow p-2 border border-gray-300 rounded-md"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                  />
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+                    type="button"
+                    onClick={addOrEditTodo}
+                  >
+                    {editingId !== null ? "Simpan" : "Tambah"}
+                  </button>
+                </div>
+
+                <div className="mt-3">
+                  <ul>
+                    {todoData?.map((todo) => (
+                      <li
+                        key={todo.id}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={todo.status === 0}
+                            onChange={() => handleCheckboxChange(todo.id)}
+                          />
+                          <span
+                            className={todo.status === 0 ? "line-through" : ""}
+                            onClick={() => {
+                              setEditingId(todo.id);
+                              setEditDescription(todo.description);
+                            }}
+                          >
+                            {todo.description}
+                          </span>
+                        </div>
+                        <button onClick={() => removeTodo(todo.id)}>
+                          <svg
+                            className="w-5 h-5 text-gray-800 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                            />
+                          </svg>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default BerandaAdmin;

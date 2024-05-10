@@ -6,7 +6,7 @@ export interface Pengumpulan {
 	status: string;
 	submissionTimeStatus: string
 	link: string;
-	grade: number;
-	comment: string;
+	grade?: number;
+	comment?: string;
 	fileData: string;
 }

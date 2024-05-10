@@ -828,10 +828,9 @@ export const createPengumpulan = async (data: Pengumpulan) => {
 				},
 			}
 		);
-		console.log(response.data);
 		return response.data;
-	} catch (error) {
-		console.error("Failed to post pengumpulan:", error);
+	} catch (error:any) {
+		throw new Error(error.response.data);
 	}
 };
 
