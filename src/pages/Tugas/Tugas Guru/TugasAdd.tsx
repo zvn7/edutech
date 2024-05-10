@@ -301,7 +301,7 @@ const TugasAdd = ({
 				type="submit"
 				disabled={createTugas.isPending}
 				value={createTugas.isPending ? "Menyimpan..." : "Simpan"}
-				className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
+				className="w-32 px-4 py-2 mt-4 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700"
 			/>
 		</form>
 	);

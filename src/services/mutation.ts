@@ -6,7 +6,6 @@ import {
   deleteMapel,
 	createUserSiswa,
 	editSiswa,
-	postDataExcelSiswa,
   createGuru,
   createSchedules,
   deleteSchedule,
@@ -24,7 +23,6 @@ import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from '../types/user';
 import {
 	createAssignmentSubmissions,
-	editAssignmentSubmission,
 	createMateri,
 } from "./api";
 import { Pengumpulan } from "../types/pengumpulan";
@@ -133,27 +131,7 @@ export function useCreateJadwalAdmin(){
     })
 }
 
-// upload file excel datas siswa
-// export function useUploadFileSiswa(){
-//     const queryClient = useQueryClient()
-//     return useMutation({
-//         mutationKey: ['uploadFileSiswa'],
-//         mutationFn:(data:UserSiswa[])=>postDataExcelSiswa(data),
-//         onMutate:()=>{
-//             console.log("mutate")
-//         },
-//         onError:()=>{
-//             console.log("error");
-//         },
-//         onSettled:()=>{
-//             console.log("settled");
-//         },
-//         onSuccess: async (data:any) => {
-//             console.log("success", data);
-//             await queryClient.invalidateQueries({ queryKey: ["usersiswa"] });
-//         },
-//     })
-// }
+
 
 //edit data siswa
 export function useEditSiswa() {

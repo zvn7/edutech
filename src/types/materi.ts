@@ -23,6 +23,7 @@ export interface IMateriGuru {
 	nameTeacher: string;
 	lessonName: string;
 	courseName: string;
+	courseLesson: string;
 	description: string;
 	fileName: string;
 	linkCourse: string;
