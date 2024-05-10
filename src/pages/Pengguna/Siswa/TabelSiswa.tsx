@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Modal } from "flowbite-react";
-import { useGetSiswaId, useSiswaDetail } from "../../../services/queries";
+import {
+  useClassrooms,
+  useGetSiswaId,
+  useSiswaDetail,
+} from "../../../services/queries";
 import UploadFile from "./UploadFile";
 import Swal from "sweetalert2";
 import { useDeleteSiswa } from "../../../services/mutation";
 
-const TabelSiswa = (
-  { id }: { id: (string | undefined)[] }) => {
+const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [openModalExcel, setOpenModalExcel] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedClass, setSelectedClass] = useState("semua");
   const [searchTerm, setSearchTerm] = useState("");
 
   const siswaQuery = useGetSiswaId();
-
   const { data, isLoading: isSiswaLoading } = siswaQuery;
-  // const siswa = useSiswa(id);
 
-  const [file, setFile] = useState();
+  const kelasQuery = useClassrooms();
+  const { data: kelasData, isLoading: isKelasLoading } = kelasQuery;
 
   // Fungsi untuk mengubah nilai pageSize saat dropdown diubah
   const handlePageSizeChange = (e: any) => {
@@ -174,9 +175,15 @@ const TabelSiswa = (
               className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
             >
               <option selected>semua</option>
-              <option value="TKR">TKR</option>
-              <option value="TKJ">TKJ</option>
-              <option value="RPL">RPL</option>
+              {kelasData?.map((kelas) => (
+                <option
+                  key={kelas.className}
+                  value={kelas.className}
+                  className="text-normal"
+                >
+                  {kelas.className}
+                </option>
+              ))}
             </select>
 
             <div className="flex gap-2 items-center">
@@ -211,31 +218,6 @@ const TabelSiswa = (
             </div>
           </div>
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setOpenModalExcel(true)}
-              className="flex items-center text-white bg-green-600 hover:bg-green-800 font-medium rounded-lg text-sm p-2 capitalize"
-            >
-              <svg
-                className="w-5 h-5 text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 5v9m-5 0H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2M8 9l4-5 4 5m1 8h.01"
-                />
-              </svg>
-
-              <span className="ps-1 capitalize">upload excel</span>
-            </button>
             <Link to="/pengguna-siswa/tambah-siswa">
               <button
                 type="button"
@@ -508,11 +490,6 @@ const TabelSiswa = (
             </div>
           </div>
         </Modal.Body>
-      </Modal>
-
-      {/* modal upload excel */}
-      <Modal show={openModalExcel} onClose={() => setOpenModalExcel(false)}>
-        <UploadFile />
       </Modal>
     </>
   );

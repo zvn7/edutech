@@ -17,8 +17,6 @@ import { Mapel } from "../types/mapel";
 import { Jadwal } from "../types/jadwal";
 import { Kehadiran } from "../types/kehadiran";
 import { Ikelas, Classrooms } from '../types/kelas';
-import react from '@vitejs/plugin-react';
-import { Ikelas, Classrooms } from "../types/kelas";
 import { CountTeacher } from "../types/countTeacher";
 import { ToDoList } from "../types/todolist";
 
@@ -392,9 +390,8 @@ export const createAssignmentSubmissions = async (data: Pengumpulan) => {
 			}
 		);
 		return response.data;
-	} catch (error) {
-		console.error("Failed to post assignments:", error);
-		throw new Error("Failed to post assignments");
+	} catch (error:any) {
+		throw new Error(error.response.data);
 	}
 };
 
@@ -894,10 +891,9 @@ export const createPengumpulan = async (data: Pengumpulan) => {
 				},
 			}
 		);
-		console.log(response.data);
 		return response.data;
-	} catch (error) {
-		console.error("Failed to post pengumpulan:", error);
+	} catch (error:any) {
+		throw new Error(error.response.data);
 	}
 };
 
