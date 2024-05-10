@@ -14,14 +14,13 @@ import {
 	getSiswaIds,
 	getTeacherinfo,
 	getUserInfo,
-  getGuruById,
-  getClassRoomsByTeacherId,
-  getSchedulesAdmin,
+	getGuruById,
+	getClassRoomsByTeacherId,
+	getSchedulesAdmin,
 	getAssignmentSubmissions,
 	getListAssignment,
 	getAttendancesCalculate,
 	getCountTeacher,
-	getCToDoLists,
 	getToDoLists,
 } from "./api";
 import {
@@ -194,19 +193,6 @@ export function useAssignmentSubmissionsById(id: string) {
 	});
 }
 
-// export function useAssignmentSubmissions(
-// 	ids: (number | undefined)[] | undefined
-// ) {
-// 	return useQueries({
-// 		queries: (ids ?? []).map((assignmentId) => {
-// 			return {
-// 				queryKey: ["assignmentSubmissions", assignmentId],
-// 				queryFn: () => getAssignmentSubmissions(assignmentId!),
-// 			};
-// 		}),
-// 	});
-// }
-
 export function useLessonsIds() {
 	return useQuery({
 		queryKey: ["lessons"],
@@ -241,29 +227,12 @@ export function useSchedulesIds() {
 	});
 }
 
-export function useSchedulesAdmin(){
+export function useSchedulesAdmin() {
 	return useQuery({
 		queryKey: ["schedulesAdmin"],
-		queryFn : getSchedulesAdmin
-	})
+		queryFn: getSchedulesAdmin,
+	});
 }
-// export function useSchedules(ids: (number | undefined)[] | undefined) {
-// 	return useQueries({
-// 		queries: (ids ?? []).map((id) => {
-// 			return {
-// 				queryKey: ["schedules", id],
-// 				queryFn: () => getSchedules(id!),
-// 			};
-// 		}),
-// 	});
-// }
-
-// export function useAttendancesIds() {
-// 	return useQuery({
-// 		queryKey: ["attendances"],
-// 		queryFn: getAttendancesIds,
-// 	});
-// }
 
 export function useAttendancesIds() {
 	return useQuery({
@@ -308,30 +277,12 @@ export function useTeacherinfo() {
 	});
 }
 
-// export function useCourseClassroom(ids: (number | undefined)[] | undefined) {
-// 	return useQueries({
-// 		queries: (ids ?? []).map((id) => {
-// 			return {
-// 				queryKey: ["courseclassroom", id],
-// 				queryFn: () => getCourseClassroom(id!),
-// 			};
-// 		}),
-// 	});
-// }
-
 export function useGetLessonByGuru() {
 	return useQuery({
 		queryKey: ["lessonByTeacher"],
 		queryFn: getLessonByTeacherId,
 	});
 }
-
-// export function useSiswaDetail(id: string) {
-// 	return useQuery({
-// 		queryKey: ["siswa", id],
-// 		queryFn: () => getSiswa(id),
-// 	});
-// }
 
 export function useCourseById(id: string) {
 	return useQuery({
@@ -347,39 +298,44 @@ export function useGetClassrooms() {
 	});
 }
 
-export function useClassrooms(){
+export function useClassrooms() {
 	return useQuery({
 		queryKey: ["classrooms"],
-		queryFn: getClassRooms
-	})
+		queryFn: getClassRooms,
+	});
 }
 
 // get list tugas
 export function useListAssignment(lessonId: string, assignmentId: string) {
 	return useQuery({
-		queryKey:["listAssignment", lessonId, assignmentId],
-		queryFn:()=> getListAssignment(lessonId, assignmentId)
-	})
+		queryKey: ["listAssignment", lessonId, assignmentId],
+		queryFn: () => getListAssignment(lessonId, assignmentId),
+	});
 }
 
 // get jumlah absensi
-export function useAttendacesCalculate(uniqueNumberOfClassRoom:string, year:string, month:string){
+export function useAttendacesCalculate(
+	uniqueNumberOfClassRoom: string,
+	year: string,
+	month: string
+) {
 	return useQuery({
-		queryKey:["attendancesCalculate", uniqueNumberOfClassRoom, year, month],
-		queryFn:()=> getAttendancesCalculate(uniqueNumberOfClassRoom, year, month)
-  })
+		queryKey: ["attendancesCalculate", uniqueNumberOfClassRoom, year, month],
+		queryFn: () =>
+			getAttendancesCalculate(uniqueNumberOfClassRoom, year, month),
+	});
 }
 
-export function useCount(){
+export function useCount() {
 	return useQuery({
 		queryKey: ["count"],
-		queryFn: getCountTeacher
-	})
+		queryFn: getCountTeacher,
+	});
 }
 
-export function useTodo(){
+export function useTodo() {
 	return useQuery({
 		queryKey: ["todo"],
-		queryFn: getToDoLists
-	})
+		queryFn: getToDoLists,
+	});
 }

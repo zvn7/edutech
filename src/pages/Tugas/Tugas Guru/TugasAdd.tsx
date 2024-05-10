@@ -75,7 +75,6 @@ const TugasAdd = ({
       if (uploadedFile) {
         formData.append("assignmentFileData", uploadedFile);
       }
-
       // Menambahkan link jika ada
       if (data.assignmentLink) {
         formData.append("assignmentLink", data.assignmentLink);

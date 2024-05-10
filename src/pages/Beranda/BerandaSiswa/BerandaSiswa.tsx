@@ -15,7 +15,7 @@ const BerandaSiswa = () => {
 	// const courseIdsQuery = useCourseIds();
 	// const courseQueries = useCourse(courseIdsQuery.data);
 	const courseClassroom = useCourseClassroom();
-	const { data: formData } = courseClassroom;
+	const { data: formData,isLoading:isDataLoading } = courseClassroom;
 	const attendancesIdsQuery = useAttendancesIds();
 	const attendancesQueries = useAttendances(attendancesIdsQuery.data);
 
@@ -54,25 +54,25 @@ const BerandaSiswa = () => {
 			<Navigation />
 			<div className="p-4 sm:ml-64">
 				<div className=" mt-14">
-					<h1 className="text-3xl font-bold font-mono">Beranda</h1>
-					<h3 className="text-lg font-sans font-semibold mt-3 capitalize">
+					<h1 className="font-mono text-3xl font-bold">Beranda</h1>
+					<h3 className="mt-3 font-sans text-lg font-semibold capitalize">
 						Selamat Datang, {nameStudent}
 					</h3>
-					<p className="text-stone-500 capitalize">
+					<p className="capitalize text-stone-500">
 						Yuk, temukan pengetahuan baru hari ini! 📚
 					</p>
 				</div>
-				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
+				<div className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-1 lg:grid-cols-2">
 					<div>
 						{/* materi terbaru */}
 						<div className="flex flex-col gap-3">
-							<h1 className="font-bold text-xl mb-3">Materi Terbaru</h1>
+							<h1 className="mb-3 text-xl font-bold">Materi Terbaru</h1>
 
 							{formData?.slice(0, 5).map((course) => (
 								<div key={course.id} className="cursor-pointer">
 									<div className="flex items-center rounded-lg shadow-sm p-3 gap-2 bg-white mb-2 hover:bg-[#fdefc8]">
 										<div className="flex gap-3">
-											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+											<div className="flex items-center bg-blue-100 rounded-lg h-14">
 												<svg
 													className="w-12 h-12 text-blue-600 dark:text-white"
 													aria-hidden="true"
@@ -88,13 +88,13 @@ const BerandaSiswa = () => {
 												</svg>
 											</div>
 											<div className="flex flex-col">
-												<p className="text-sm capitalize text-gray-500">
+												<p className="text-sm text-gray-500 capitalize">
 													{course.lessonName}
 												</p>
-												<p className="text-md font-semibold text-gray-900">
+												<p className="font-semibold text-gray-900 text-md">
 													{course.courseName}
 												</p>
-												<p className="text-sm capitalize text-gray-500">
+												<p className="text-sm text-gray-500 capitalize">
 													{course.nameTeacher}
 												</p>
 											</div>
@@ -105,22 +105,22 @@ const BerandaSiswa = () => {
 
 							<Link
 								to="/materi-siswa"
-								className="bg-white p-2 rounded text-blue-700 hover:bg-gray-200 hover:text-blue-500"
+								className="p-2 text-blue-700 bg-white rounded hover:bg-gray-200 hover:text-blue-500"
 							>
 								Selengkapnya...
 							</Link>
 						</div>
 						{/* tugas */}
-						<div className="mt-8 flex flex-col gap-3">
-							<h1 className="font-bold text-xl mb-3">Daftar Tugas</h1>
+						<div className="flex flex-col gap-3 mt-8">
+							<h1 className="mb-3 text-xl font-bold">Daftar Tugas</h1>
 							{dataTugas?.slice(0, 5).map((item) => (
 								<div
 									key={item?.id}
-									className="cursor-pointer flex flex-col gap-3"
+									className="flex flex-col gap-3 cursor-pointer"
 								>
 									<div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2 hover:bg-[#fdefc8]">
 										<div className="flex gap-3">
-											<div className="bg-blue-100 rounded-lg h-14 flex items-center">
+											<div className="flex items-center bg-blue-100 rounded-lg h-14">
 												<svg
 													className="w-12 h-12 text-blue-600 dark:text-white"
 													aria-hidden="true"
@@ -139,7 +139,7 @@ const BerandaSiswa = () => {
 												<p className="text-sm font-normal text-gray-500">
 													{item?.lessonName}
 												</p>
-												<h2 className="text-md font-medium">
+												<h2 className="font-medium text-md">
 													{item?.assignmentName}
 												</h2>
 												<div className="flex flex-wrap gap-2 ">
@@ -174,7 +174,7 @@ const BerandaSiswa = () => {
 							))}
 							<Link
 								to="/tugas-siswa"
-								className="bg-white p-2 rounded text-blue-700 hover:bg-gray-200 hover:text-blue-500"
+								className="p-2 text-blue-700 bg-white rounded hover:bg-gray-200 hover:text-blue-500"
 							>
 								Selengkapnya...
 							</Link>
@@ -182,7 +182,7 @@ const BerandaSiswa = () => {
 					</div>
 					{/* tabel kehadiran */}
 					<div>
-						<h1 className="mb-5 text-xl font-sans font-bold">
+						<h1 className="mb-5 font-sans text-xl font-bold">
 							Daftar kehadiran
 						</h1>
 						{attendancesQueries.map((query, index) => {
@@ -194,10 +194,10 @@ const BerandaSiswa = () => {
 										{query.isSuccess && query.data && (
 											<Table>
 												<Table.Head>
-													<Table.HeadCell className="bg-gray-200 text-black">
+													<Table.HeadCell className="text-black bg-gray-200">
 														Tanggal
 													</Table.HeadCell>
-													<Table.HeadCell className="bg-gray-200 text-black">
+													<Table.HeadCell className="text-black bg-gray-200">
 														Status
 													</Table.HeadCell>
 												</Table.Head>
