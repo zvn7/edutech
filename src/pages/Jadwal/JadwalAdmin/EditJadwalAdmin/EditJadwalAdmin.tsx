@@ -21,32 +21,32 @@ const EditJadwalAdmin = () => {
 
 	const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://192.168.66.239:13311/api/Schedules/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        setFormData({
-          ...formData,
-          day: response.data.day || "",
-          startTime: response.data.startTime || "",
-          endTime: response.data.endTime || "",
-          lessonName: response.data.lessonName || "",
-          className: response.data.className || "",
-        });
-        setSelectedLesson(response.data.lessonName || "");
-        setSelectedClass(response.data.className || "");
-        return response.data;
-      } catch (error) {
-        console.log(error);
-      }
-    };
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await axios.get(
+					`http://192.168.110.239:13311/api/Schedules/${id}`,
+					{
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+					}
+				);
+				setFormData({
+					...formData,
+					day: response.data.day || "",
+					startTime: response.data.startTime || "",
+					endTime: response.data.endTime || "",
+					lessonName: response.data.lessonName || "",
+					className: response.data.className || "",
+				});
+				setSelectedLesson(response.data.lessonName || "");
+				setSelectedClass(response.data.className || "");
+				return response.data;
+			} catch (error) {
+				console.log(error);
+			}
+		};
 
 		fetchData();
 	}, [id]);
@@ -59,36 +59,36 @@ const EditJadwalAdmin = () => {
 	const jadwalQuery = useLessonsIds();
 	const { data: dataJadwal } = jadwalQuery;
 
-  const handleSubmitEdit = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await axios.put(
-        `http://192.168.66.239:13311/api/Schedules/${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log(response.data);
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Jadwal Berhasil diperbarui!",
-        confirmButtonText: "Ok",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/jadwal-admin");
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+	const handleSubmitEdit = async (e: any) => {
+		e.preventDefault();
+		setLoading(true);
+		try {
+			const response = await axios.put(
+				`http://192.168.110.239:13311/api/Schedules/${id}`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+			console.log(response.data);
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil",
+				text: "Jadwal Berhasil diperbarui!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					navigate("/jadwal-admin");
+				}
+			});
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const handleLessonChange = (e: any) => {
 		const { value } = e.target;

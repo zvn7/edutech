@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import {
-	useGetLessonByGuru,
-	useGetMapelByGuru,
-} from "../../../services/queries";
+import { useGetLessonByGuru } from "../../../services/queries";
 import axios from "axios";
 import { FileInput, Textarea, TextInput } from "flowbite-react"; // Pastikan impor FileInput ada di sini
 
@@ -12,20 +9,10 @@ interface MateriEditProps {
 	setisTabletModalOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MateriEditTablet = ({
-	id,
-	setisTabletModalOpenEdit,
-}: MateriEditProps) => {
+const MateriEditTablet = ({ id, setisTabletModalOpenEdit }: MateriEditProps) => {
 	const [selectedOption, setSelectedOption] = useState("file");
 	const [loading, setLoading] = useState(false);
-	const [formUpdate, setFormUpdate] = useState<{
-		id: string;
-		courseName: string;
-		description: string;
-		fileData: File | null;
-		linkCourse: string;
-		lessonName: string;
-	}>({
+	const [formUpdate, setFormUpdate] = useState({
 		id: "",
 		courseName: "",
 		description: "",
@@ -41,7 +28,7 @@ const MateriEditTablet = ({
 		const fetchMateri = async () => {
 			try {
 				const response = await axios.get(
-					`http://192.168.66.239:13311/api/Courses/${id}`,
+					`http://192.168.110.239:13311/api/Courses/${id}`,
 					{
 						headers: {
 							Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -108,7 +95,7 @@ const MateriEditTablet = ({
 			}
 
 			const response = await axios.put(
-				`http://192.168.66.239:13311/api/Courses/${formUpdate.id}`,
+				`http://192.168.110.239:13311/api/Courses/${formUpdate.id}`,
 				formData,
 				{
 					headers: {
@@ -136,8 +123,7 @@ const MateriEditTablet = ({
 					setisTabletModalOpenEdit(false); // Tutup formulir setelah berhasil
 				}
 			});
-		} catch (error) {
-			console.log(error);
+		} catch (error: any) {
 			if (error.response && error.response.data) {
 				console.log(error.response.data.errors);
 			}
@@ -186,11 +172,12 @@ const MateriEditTablet = ({
 			>
 				{dataMapel &&
 					dataMapel.map((mapel) => (
-						<option key={mapel.id} value={mapel.lessonName}>
+						<option key={mapel.lessonId} value={mapel.lessonName}>
 							{mapel.lessonName}
 						</option>
 					))}
 			</select>
+			<p>{formUpdate.lessonName}</p>
 			<label htmlFor="description" className="mt-2 block">
 				Deskripsi
 			</label>

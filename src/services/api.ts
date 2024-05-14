@@ -1,5 +1,3 @@
-import { getAttendances } from "./api";
-import { getSchedules } from "./api";
 import axios from "axios";
 import { LoginUser } from "../types/login";
 import { UserGuru, UserLogin, UserSiswa } from "../types/user";
@@ -20,7 +18,7 @@ import { Ikelas, Classrooms } from "../types/kelas";
 import { CountTeacher } from "../types/countTeacher";
 import { ToDoList } from "../types/todolist";
 
-const BASE_URL = "http://192.168.66.239:13311";
+const BASE_URL = "http://192.168.110.239:13311";
 
 // login
 export const postLogin = async (data: LoginUser) => {
@@ -829,7 +827,7 @@ export const createPengumpulan = async (data: Pengumpulan) => {
 			}
 		);
 		return response.data;
-	} catch (error:any) {
+	} catch (error: any) {
 		throw new Error(error.response.data);
 	}
 };

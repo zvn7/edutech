@@ -254,14 +254,14 @@ const BerandaAdmin = () => {
               <div className="w-full lg:w-[608px] sm:w-full bg-white h-60 relative overflow-y-auto p-3 rounded-md shadow-sm mt-4 lg:mt-0">
                 <div className="flex justify-between items-center">
                   <h1 className="text-lg font-bold capitalize">
-                    Informasi Rekap Absensi
+                    Informasi Tugas Admin
                   </h1>
                 </div>
-                <div className="flex items-center justify-between gap-4 mt-4">
-                  <p className="text-base ">Teknik Komputer dan Jaringan</p>
-                  <span className="px-2 py-1 bg-yellow-500 text-white text-sm rounded-lg">
-                    Belum Rekap
-                  </span>
+                <div className="mt-4">
+                  <ul className="list-disc ml-6">
+                    <li >Merekap Absensi setiap kelas</li>
+                    <li >Membuat Jadwal Pelajaran</li>
+                  </ul>
                 </div>
               </div>
             </div>

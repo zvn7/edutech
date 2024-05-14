@@ -1,5 +1,5 @@
-import { TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { FileInput, TextInput } from "flowbite-react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { useTeacherinfo, useGetLessonByGuru } from "../../../services/queries";
 import { useCreateTugas } from "../../../services/mutation";
@@ -7,10 +7,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Tugas } from "../../../types/tugas";
 
 const TugasAdd = ({
-  handleCloseForms,
   setShowAddForm,
 }: {
-  handleCloseForms: () => void;
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [selectedOption, setSelectedOption] = useState("file");
@@ -31,24 +29,10 @@ const TugasAdd = ({
     typeOfSubmission: 0,
   });
 
-  const [formUpdate, setFormUpdate] = useState({
-    id: "",
-    assignmentName: "",
-    assignmentDate: "",
-    assignmentDeadline: "",
-    assignmentDescription: "",
-    assignmentFileData: "",
-    assignmentLink: "",
-    courseId: "",
-    lessonName: "",
-    courseName: "",
-    typeOfSubmission: 0,
-  });
-
   const [selectedLesson, setSelectedLesson] = useState("");
 
   const mapelQuery = useGetLessonByGuru();
-  const { data: dataMapel, isLoading: mapelIsLoading } = mapelQuery;
+  const { data: dataMapel } = mapelQuery;
 
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
@@ -147,7 +131,6 @@ const TugasAdd = ({
           className="mr-4 text-gray-700 dark:text-white"
         >
           Tugas
-          {/* <sup className="ml-1 text-red-500">*</sup> */}
         </label>
         <select
           id="countries"
@@ -241,7 +224,7 @@ const TugasAdd = ({
             htmlFor="nama_tugas"
             className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
           >
-            Deadline Tugas
+            Deadline Tugas   
           </label>
           <input
             type="datetime-local"
@@ -292,8 +275,7 @@ const TugasAdd = ({
           </div>
           {selectedOption === "file" && (
             <div id="fileUpload" className="mt-4">
-              <input
-                type="file"
+              <FileInput
                 id="assignmentFileData"
                 {...register("assignmentFileData")}
                 onChange={(e) => {

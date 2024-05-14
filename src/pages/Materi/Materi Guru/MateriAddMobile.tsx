@@ -1,36 +1,17 @@
 import { FileInput, TextInput } from "flowbite-react"; // Import Modal component
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { useGetLessonByGuru, useGetMapelByGuru } from "../../../services/queries";
+import { useGetLessonByGuru } from "../../../services/queries";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { UploadMateri } from "../../../types/materi";
 
 const MateriAddMobile = ({
-	handleCloseForms,
 	setisMobileModalOpenAdd,
 }: {
-	handleCloseForms: () => void;
 	setisMobileModalOpenAdd: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-	// const [showEditForm, setShowEditForm] = useState(false);
 	const [selectedOption, setSelectedOption] = useState("file");
-
-	const [formUpdate, setFormUpdate] = useState<{
-		id: string;
-		courseName: string;
-		description: string;
-		fileData: File | null; // Update the type here
-		linkCourse: string;
-		lessonName: string;
-	}>({
-		id: "",
-		courseName: "",
-		description: "",
-		fileData: null, // Initialize with null
-		linkCourse: "",
-		lessonName: "",
-	});
 
 	const handleOptionChange = (option: string) => {
 		setSelectedOption(option);
@@ -47,8 +28,8 @@ const MateriAddMobile = ({
 
 	const handleInputChange = (e: any) => {
 		const { value, name } = e.target;
-		setFormUpdate({
-			...formUpdate,
+		setForm({
+			...form,
 			[name]: value,
 		});
 		console.log("data form", form);
@@ -67,15 +48,18 @@ const MateriAddMobile = ({
 			const formData = new FormData();
 			formData.append("CourseName", data.CourseName);
 			formData.append("Description", data.Description);
-			formData.append("LinkCourse", data.LinkCourse);
 			formData.append("LessonName", data.LessonName);
 			formData.append("TeacherId", data.TeacherId);
-			if (data.FileData) {
-				formData.append("FileData", data.FileData[0]); // Mengambil file pertama dari array fileData
+			if (uploadedFile) {
+				formData.append("FileData", uploadedFile);
+			}
+
+			if (data.LinkCourse) {
+				formData.append("LinkCourse", data.LinkCourse);
 			}
 
 			// Mengirim data materi ke API menggunakan createMateri.mutateAsync
-			await createMateri.mutate(data, {
+			await createMateri.mutate(formData, {
 				onSuccess: () => {
 					// Jika pengiriman sukses, lakukan tindakan setelah materi berhasil ditambahkan
 					Swal.fire({
@@ -95,6 +79,7 @@ const MateriAddMobile = ({
 								TeacherId: "",
 							});
 							setisMobileModalOpenAdd(false);
+							setUploadedFile(null);
 						}
 					});
 				},
@@ -114,15 +99,10 @@ const MateriAddMobile = ({
 	const queryMapel = useGetLessonByGuru();
 	const { data: dataMapel } = queryMapel;
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files && e.target.files[0];
-		if (file) {
-			setUploadedFile(file);
-			setFormUpdate({
-				...formUpdate,
-				fileData: file, // Set fileData to the selected file
-			});
-		}
+	// Handler untuk mengubah file
+	const handleFileChange = (e: any) => {
+		const file = e.target.files[0];
+		setUploadedFile(file);
 	};
 
 	return (
@@ -137,12 +117,10 @@ const MateriAddMobile = ({
 				</label>
 				<input
 					type="text"
-					// value={form.CourseName}
-
 					{...register(`CourseName`, { required: true })}
 					onChange={handleInputChange}
 					className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-					placeholder="Masukkan nama lengkap"
+					placeholder="Masukkan nama materi"
 					required
 					onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
 						e.target.setCustomValidity("Nama Lengkap tidak boleh kosong")
@@ -160,7 +138,7 @@ const MateriAddMobile = ({
 				<option value="">Pilih Mata Pelajaran</option>
 				{dataMapel &&
 					dataMapel.map((mapel) => (
-						<option key={mapel.id} value={mapel.lessonName}>
+						<option key={mapel.lessonId} value={mapel.lessonName}>
 							{mapel.lessonName}
 						</option>
 					))}
@@ -212,7 +190,7 @@ const MateriAddMobile = ({
 			{selectedOption === "file" && (
 				<div id="fileUpload" className="mt-4">
 					<FileInput
-						id="fileData"
+						id="FileData"
 						{...register("FileData")}
 						onChange={(e) => {
 							handleFileChange(e);

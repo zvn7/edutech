@@ -148,7 +148,7 @@ const TabelAbsensi = () => {
 		setIsDownloading(true);
 
 		fetch(
-			`http://192.168.66.239:13311/api/Attendances/download-attendance?uniqueNumberOfClassRoom=${selectedClass}&year=${selectedYear}&month=${selectedMonth}`,
+			`http://192.168.110.239:13311/api/Attendances/download-attendance?uniqueNumberOfClassRoom=${selectedClass}&year=${selectedYear}&month=${selectedMonth}`,
 			{
 				method: "GET",
 				headers: {
@@ -164,7 +164,7 @@ const TabelAbsensi = () => {
 				return response.blob();
 			})
 			.then((blob) => {
-        const classFullName = getClassFullName(selectedClass);
+				const classFullName = getClassFullName(selectedClass);
 				const fileName = `${classFullName}_${selectedMonth}_${selectedYear}_absensi.xlsx`;
 				const url = window.URL.createObjectURL(blob);
 				const link = document.createElement("a");

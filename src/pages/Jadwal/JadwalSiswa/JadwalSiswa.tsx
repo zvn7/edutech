@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Navigation from "../../../component/Navigation/Navigation";
 import {
-	useLessons,
 	useLessonsIds,
 	useSchedulesIds,
 } from "../../../services/queries";
@@ -9,15 +8,15 @@ import {
 const JadwalSiswa = () => {
 	const schedulesIdsQuery = useSchedulesIds();
 	const lessonsIdsQuery = useLessonsIds();
-	const lessonsQueries = useLessons(lessonsIdsQuery.data);
-	const [hoveredTeacher, setHoveredTeacher] = useState(null);
+	// const schedules = useLessons(lessonsIdsQuery.data);
+	const {data: schedules} = lessonsIdsQuery;
 
 	const [lessonNames, setLessonNames] = useState({});
 
 	useEffect(() => {
-		if (lessonsQueries && lessonsQueries.length > 0) {
+		if (schedules && schedules.length > 0) {
 			const lessonData = {};
-			lessonsQueries.forEach((lessonQuery) => {
+			schedules.forEach((lessonQuery) => {
 				if (lessonQuery.isSuccess) {
 					const lesson = lessonQuery.data;
 					lessonData[lesson.id] = lesson.lessonName;
@@ -25,25 +24,7 @@ const JadwalSiswa = () => {
 			});
 			setLessonNames(lessonData);
 		}
-	}, [lessonsQueries]);
-
-	const handleMouseEnter = (teacher) => {
-		setHoveredTeacher(teacher);
-	};
-
-	const handleMouseLeave = () => {
-		setHoveredTeacher(null);
-	};
-
-	const renderTeacherName = (nameTeacher) => {
-		if (hoveredTeacher === nameTeacher) {
-			return nameTeacher;
-		} else {
-			return nameTeacher.length > 15
-				? `${nameTeacher.slice(0, 15)}...`
-				: nameTeacher;
-		}
-	};
+	}, [schedules]);
 
 	const renderSchedules = () => {
 		if (!schedulesIdsQuery.data) return null;
@@ -74,7 +55,7 @@ const JadwalSiswa = () => {
 						: "Jum'at"}
 				</h1>
 				<div className="flex flex-col gap-6 mt-4">
-					{groupedSchedules[day].map((schedule) => (
+					{groupedSchedules[day].map((schedule : any) => (
 						<div
 							key={schedule.id}
 							className="bg-blue-100 border-l-4 border-blue-500 rounded-lg h-full flex items-center w-52"
@@ -106,10 +87,11 @@ const JadwalSiswa = () => {
 								</div>
 								<p
 									className="m-1 text-md font-medium text-gray-700 capitalize"
-									onMouseEnter={() => handleMouseEnter(schedule.nameTeacher)}
-									onMouseLeave={handleMouseLeave}
+									title={schedule.nameTeacher}
 								>
-									{renderTeacherName(schedule.nameTeacher)}
+									{schedule.nameTeacher.length > 15
+										? `${schedule.nameTeacher.slice(0, 15)}...`
+										: schedule.nameTeacher}
 								</p>
 							</div>
 						</div>
