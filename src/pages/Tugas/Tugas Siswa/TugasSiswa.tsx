@@ -93,7 +93,7 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 
     try {
       const response = await axios.get(
-        `http://192.168.66.239:13311/api/Assignments/download/${id}`,
+        `http://192.168.110.239:13311/api/Assignments/download/${id}`,
         {
           responseType: "blob",
           headers: {
@@ -136,7 +136,6 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
   const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
     // Memastikan assignmentId sudah diset
     if (!data.assignmentId) {
-      console.error("Assignment ID is missing.");
       return;
     }
 
@@ -194,15 +193,50 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
       : dataTugas?.filter(
           ({ lessonName }) => lessonName === selectedAssignment
         );
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (e: any) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const searchFilter = (tugas: any) => {
+    return tugas.assignmentName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+  };
   return (
     <div>
       <Navigation />
       <div className="p-4 sm:ml-64">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-          {/* left side */}
           <div>
-            <div className="flex justify-between mb-2 mt-14">
+            <div className="mt-14">
               <h1 className="text-3xl font-bold">Tugas</h1>
+            </div>
+            <div className="flex justify-between mb-2 mt-8">
+              <div className="flex gap-2 items-center">
+                <label htmlFor="table-search" className="sr-only">
+                  Search
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                    <img
+                      src="/gif/search.gif"
+                      alt="search"
+                      className="w-5 h-5"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    id="table-search"
+                    className="block p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-white focus:ring-gray-200 focus:border-none capitalize"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="temukan tugas disini..."
+                  />
+                </div>
+              </div>
               <select
                 id="subject"
                 value={selectedLesson}
@@ -222,34 +256,11 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
               style={{ scrollbarWidth: "none" }}
             >
               <div className="flex flex-col gap-3 mt-2">
-                {isLoadingTugas
-                  ? Array.from({ length: 5 }, (_, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg bg-white border-b animate-pulse"
-                      >
-                        <div className="flex gap-3">
-                          <div className="flex items-center bg-blue-100 rounded-lg h-14"></div>
-                          <div className="flex flex-col">
-                            <p className="text-sm font-normal text-gray-500">
-                              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-4" />{" "}
-                            </p>
-                            <h2 className="font-medium text-md">
-                              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-4" />
-                            </h2>
-                            <div className="flex flex-wrap gap-2 ">
-                              <div className="flex gap-1">
-                                <span className="text-sm text-gray-500">
-                                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-4" />{" "}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize"></span>
-                      </div>
-                    ))
-                  : filteredData?.map((items) => (
+                {isLoadingTugas ? (
+                  <p>loading....</p>
+                ) : filteredData && filteredData.length > 0 ? (
+                  filteredData.filter(searchFilter).length > 0 ? (
+                    filteredData.filter(searchFilter).map((items) => (
                       <div
                         key={items?.id}
                         onClick={() => handleCardClick(items?.id)}
@@ -314,7 +325,18 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
                           </span>
                         </div>
                       </div>
-                    ))}
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-400">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </p>
+                  )
+                ) : (
+                  <p className="text-center text-gray-400">
+                    Tidak ada data yang sesuai dengan pilihan tugas yang
+                    dipilih.
+                  </p>
+                )}
               </div>
             </div>
           </div>

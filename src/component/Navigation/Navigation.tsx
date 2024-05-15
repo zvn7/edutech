@@ -120,7 +120,7 @@ const Navigation = () => {
     const fetchUserLogin = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.66.239:13311/api/Account/userinfo",
+          "http://192.168.110.239:13311/api/Account/userinfo",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -337,16 +337,6 @@ const Navigation = () => {
                 {absenMenuOpen && (
                   <div className="ml-10 space-y-2">
                     <Link
-                      to="/rekap-absensi"
-                      className={`block px-4 py-2 ${
-                        location.pathname === "/rekap-absensi"
-                          ? "bg-gray-200 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      Rekap Absensi
-                    </Link>
-                    <Link
                       to="/data-absensi"
                       className={`block px-4 py-2 ${
                         location.pathname === "/data-absensi"
@@ -355,6 +345,16 @@ const Navigation = () => {
                       }`}
                     >
                       Data Absensi
+                    </Link>
+                    <Link
+                      to="/rekap-absensi"
+                      className={`block px-4 py-2 ${
+                        location.pathname === "/rekap-absensi"
+                          ? "bg-gray-200 rounded-md"
+                          : ""
+                      }`}
+                    >
+                      Rekap Absensi
                     </Link>
                   </div>
                 )}

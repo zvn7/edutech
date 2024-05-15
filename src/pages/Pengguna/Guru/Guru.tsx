@@ -5,13 +5,26 @@ const Guru = () => {
   return (
     <div>
       <Navigation />
+      <div>
+        <div className="bg-[#86d9ff] h-40 relative z-10"></div>
+      </div>
       <div className="p-4 sm:ml-64">
-        <div className="mt-14">
-          <h1 className="text-3xl font-bold capitalize">
-            Daftar Guru
-          </h1>
+        <div className="w-full">
+          <div className="h-20 bg-white p-4 rounded-sm shadow-md relative -top-11 z-20">
+            <div className="flex gap-3 items-center">
+              <img
+                src="/gif/user.gif"
+                alt="calendar"
+                className="w-12 h-12"
+              />
+              <h1 className="text-2xl font-bold text-gray-800 capitalize">
+                daftar guru
+              </h1>
+            </div>
+          </div>
         </div>
-        <div className="mt-4">
+
+        <div>
           <TabelGuru />
         </div>
       </div>

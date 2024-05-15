@@ -1,5 +1,5 @@
-import { TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { FileInput, TextInput } from "flowbite-react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { useTeacherinfo, useGetLessonByGuru } from "../../../services/queries";
 import { useCreateTugas } from "../../../services/mutation";
@@ -31,24 +31,10 @@ const TugasAdd = ({
     typeOfSubmission: 0,
   });
 
-  const [formUpdate, setFormUpdate] = useState({
-    id: "",
-    assignmentName: "",
-    assignmentDate: "",
-    assignmentDeadline: "",
-    assignmentDescription: "",
-    assignmentFileData: "",
-    assignmentLink: "",
-    courseId: "",
-    lessonName: "",
-    courseName: "",
-    typeOfSubmission: 0,
-  });
-
   const [selectedLesson, setSelectedLesson] = useState("");
 
   const mapelQuery = useGetLessonByGuru();
-  const { data: dataMapel, isLoading: mapelIsLoading } = mapelQuery;
+  const { data: dataMapel } = mapelQuery;
 
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
@@ -88,8 +74,8 @@ const TugasAdd = ({
           // Jika pengiriman sukses, lakukan tindakan setelah tugas berhasil ditambahkan
           Swal.fire({
             icon: "success",
-            title: "Tugas Berhasil",
-            text: "Tugas Berhasil Berhasil",
+            title: "Berhasil",
+            text: "Tugas Berhasil ditambahkan",
             confirmButtonText: "Ok",
           }).then((result) => {
             if (result.isConfirmed) {
@@ -106,18 +92,16 @@ const TugasAdd = ({
                 courseId: "",
                 typeOfSubmission: 0,
               });
-              setUploadedFile(null); // Mengatur uploadedFile kembali menjadi null setelah pengiriman berhasil
+              setUploadedFile(null);
             }
           });
         },
       });
-    } catch (error) {
-      console.error("Error submitting tugas:", error);
-      // Handle error jika pengiriman data gagal
+    } catch (error: any) {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: "Terjadi kesalahan saat menambahkan tugas.",
+        text: error.toString(),
         confirmButtonText: "Ok",
       });
     }
@@ -139,21 +123,38 @@ const TugasAdd = ({
     (lesson) => lesson.lessonName === selectedLesson
   );
 
+  const handleBatal = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Peringatan",
+      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, lanjutkan",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowAddForm(false);
+        reset();
+      }
+    });
+  };
+
   return (
     <>
-      <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+      <div>
         <label
           htmlFor="countries"
-          className="mr-4 text-gray-700 dark:text-white"
+          className="block mb-2 text-sm font-medium text-blue-600 capitalize dark:text-white"
         >
-          Tugas
-          {/* <sup className="ml-1 text-red-500">*</sup> */}
+          Mata Pelajaran
         </label>
         <select
           id="countries"
           value={selectedLesson}
           onChange={handleLessonChange}
-          className="w-full bg-transparent border-none"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         >
           <option selected>Pilih Mapel</option>
 
@@ -179,13 +180,28 @@ const TugasAdd = ({
             id="countries"
             {...register("courseId")}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Materi harus dipilih")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
           >
-            <option selected>Pilih Materi</option>
-            {filteredCourseData?.map((course) => (
-              <option key={course.courseName} value={course.courseId}>
-                {course.courseName}
+            <option selected disabled>
+              Pilih Materi
+            </option>
+            {filteredCourseData && filteredCourseData.length > 0 ? (
+              filteredCourseData.map((course) => (
+                <option key={course.courseName} value={course.courseId}>
+                  {course.courseName}
+                </option>
+              ))
+            ) : (
+              <option className="text-center text-gray-400">
+                Tidak ada materi
               </option>
-            ))}
+            )}
           </select>
         </div>
         <div className="mb-5">
@@ -200,8 +216,15 @@ const TugasAdd = ({
             {...register("assignmentName")}
             onChange={handleInputChange}
             id="nama_tugas"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Nama tugas tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -218,6 +241,13 @@ const TugasAdd = ({
             placeholder="Masukkan Deskripsi Tugas"
             {...register("assignmentDescription")}
             onChange={handleInputChange}
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("Deskripsi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -234,6 +264,13 @@ const TugasAdd = ({
             onChange={handleInputChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Tanggal tugas tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -253,7 +290,37 @@ const TugasAdd = ({
             step="1"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Deadline tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
+        </div>
+        <div className="mb-5">
+          <label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
+            Tipe Pengumpulan
+          </label>
+          {/* select */}
+          <select
+            id="typeOfSubmission"
+            {...register("typeOfSubmission")}
+            onChange={handleInputChange}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Tipe Pengumpulan harus dipilih")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
+          >
+            <option value="">Pilih Tipe Pengumpulan</option>
+            <option value="1">File</option>
+            <option value="2">Link</option>
+          </select>
         </div>
         <div className="mb-2">
           <label
@@ -292,8 +359,7 @@ const TugasAdd = ({
           </div>
           {selectedOption === "file" && (
             <div id="fileUpload" className="mt-4">
-              <input
-                type="file"
+              <FileInput
                 id="assignmentFileData"
                 {...register("assignmentFileData")}
                 onChange={(e) => {
@@ -315,28 +381,24 @@ const TugasAdd = ({
             </div>
           )}
         </div>
-        <div className="mb-5">
-          <label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
-            Tipe Pengumpulan
-          </label>
-          {/* select */}
-          <select
-            id="typeOfSubmission"
-            {...register("typeOfSubmission")}
-            onChange={handleInputChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value="">Pilih Tipe Pengumpulan</option>
-            <option value="1">File</option>
-            <option value="2">Link</option>
-          </select>
+
+        <div>
+          <div className="flex items-center gap-3 mt-6">
+            <input
+              type="submit"
+              disabled={createTugas.isPending}
+              value={createTugas.isPending ? "Menyimpan..." : "Simpan"}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md w-32"
+            />
+            <button
+              onClick={handleBatal}
+              type="submit"
+              className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
+            >
+              batal
+            </button>
+          </div>
         </div>
-        <input
-          type="submit"
-          disabled={createTugas.isPending}
-          value={createTugas.isPending ? "Menyimpan..." : "Simpan"}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-        />
       </form>
     </>
   );

@@ -1,10 +1,7 @@
-import { FileInput, TextInput } from "flowbite-react"; // Import Modal component
+import { FileInput, TextInput } from "flowbite-react";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import {
-  useGetLessonByGuru,
-  useGetMapelByGuru,
-} from "../../../services/queries";
+import { useGetLessonByGuru } from "../../../services/queries";
 import { useCreateMateri } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { UploadMateri } from "../../../types/materi";
@@ -18,22 +15,6 @@ const MateriAdd = ({
 }) => {
   // const [showEditForm, setShowEditForm] = useState(false);
   const [selectedOption, setSelectedOption] = useState("file");
-
-//   const [formUpdate, setFormUpdate] = useState<{
-//     id: string;
-//     courseName: string;
-//     description: string;
-//     fileData: File | null; // Update the type here
-//     linkCourse: string;
-//     lessonName: string;
-//   }>({
-//     id: "",
-//     courseName: "",
-//     description: "",
-//     fileData: null, // Initialize with null
-//     linkCourse: "",
-//     lessonName: "",
-//   });
 
   const handleOptionChange = (option: string) => {
     setSelectedOption(option);
@@ -106,13 +87,11 @@ const MateriAdd = ({
           });
         },
       });
-    } catch (error) {
-      console.error("Error submitting materi:", error);
-      // Handle error jika pengiriman data gagal
+    } catch (error: any) {
       Swal.fire({
         icon: "error",
-        title: "Error!",
-        text: "Terjadi kesalahan saat menambahkan materi.",
+        title: "Gagal",
+        text: error.toString(),
         confirmButtonText: "Ok",
       });
     }
@@ -127,121 +106,181 @@ const MateriAdd = ({
     setUploadedFile(file);
   };
 
+  const handleBatal = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Peringatan",
+      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, lanjutkan",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowAddForm(false);
+        reset();
+      }
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
       <hr className="my-3" />
-      <div>
-        <label
-          htmlFor="name"
-          className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-        >
-          nama materi
-        </label>
-        <input
-          type="text"
-          // value={form.CourseName}
-
-          {...register(`CourseName`, { required: true })}
-          onChange={handleInputChange}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-          placeholder="Masukkan nama lengkap"
-          required
-          onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-            e.target.setCustomValidity("Nama Lengkap tidak boleh kosong")
-          }
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            e.target.setCustomValidity("")
-          }
-        />
-      </div>
-      <p className="mt-2">Mata Pelajaran</p>
-      <select
-        {...register("LessonName")}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      >
-        <option value="">Pilih Mata Pelajaran</option>
-        {dataMapel &&
-          dataMapel.map((mapel) => (
-            <option key={mapel.id} value={mapel.lessonName}>
-              {mapel.lessonName}
-            </option>
-          ))}
-      </select>
-
-      <p className="mt-2">Deskripsi</p>
-      <textarea
-        className="mt-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-        id="Description"
-        {...register(`Description`, { required: true })}
-        onChange={handleInputChange}
-        placeholder="Masukkan deskripsi tugas disini..."
-        required
-        rows={4}
-      />
-
-      {/* Modul */}
-      <p className="mt-2">Modul</p>
-      <div className=" flex gap-5">
-        <div
-          className="flex items-center gap-2 mt-5"
-          onClick={() => handleOptionChange("file")}
-        >
+      <div className="space-y-3">
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            nama materi
+          </label>
           <input
-            type="radio"
-            id="file"
-            name="submissionOption"
-            value="file"
-            checked={selectedOption === "file"}
-          />
-          <label htmlFor="file">File</label>
-        </div>
-        <div
-          className="flex items-center gap-2 mt-5"
-          onClick={() => handleOptionChange("link")}
-        >
-          <input
-            type="radio"
-            id="link"
-            name="submissionOption"
-            value="link"
-            checked={selectedOption === "link"}
-          />
-          <label htmlFor="link">Link</label>
-        </div>
-      </div>
-
-      {/* File atau link input */}
-      {selectedOption === "file" && (
-        <div id="fileUpload" className="mt-4">
-          <input
-            type="file"
-            id="FileData"
-            {...register("FileData")}
-            onChange={(e) => {
-              handleFileChange(e);
-            }}
-          />
-        </div>
-      )}
-      {selectedOption === "link" && (
-        <div id="linkInput" className="mt-4">
-          <TextInput
-            id="link"
             type="text"
-            {...register("LinkCourse")}
+            {...register(`CourseName`, { required: true })}
             onChange={handleInputChange}
-            placeholder="Masukkan url atau link yang valid disini"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+            placeholder="Masukkan nama lengkap"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Nama materi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
-      )}
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Mata Pelajaran
+          </label>
+          <select
+            {...register("LessonName")}
+            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-200 focus:border-none block w-full p-2.5 capitalize"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Harap pilih mata pelajaran")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
+          >
+            <option value="">Pilih Mata Pelajaran</option>
+            {dataMapel &&
+              dataMapel.map((mapel) => (
+                <option key={mapel.lessonId} value={mapel.lessonName}>
+                  {mapel.lessonName}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Deskripsi
+          </label>
+          <textarea
+            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+            id="Description"
+            {...register(`Description`, { required: true })}
+            onChange={handleInputChange}
+            placeholder="Masukkan deskripsi tugas disini..."
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("Deskripsi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("")
+            }
+            rows={4}
+          />
+        </div>
+        {/* Modul */}
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Modul
+          </label>
+          <div className="flex gap-5">
+            <div
+              className="flex items-center gap-2"
+              onClick={() => handleOptionChange("file")}
+            >
+              <input
+                type="radio"
+                id="file"
+                name="submissionOption"
+                value="file"
+                checked={selectedOption === "file"}
+              />
+              <label htmlFor="file">File</label>
+            </div>
+            <div
+              className="flex items-center gap-2"
+              onClick={() => handleOptionChange("link")}
+            >
+              <input
+                type="radio"
+                id="link"
+                name="submissionOption"
+                value="link"
+                checked={selectedOption === "link"}
+              />
+              <label htmlFor="link">Link</label>
+            </div>
+          </div>
 
-      {/* Tombol submit */}
-      <input
-        type="submit"
-        disabled={createMateri.isPending}
-        value={createMateri.isPending ? "Menyimpan..." : "Simpan"}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32"
-      />
+          {/* File atau link input */}
+          {selectedOption === "file" && (
+            <div id="fileUpload" className="mt-4">
+              <FileInput
+                id="FileData"
+                {...register("FileData")}
+                onChange={(e) => {
+                  handleFileChange(e);
+                }}
+              />
+            </div>
+          )}
+          {selectedOption === "link" && (
+            <div id="linkInput" className="mt-4">
+              <TextInput
+                id="link"
+                type="text"
+                {...register("LinkCourse")}
+                onChange={handleInputChange}
+                placeholder="Masukkan url atau link yang valid disini"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Tombol submit */}
+        <div>
+          <div className="flex items-center gap-2">
+            <input
+              type="submit"
+              disabled={createMateri.isPending}
+              value={createMateri.isPending ? "Menyimpan..." : "Simpan"}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md w-32"
+            />
+            <button
+              onClick={handleBatal}
+              type="submit"
+              className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
+            >
+              batal
+            </button>
+          </div>
+        </div>
+      </div>
     </form>
   );
 };

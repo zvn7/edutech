@@ -50,7 +50,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
     const fetchTugas = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.66.239:13311/api/Assignments/${id}`,
+          `http://192.168.110.239:13311/api/Assignments/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -58,7 +58,6 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
           }
         );
         const tugas = response.data;
-        console.log(tugas);
 
         // Mengambil hanya bagian tanggal dari assignmentDeadline
         const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
@@ -75,8 +74,13 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
           courseName: tugas.courseName,
           typeOfSubmission: tugas.typeOfSubmission,
         });
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
       }
     };
 
@@ -97,18 +101,15 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
       (selectedOption === "file" && !formUpdate.assignmentFileData) ||
       (selectedOption === "link" && !formUpdate.assignmentLink)
     ) {
-      console.log("Semua kolom harus diisi!");
       setLoading(false);
       return;
     }
 
     // Tambahan validasi untuk opsi 'file' atau 'link'
     if (selectedOption === "file" && !formUpdate.assignmentFileData) {
-      console.log("File harus diunggah jika opsi file dipilih!");
       setLoading(false);
       return;
     } else if (selectedOption === "link" && !formUpdate.assignmentLink) {
-      console.log("Link harus disediakan jika opsi link dipilih!");
       setLoading(false);
       return;
     }
@@ -135,7 +136,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
       );
 
       const response = await axios.put(
-        `http://192.168.66.239:13311/api/Assignments/${formUpdate.id}`,
+        `http://192.168.110.239:13311/api/Assignments/${formUpdate.id}`,
         formData,
         {
           headers: {
@@ -168,11 +169,13 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
           queryClient.invalidateQueries("mapel");
         }
       });
-    } catch (error) {
-      console.log(error);
-      if (error.response && error.response.data) {
-        console.log(error.response.data.errors);
-      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: error.toString(),
+        confirmButtonText: "Ok",
+      });
     } finally {
       setLoading(false);
     }
@@ -212,22 +215,32 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
     }
   };
 
-  // const formattedDeadline = formUpdate.assignmentDeadline.replace("Z", "");
-  // const displayDeadline =
-  // 	formattedDeadline.split("T")[0] +
-  // 	"T" +
-  // 	formattedDeadline.split("T")[1].substring(0, 5) +
-  // 	"Z";
-
   const filteredCourseData = dataMapel?.filter(
     (lesson) => lesson.lessonName === selectedLesson
   );
+
+  const handleBatal = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Peringatan",
+      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, lanjutkan",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowEditForm(false);
+      }
+    });
+  };
   return (
     <>
-      <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+      <div>
         <label
           htmlFor="countries"
-          className="mr-4 text-gray-700 dark:text-white"
+          className="block mb-2 text-sm font-medium text-blue-600 capitalize dark:text-white"
         >
           Tugas
         </label>
@@ -235,7 +248,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
           id="countries"
           value={selectedLesson}
           onChange={handleLessonChange}
-          className="w-full bg-transparent border-none"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         >
           <option selected>Pilih Mapel</option>
 
@@ -258,6 +271,13 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
             name="courseId"
             onChange={handleInputEditChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Materi harus dipilih")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
           >
             <option value={formUpdate.courseId}>{formUpdate.courseName}</option>
             {filteredCourseData?.map((mapel) => (
@@ -266,7 +286,6 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
               </option>
             ))}
           </select>
-          <p>{formUpdate.courseId}</p>
         </div>
         <div className="mb-5">
           <label
@@ -282,6 +301,13 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
             onChange={handleInputEditChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Nama tugas tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -293,11 +319,19 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
           </label>
           <textarea
             name="assignmentDescription"
+            rows={4}
             value={formUpdate.assignmentDescription}
             onChange={handleInputEditChange}
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Deskripsi Tugas"
             defaultValue={""}
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("Deskripsi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -314,6 +348,13 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
             onChange={handleInputEditChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Tanggal tugas tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
         </div>
         <div className="mb-5">
@@ -334,7 +375,35 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
             onChange={handleInputEditChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Masukkan Nama Tugas"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Deadline tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
           />
+        </div>
+        <div className="mb-5">
+          <label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
+            Tipe Pengumpulan
+          </label>
+          <select
+            value={formUpdate.typeOfSubmission}
+            onChange={handleInputEditChange}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Tipe Pengumpulan harus dipilih")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
+          >
+            <option value="">Pilih Tipe Pengumpulan</option>
+            <option value="1">File</option>
+            <option value="2">Link</option>
+          </select>
         </div>
         <div className="mb-5">
           <label
@@ -389,28 +458,25 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
             </div>
           )}
         </div>
-        <div className="mb-5">
-          <label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
-            Tipe Pengumpulan
-          </label>
-          {/* select */}
-          <select
-            value={formUpdate.typeOfSubmission}
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value="">Pilih Tipe Pengumpulan</option>
-            <option value="1">File</option>
-            <option value="2">Link</option>
-          </select>
+
+        <div>
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+            >
+              {loading ? "Loading..." : "Kirim"}
+            </button>
+            <button
+              onClick={handleBatal}
+              type="submit"
+              className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
+            >
+              batal
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-4 flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
-        >
-          {loading ? "Loading..." : "Kirim"}
-        </button>
       </form>
     </>
   );

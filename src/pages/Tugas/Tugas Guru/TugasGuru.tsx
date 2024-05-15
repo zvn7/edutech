@@ -1,5 +1,5 @@
 import Navigation from "../../../component/Navigation/Navigation";
-import { Button, FileInput, Modal, TextInput } from "flowbite-react";
+import { Button, Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import {
@@ -17,7 +17,6 @@ import TugasEditTablet from "./TugasEditTablet";
 const TugasGuru = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("file");
   const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
   const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
   const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
@@ -25,12 +24,13 @@ const TugasGuru = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const assigmentQueries = useAssignmentsByTeacherId();
-  const { data: assigmentData } = assigmentQueries;
+  const { data: assigmentData, isLoading } = assigmentQueries;
 
   const [selectedLesson, setSelectedLesson] = useState("semua tugas");
 
   const mapelQuery = useGetLessonByGuru();
-  const { data: dataMapel, isLoading: mapelIsLoading } = mapelQuery;
+  const { data: dataMapel } = mapelQuery;
+
   useEffect(() => {
     const handleResize = () => {
       const windowWidth = window.innerWidth;
@@ -38,18 +38,12 @@ const TugasGuru = () => {
       setIsTablet(windowWidth > 768 && windowWidth <= 1024);
     };
 
-    handleResize(); // Panggil fungsi handleResize saat komponen dimuat agar state 'isMobile' dan 'isTablet' dapat diatur dengan benar
-
-    window.addEventListener("resize", handleResize); // Tambahkan event listener untuk memantau perubahan ukuran layar
-
+    handleResize();
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize); // Bersihkan event listener saat komponen di-unmount
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const handleOptionChange = (option: string) => {
-    setSelectedOption(option);
-  };
 
   const handleLessonChange = (e: any) => {
     setSelectedLesson(e.target.value);
@@ -65,14 +59,14 @@ const TugasGuru = () => {
   const handleShowAddForm = () => {
     if (showEditForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setShowEditForm(false);
@@ -87,27 +81,24 @@ const TugasGuru = () => {
   const [taskIdToEdit, setTaskIdToEdit] = useState(null);
 
   const handleShowEditForm = (taskId: any) => {
-    console.log("ID aa:", taskId);
     if (showAddForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setShowAddForm(false);
           setTaskIdToEdit(taskId);
-          // Set ID tugas yang akan diedit ke dalam state
           setShowEditForm(true);
         }
       });
     } else {
-      // Set ID tugas yang akan diedit ke dalam state
       setTaskIdToEdit(taskId);
       setShowEditForm(!showEditForm);
     }
@@ -116,14 +107,14 @@ const TugasGuru = () => {
   const handleCloseForms = () => {
     if (showAddForm || showEditForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setShowAddForm(false);
@@ -142,15 +133,14 @@ const TugasGuru = () => {
   };
 
   const handleShowModalEditFormMobile = (taskId: any) => {
-    console.log("ID aa:", taskId);
     if (showAddForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
         cancelButtonText: "Tidak, batalkan",
       }).then((result) => {
@@ -158,7 +148,6 @@ const TugasGuru = () => {
           isMobileModalOpenAdd
             ? setisMobileModalOpenAdd(false)
             : setisMobileModalOpenAdd(false);
-          // Set ID tugas yang akan diedit ke dalam state
           setTaskIdToEdit(taskId);
           isMobileModalOpenEdit
             ? setisMobileModalOpenEdit(false)
@@ -166,7 +155,6 @@ const TugasGuru = () => {
         }
       });
     } else {
-      // Set ID tugas yang akan diedit ke dalam state
       setTaskIdToEdit(taskId);
       isMobileModalOpenEdit
         ? setisMobileModalOpenEdit(false)
@@ -180,15 +168,14 @@ const TugasGuru = () => {
   };
 
   const handleShowModalEditFormTablet = (taskId: any) => {
-    console.log("ID aa:", taskId);
     if (showAddForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
         cancelButtonText: "Tidak, batalkan",
       }).then((result) => {
@@ -206,7 +193,6 @@ const TugasGuru = () => {
     }
   };
 
-  // search
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredAssignments = (tugas: any) => {
@@ -219,20 +205,17 @@ const TugasGuru = () => {
     setSearchTerm(e.target.value);
   };
 
-  // delete
   const deleteTugas = useDeleteTugas();
 
   const handleDeleteTugas = async (id: any) => {
-    console.log(id);
-
     const confirmation = await Swal.fire({
-      title: "Anda yakin ingin menghapus tugas ini?",
-      text: "Aksi ini tidak dapat dibatalkan!",
+      title: "Peringatan",
+      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Ya, hapus!",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, Lanjutkan",
       cancelButtonText: "Batal",
     });
 
@@ -242,22 +225,48 @@ const TugasGuru = () => {
         Swal.fire({
           icon: "success",
           title: "Berhasil",
-          text: "Mapel Berhasil dihapus!",
+          text: "Tugas Berhasil dihapus!",
           confirmButtonText: "Ok",
         });
-      } catch (error) {
-        console.error("Gagal menghapus mapel:", error);
-        // Tangani kesalahan, misalnya dengan menampilkan pesan kepada pengguna
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
       }
     }
   };
 
+  const formatDate = (assignmentDate: string): string => {
+    const parts = assignmentDate.split("-");
+    const year = parts[0];
+    const month = parseInt(parts[1], 10);
+    const date = parseInt(parts[2], 10);
+
+    const months = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+
+    return `${date} ${months[month - 1]} ${year}`;
+  };
   return (
     <div>
       <Navigation />
       <div className="p-4 sm:ml-64">
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* left side */}
           <div>
             <div className="mt-14 flex justify-between">
               <h1 className="text-3xl font-bold font-mono">Tugas</h1>
@@ -286,27 +295,17 @@ const TugasGuru = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-                    <svg
-                      className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                      />
-                    </svg>
+                    <img
+                      src="/gif/search.gif"
+                      alt="search"
+                      className="w-5 h-5"
+                    />
                   </div>
                   <input
                     type="search"
                     id="default-search"
-                    className="block md:w-80 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Cari..."
+                    className="block md:w-80 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+                    placeholder="temukan tugas disini...."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     required
@@ -398,98 +397,110 @@ const TugasGuru = () => {
               style={{ scrollbarWidth: "none" }}
             >
               <div className="mt-4 flex flex-col gap-3">
-                {filteredData?.filter(filteredAssignments).map((items) => (
-                  <div key={items?.assignmentId} className="cursor-pointer">
-                    <div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
-                      <div className="flex gap-3">
-                        <div className="bg-blue-100 rounded-lg h-14 flex items-center">
-                          <svg
-                            className="w-12 h-12 text-blue-600 dark:text-white"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <div className="flex flex-col">
-                          <p className="text-sm font-normal text-gray-500">
-                            {items?.lessonName}
-                          </p>
-                          <h2
-                            className="text-md font-medium"
-                            title={items?.assignmentName}
-                          >
-                            {items?.assignmentName &&
-                            items.assignmentName.length > 25
-                              ? items.assignmentName.substring(0, 25) + "..."
-                              : items.assignmentName}
-                          </h2>
-                          <div className="flex flex-wrap gap-2 ">
-                            <div className="flex gap-1">
+                {isLoading ? (
+                  <p>Loading...</p>
+                ) : filteredData && filteredData.length > 0 ? (
+                  filteredData.filter(filteredAssignments).length > 0 ? (
+                    filteredData.filter(filteredAssignments).map((items) => (
+                      <div key={items?.assignmentId} className="cursor-pointer">
+                        <div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-3 gap-2">
+                          <div className="flex gap-3">
+                            <div className="bg-blue-100 rounded-lg h-14 flex items-center">
                               <svg
-                                className="w-5 h-5 text-gray-500"
+                                className="w-12 h-12 text-blue-600 dark:text-white"
                                 aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
+                                fill="currentColor"
                                 viewBox="0 0 24 24"
                               >
                                 <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+                                  fill-rule="evenodd"
+                                  d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+                                  clip-rule="evenodd"
                                 />
                               </svg>
-                              <span className="text-sm text-gray-500">
-                                {items?.assignmentDate}
-                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <p className="text-sm font-normal text-gray-500">
+                                {items?.lessonName}
+                              </p>
+                              <h2
+                                className="text-md font-medium"
+                                title={items?.assignmentName}
+                              >
+                                {items?.assignmentName &&
+                                items.assignmentName.length > 25
+                                  ? items.assignmentName.substring(0, 25) +
+                                    "..."
+                                  : items.assignmentName}
+                              </h2>
+                              <div className="flex flex-wrap gap-2 ">
+                                <div className="flex gap-1">
+                                  <svg
+                                    className="w-5 h-5 text-gray-500"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm text-gray-500">
+                                    {formatDate(items?.assignmentDate)}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
+                          <Button.Group>
+                            <Button
+                              color="warning"
+                              onClick={
+                                isMobile
+                                  ? () =>
+                                      handleShowModalEditFormMobile(
+                                        items.assignmentId
+                                      )
+                                  : isTablet
+                                  ? () =>
+                                      handleShowModalEditFormTablet(
+                                        items.assignmentId
+                                      )
+                                  : () => handleShowEditForm(items.assignmentId)
+                              }
+                            >
+                              Edit
+                            </Button>
+
+                            <Button
+                              onClick={() =>
+                                handleDeleteTugas(items.assignmentId)
+                              }
+                              color="failure"
+                            >
+                              Hapus
+                            </Button>
+                          </Button.Group>
                         </div>
                       </div>
-                      <Button.Group>
-                        <Button
-                          color="warning"
-                          onClick={
-                            isMobile
-                              ? () =>
-                                  handleShowModalEditFormMobile(
-                                    items.assignmentId
-                                  )
-                              : isTablet
-                              ? () =>
-                                  handleShowModalEditFormTablet(
-                                    items.assignmentId
-                                  )
-                              : () => handleShowEditForm(items.assignmentId)
-                          }
-                        >
-                          Edit
-                        </Button>
-                        {/* <Button
-													color="warning"
-													onClick={() => handleShowEditForm(items.assignmentId)}
-												>
-													Edit
-												</Button> */}
-
-                        <Button
-                          onClick={() => handleDeleteTugas(items.assignmentId)}
-                          color="failure"
-                        >
-                          Hapus
-                        </Button>
-                      </Button.Group>
-                    </div>
-                  </div>
-                ))}
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-400">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </p>
+                  )
+                ) : (
+                  <p className="text-center text-gray-400">
+                    Tidak ada data yang sesuai dengan pilihan tugas yang
+                    dipilih.
+                  </p>
+                )}
               </div>
             </div>
           </div>

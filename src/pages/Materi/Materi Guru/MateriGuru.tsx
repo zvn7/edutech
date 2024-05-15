@@ -1,17 +1,9 @@
 import Navigation from "../../../component/Navigation/Navigation";
-import { Button, FileInput, TextInput, Textarea } from "flowbite-react"; // Import Modal component
+import { Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import {
-  useGetLessonByGuru,
-  useGetMapelByGuru,
-  useTeacherinfo,
-} from "../../../services/queries";
-import { useCreateMateri } from "../../../services/mutation";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { IMateriGuru, UploadMateri } from "../../../types/materi";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useGetLessonByGuru, useTeacherinfo } from "../../../services/queries";
+import { IMateriGuru } from "../../../types/materi";
 import MateriAdd from "./MateriAdd";
 import MateriEdit from "./MateriEdit";
 import MateriEditMobile from "./MateriEditMobile";
@@ -22,16 +14,13 @@ import MateriEditTablet from "./MateriEditTablet";
 const MateriGuru = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("file");
-  const [selectedCardDescription, setSelectedCardDescription] = useState("");
   const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
   const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
   const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
   const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const [selectedMapel, setSelectedMapel] = useState([]);
+
   const teacherinfo = useTeacherinfo();
   const { data: formData } = teacherinfo;
 
@@ -39,14 +28,14 @@ const MateriGuru = () => {
     id: string;
     courseName: string;
     description: string;
-    fileData: File | null; // Update the type here
+    fileData: File | null;
     linkCourse: string;
     lessonName: string;
   }>({
     id: "",
     courseName: "",
     description: "",
-    fileData: null, // Initialize with null
+    fileData: null,
     linkCourse: "",
     lessonName: "",
   });
@@ -58,26 +47,24 @@ const MateriGuru = () => {
       setIsTablet(windowWidth > 768 && windowWidth <= 1024);
     };
 
-    handleResize(); // Panggil fungsi handleResize saat komponen dimuat agar state 'isMobile' dan 'isTablet' dapat diatur dengan benar
-
-    window.addEventListener("resize", handleResize); // Tambahkan event listener untuk memantau perubahan ukuran layar
-
+    handleResize();
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize); // Bersihkan event listener saat komponen di-unmount
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   const handleShowAddForm = () => {
     if (showEditForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setShowEditForm(false);
@@ -90,19 +77,16 @@ const MateriGuru = () => {
   };
 
   const handleShowEditForm = async (data: IMateriGuru) => {
-    console.log(data);
-    // Jika sedang menampilkan form tambah
     if (showAddForm) {
-      // Tampilkan SweetAlert untuk konfirmasi
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           // Tutup form tambah jika dikonfirmasi
@@ -118,18 +102,16 @@ const MateriGuru = () => {
         }
       });
     } else {
-      // Jika sedang menampilkan form edit
       if (showEditForm) {
-        // Tampilkan SweetAlert untuk konfirmasi
         Swal.fire({
-          title: "Anda yakin ingin meninggalkan halaman?",
-          text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+          title: "Peringatan",
+          text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
           confirmButtonText: "Ya, lanjutkan",
-          cancelButtonText: "Tidak, batalkan",
+          cancelButtonText: "Tidak",
         }).then((result) => {
           if (result.isConfirmed) {
             // Tampilkan form edit
@@ -161,14 +143,14 @@ const MateriGuru = () => {
   const handleCloseForms = () => {
     if (showAddForm || showEditForm) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setShowAddForm(false);
@@ -184,6 +166,11 @@ const MateriGuru = () => {
   const handleShowModalAddFormMobile = () => {
     setisMobileModalOpenAdd(true);
     setisMobileModalOpenEdit(false);
+  };
+
+  const handleShowModalAddFormTablet = () => {
+    setisTabletModalOpenAdd(true);
+    setisTabletModalOpenEdit(false);
   };
 
   const handleShowModalEditFormMobile = (data: IMateriGuru) => {
@@ -202,14 +189,14 @@ const MateriGuru = () => {
   const handleCloseModalFormMobile = () => {
     if (isMobileModalOpenAdd || isMobileModalOpenEdit) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak, batalkan",
+        cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
           setisMobileModalOpenAdd(false);
@@ -225,12 +212,12 @@ const MateriGuru = () => {
   const handleCloseModalFormTablet = () => {
     if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
       Swal.fire({
-        title: "Anda yakin ingin meninggalkan halaman?",
-        text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+        title: "Peringatan",
+        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
         confirmButtonText: "Ya, lanjutkan",
         cancelButtonText: "Tidak, batalkan",
       }).then((result) => {
@@ -258,17 +245,13 @@ const MateriGuru = () => {
     setisTabletModalOpenAdd(false);
   };
 
-  const handleOptionChange = (option: string) => {
-    setSelectedOption(option);
-  };
-
-  const [selectedLesson, setSelectedLesson] = useState("semua");
+  const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
 
   const queryMapel = useGetLessonByGuru();
-  const { data: dataMapel } = queryMapel;
+  const { data: dataMapel, isLoading } = queryMapel;
 
   const filteredData: IMateriGuru[] =
-    selectedLesson === "semua"
+    selectedLesson === "semua mata pelajaran"
       ? formData || []
       : (formData || []).filter(
           (materi) => materi.lessonName === selectedLesson
@@ -302,9 +285,9 @@ const MateriGuru = () => {
               <select
                 value={selectedLesson}
                 onChange={handleLessonChange}
-                className="p-3 capitalize bg-white border border-gray-300 rounded-lg"
+                className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
               >
-                <option selected>semua</option>
+                <option selected>semua mata pelajaran</option>
                 {dataMapel?.map((item) => (
                   <option value={item.lessonName}>{item.lessonName}</option>
                 ))}
@@ -320,31 +303,20 @@ const MateriGuru = () => {
                   Search
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                      />
-                    </svg>
+                  <div className="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-1">
+                    <img
+                      src="/gif/search.gif"
+                      alt="search"
+                      className="w-5 h-5"
+                    />
                   </div>
                   <input
                     type="search"
                     id="default-search"
-                    className="block w-56 p-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg md:w-80 ps-7 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Cari..."
+                    className="block w-56 p-3 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg md:w-80 ps-7 focus:ring-gray-200 focus:border-none capitalize"
+                    placeholder="temukan materi disini...."
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    required
                   />
                 </div>
               </form>
@@ -433,60 +405,62 @@ const MateriGuru = () => {
               style={{ scrollbarWidth: "none" }}
             >
               <div className="flex flex-col gap-3 mt-6 ">
-                {filteredData.filter(searchFilter).length > 0 ? (
-                  filteredData.filter(searchFilter).map((card) => (
-                    <div key={card.id} className="cursor-pointer">
-                      <div className="flex items-center justify-between gap-2 p-3 bg-white rounded-lg shadow-sm">
-                        <div className="flex gap-3">
-                          <div className="flex items-center bg-blue-100 rounded-lg h-14">
-                            <svg
-                              className="w-12 h-12 text-blue-600 dark:text-white"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                {isLoading ? (
+                  <p>Loading...</p>
+                ) : filteredData && filteredData.length > 0 ? (
+                  filteredData.filter(searchFilter).length > 0 ? (
+                    filteredData.filter(searchFilter).map((card) => (
+                      <div key={card.id} className="cursor-pointer">
+                        <div className="flex items-center justify-between gap-2 p-3 bg-white rounded-lg shadow-sm">
+                          <div className="flex gap-3">
+                            <div className="flex items-center bg-blue-100 rounded-lg h-14">
+                              <svg
+                                className="w-12 h-12 text-blue-600 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <p className="text-sm text-gray-500 capitalize">
+                                {card.lessonName}
+                              </p>
+                              <p className="text-base font-medium capitalize">
+                                {card.courseName}
+                              </p>
+                              <p className="text-sm text-gray-500 capitalize">
+                                {card.longClassName}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex flex-col">
-                            <p className="text-sm text-gray-500 capitalize">
-                              {card.lessonName}
-                            </p>
-                            <p className="text-base font-medium capitalize">
-                              {card.courseName}
-                            </p>
-                            <p className="text-sm text-gray-500 capitalize">
-                              {card.longClassName}
-                            </p>
-                          </div>
+                          <Button
+                            color="warning"
+                            onClick={
+                              isMobile
+                                ? () => handleShowModalEditFormMobile(card)
+                                : isTablet
+                                ? () => handleShowModalEditFormTablet(card)
+                                : () => handleShowEditForm(card)
+                            }
+                          >
+                            Edit
+                          </Button>
                         </div>
-                        <Button
-                          color="warning"
-                          onClick={
-                            isMobile
-                              ? () => handleShowModalEditFormMobile(card)
-                              : isTablet
-                              ? () => handleShowModalEditFormTablet(card)
-                              : () => handleShowEditForm(card)
-                          }
-                        >
-                          Edit
-                        </Button>
                       </div>
-                    </div>
-                  ))
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-400">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </p>
+                  )
                 ) : (
-                  <p className="text-center text-gray-400">
-                    Tidak ada hasil pencarian yang sesuai.
-                  </p>
-                )}
-
-                {filteredData.length === 0 && searchTerm.length === 0 && (
                   <p className="text-center text-gray-400">
                     Tidak ada data yang sesuai dengan pilihan pelajaran yang
                     dipilih.

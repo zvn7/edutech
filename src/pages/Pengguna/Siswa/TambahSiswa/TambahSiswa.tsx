@@ -53,6 +53,15 @@ const TambahSiswa = () => {
           }
         });
       },
+
+      onError: (error: any) => {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      },
     });
   };
 
@@ -64,7 +73,7 @@ const TambahSiswa = () => {
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya",
+      confirmButtonText: "Ya], Lanjutkan",
       cancelButtonText: "Tidak",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -277,8 +286,8 @@ const TambahSiswa = () => {
                         e.target.setCustomValidity("")
                       }
                     />
-                    <span className="text-sm text-red-500">
-                      * no.tlp mulai dari 0
+                    <span className="text-gray-500 capitalize text-xs">
+                      * nomor telepon diawali angka 0 dan max 13 angka
                     </span>
                   </div>
                   <div>

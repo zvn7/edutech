@@ -18,7 +18,7 @@ const MateriSiswa = () => {
     "semua mata pelajaran"
   );
   const courseClassroom = useCourseClassroom();
-  const { data: formData } = courseClassroom;
+  const { data: formData, isLoading: isLoadingCourse } = courseClassroom;
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,7 +37,7 @@ const MateriSiswa = () => {
     setIsLoading(true); // Set isLoading menjadi true sebelum memuat data
     try {
       const response = await fetch(
-        `http://192.168.66.239:13311/api/Courses/${id}`,
+        `http://192.168.110.239:13311/api/Courses/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,7 +73,7 @@ const MateriSiswa = () => {
     }
     try {
       const response = await axios.get(
-        `http://192.168.66.239:13311/api/Courses/download/${id}`,
+        `http://192.168.110.239:13311/api/Courses/download/${id}`,
         {
           responseType: "blob",
           headers: {
@@ -102,6 +102,8 @@ const MateriSiswa = () => {
       : formData?.filter(({ lessonName }) => lessonName === selectedSubject) ||
         [];
 
+  
+
   return (
     <div>
       <Navigation />
@@ -129,49 +131,58 @@ const MateriSiswa = () => {
               style={{ scrollbarWidth: "none" }}
             >
               <div className=" flex flex-col gap-3 mt-2">
-                {filteredCourses && (
+                {isLoadingCourse ? (
+                  <p>loading...</p>
+                ) : (
                   <div className="cursor-pointer rounded-lg ">
-                    {filteredCourses.map((course) => (
-                      <div
-                        key={course.id}
-                        className={`flex items-center shadow-sm p-3 gap-2 bg-white hover:bg-[#fdefc8] mb-2 rounded-lg hover:rounded-lg ${
-                          selectedCardId === course.id
-                            ? "bg-[#fdefc8] rounded-lg"
-                            : ""
-                        }`}
-                        onClick={() => handleCardClick(course.id)}
-                      >
-                        <div className="flex gap-3">
-                          <div className="bg-blue-100 rounded-lg h-14 flex items-center">
-                            <svg
-                              className="w-12 h-12 text-blue-600 dark:text-white"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
+                    {filteredCourses && filteredCourses.length > 0 ? (
+                      filteredCourses.map((course) => (
+                        <div
+                          key={course.id}
+                          className={`flex items-center shadow-sm p-3 gap-2 bg-white hover:bg-[#fdefc8] mb-2 rounded-lg hover:rounded-lg ${
+                            selectedCardId === course.id
+                              ? "bg-[#fdefc8] rounded-lg"
+                              : ""
+                          }`}
+                          onClick={() => handleCardClick(course.id)}
+                        >
+                          <div className="flex gap-3">
+                            <div className="bg-blue-100 rounded-lg h-14 flex items-center">
+                              <svg
+                                className="w-12 h-12 text-blue-600 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M6 2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 1 0 0-2h-2v-2h2c.6 0 1-.4 1-1V4a2 2 0 0 0-2-2h-8v16h5v2H7a1 1 0 1 1 0-2h1V2H6Z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
 
-                          <div className="flex flex-col">
-                            <p className="text-sm capitalize text-gray-500">
-                              {course.lessonName}
-                            </p>
-                            <p className="text-md font-semibold text-gray-900">
-                              {course.courseName}
-                            </p>
-                            <p className="text-sm capitalize text-gray-500">
-                              {course.nameTeacher}
-                            </p>
+                            <div className="flex flex-col">
+                              <p className="text-sm capitalize text-gray-500">
+                                {course.lessonName}
+                              </p>
+                              <p className="text-md font-semibold text-gray-900">
+                                {course.courseName}
+                              </p>
+                              <p className="text-sm capitalize text-gray-500">
+                                {course.nameTeacher}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-center text-gray-400">
+                        Tidak ada data yang sesuai dengan pilihan tugas yang
+                        dipilih.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -278,7 +289,8 @@ const MateriSiswa = () => {
                 style={{ scrollbarWidth: "none" }}
               >
                 <div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
-                  <div className="flex justify-end">
+                  <div className="flex justify-between mb-4 p-2">
+                    <h1 className="text-xl font-bold">Detail Materi</h1>
                     <button
                       className="text-gray-500 hover:text-gray-700"
                       onClick={() => {
