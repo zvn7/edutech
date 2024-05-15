@@ -5,8 +5,8 @@ import axios from "axios";
 import { FileInput, Textarea, TextInput } from "flowbite-react";
 
 interface MateriEditProps {
-  id: string;
-  setShowEditForm: React.Dispatch<React.SetStateAction<boolean>>;
+	id: string;
+	setShowEditForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MateriEdit = ({ id, setShowEditForm }: MateriEditProps) => {

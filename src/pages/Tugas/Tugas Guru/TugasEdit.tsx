@@ -6,214 +6,200 @@ import Swal from "sweetalert2";
 import { useQueryClient } from "@tanstack/react-query";
 
 type TugasEditProps = {
-  id: string;
-  setShowEditForm: Dispatch<SetStateAction<boolean>>;
+	id: string;
+	setShowEditForm: Dispatch<SetStateAction<boolean>>;
 };
 
-// Define the TugasEdit component
 const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
-  const [selectedOption, setSelectedOption] = useState("file");
-  const [loading, setLoading] = useState(false);
-  const queryMapel = useTeacherinfo();
-  const { data: dataMapel, refetch: refetchTugas } = queryMapel;
-  const queryClient = useQueryClient();
+	const [selectedOption, setSelectedOption] = useState("file");
+	const [loading, setLoading] = useState(false);
+	const queryMapel = useTeacherinfo();
+	const { data: dataMapel, refetch: refetchTugas } = queryMapel;
+	const queryClient = useQueryClient();
+	
+	const [formUpdate, setFormUpdate] = useState({
+		id: "",
+		assignmentName: "",
+		assignmentDate: "",
+		assignmentDeadline: "",
+		assignmentDescription: "",
+		assignmentFileData: null,
+		assignmentLink: "",
+		courseId: "",
+		courseName: "",
+		typeOfSubmission: 0,
+	});
 
-  // State untuk menyimpan file yang diunggah
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [formUpdate, setFormUpdate] = useState({
-    id: "",
-    assignmentName: "",
-    assignmentDate: "",
-    assignmentDeadline: "",
-    assignmentDescription: "",
-    assignmentFileData: null, // Inisialisasi dengan null
-    assignmentLink: "",
-    courseId: "",
-    courseName: "",
-    typeOfSubmission: 0,
-  });
+	const [selectedLesson, setSelectedLesson] = useState("");
 
-  const [selectedLesson, setSelectedLesson] = useState("");
+	const mapelQuery = useGetLessonByGuru();
+	const { data: Mapel } = mapelQuery;
 
-  const mapelQuery = useGetLessonByGuru();
-  const { data: Mapel, isLoading: mapelIsLoading } = mapelQuery;
+	const handleOptionChange = (option: string) => {
+		setSelectedOption(option);
+	};
 
-  const handleOptionChange = (option: string) => {
-    setSelectedOption(option);
-  };
+	const handleLessonChange = (e: any) => {
+		setSelectedLesson(e.target.value);
+	};
 
-  const handleLessonChange = (e: any) => {
-    setSelectedLesson(e.target.value);
-  };
+	useEffect(() => {
+		const fetchTugas = async () => {
+			try {
+				const response = await axios.get(
+					`http://192.168.110.239:13311/api/Assignments/${id}`,
+					{
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+					}
+				);
+				const tugas = response.data;
+				const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
+				setFormUpdate({
+					id: tugas.id,
+					assignmentName: tugas.assignmentName,
+					assignmentDate: tugas.assignmentDate,
+					assignmentDeadline: assignmentDeadlineDate,
+					assignmentDescription: tugas.assignmentDescription,
+					assignmentFileData: tugas.assignmentFileData,
+					assignmentLink: tugas.assignmentLink,
+					courseId: tugas.courseId,
+					courseName: tugas.courseName,
+					typeOfSubmission: tugas.typeOfSubmission,
+				});
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		fetchTugas();
+	}, [id]);
 
-  useEffect(() => {
-    const fetchTugas = async () => {
-      try {
-        const response = await axios.get(
-          `http://192.168.110.239:13311/api/Assignments/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        const tugas = response.data;
+	const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setLoading(true);
 
-        // Mengambil hanya bagian tanggal dari assignmentDeadline
-        const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
+		// Validasi data sebelum mengirim permintaan
+		if (
+			!formUpdate.assignmentName ||
+			!formUpdate.assignmentDate ||
+			!formUpdate.assignmentDeadline ||
+			!formUpdate.assignmentDescription ||
+			!formUpdate.typeOfSubmission ||
+			(selectedOption === "file" && !formUpdate.assignmentFileData) ||
+			(selectedOption === "link" && !formUpdate.assignmentLink)
+		) {
+			setLoading(false);
+			return;
+		}
 
-        setFormUpdate({
-          id: tugas.id,
-          assignmentName: tugas.assignmentName,
-          assignmentDate: tugas.assignmentDate,
-          assignmentDeadline: assignmentDeadlineDate, // Menggunakan nilai tanggal saja
-          assignmentDescription: tugas.assignmentDescription,
-          assignmentFileData: tugas.assignmentFileData,
-          assignmentLink: tugas.assignmentLink,
-          courseId: tugas.courseId, // Atur courseId
-          courseName: tugas.courseName,
-          typeOfSubmission: tugas.typeOfSubmission,
-        });
-      } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: error.toString(),
-          confirmButtonText: "Ok",
-        });
-      }
-    };
+		// Tambahan validasi untuk opsi 'file' atau 'link'
+		if (selectedOption === "file" && !formUpdate.assignmentFileData) {
+			console.log("File harus diunggah jika opsi file dipilih!");
+			setLoading(false);
+			return;
+		} else if (selectedOption === "link" && !formUpdate.assignmentLink) {
+			console.log("Link harus disediakan jika opsi link dipilih!");
+			setLoading(false);
+			return;
+		}
 
-    fetchTugas();
-  }, [id]);
+		try {
+			// Kirim permintaan PUT ke API
+			const formData = new FormData();
+			formData.append("assignmentName", formUpdate.assignmentName);
+			formData.append("courseId", formUpdate.courseId);
+			formData.append("assignmentDate", formUpdate.assignmentDate);
+			formData.append("assignmentDeadline", formUpdate.assignmentDeadline);
+			formData.append(
+				"assignmentDescription",
+				formUpdate.assignmentDescription
+			);
+			if (selectedOption === "file" && formUpdate.assignmentFileData) {
+				formData.append("assignmentFileData", formUpdate.assignmentFileData);
+			} else {
+				formData.append("assignmentLink", formUpdate.assignmentLink);
+			}
+			formData.append(
+				"typeOfSubmission",
+				formUpdate.typeOfSubmission.toString()
+			);
 
-  const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+			const response = await axios.put(
+				`http://192.168.110.239:13311/api/Assignments/${formUpdate.id}`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+						"Content-Type": "multipart/form-data",
+					},
+				}
+			);
+			console.log(response.data);
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil!",
+				text: "Tugas Berhasil diperbarui!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setFormUpdate({
+						assignmentName: "",
+						assignmentDate: "",
+						assignmentDeadline: "",
+						assignmentDescription: "",
+						assignmentFileData: "",
+						assignmentLink: "",
+						courseId: "",
+						courseName: "",
+						typeOfSubmission: 0,
+					});
+					setShowEditForm(false); // Tutup formulir setelah berhasil
+					refetchTugas();
+					queryClient.invalidateQueries("mapel");
+				}
+			});
+		} catch (error) {
+			console.log(error);
+			if (error.response && error.response.data) {
+				console.log(error.response.data.errors);
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
 
-    // Validasi data sebelum mengirim permintaan
-    if (
-      !formUpdate.assignmentName ||
-      !formUpdate.assignmentDate ||
-      !formUpdate.assignmentDeadline ||
-      !formUpdate.assignmentDescription ||
-      !formUpdate.typeOfSubmission ||
-      (selectedOption === "file" && !formUpdate.assignmentFileData) ||
-      (selectedOption === "link" && !formUpdate.assignmentLink)
-    ) {
-      setLoading(false);
-      return;
-    }
+	// Handler untuk mengubah file
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files;
+		if (files && files.length > 0) {
+			setFormUpdate({
+				...formUpdate,
+				assignmentFileData: files[0],
+			});
+		}
+	};
 
-    // Tambahan validasi untuk opsi 'file' atau 'link'
-    if (selectedOption === "file" && !formUpdate.assignmentFileData) {
-      setLoading(false);
-      return;
-    } else if (selectedOption === "link" && !formUpdate.assignmentLink) {
-      setLoading(false);
-      return;
-    }
+	const handleInputEditChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>
+	) => {
+		const { name, value } = e.target;
 
-    try {
-      // Kirim permintaan PUT ke API
-      const formData = new FormData();
-      formData.append("assignmentName", formUpdate.assignmentName);
-      formData.append("courseId", formUpdate.courseId);
-      formData.append("assignmentDate", formUpdate.assignmentDate);
-      formData.append("assignmentDeadline", formUpdate.assignmentDeadline);
-      formData.append(
-        "assignmentDescription",
-        formUpdate.assignmentDescription
-      );
-      if (selectedOption === "file" && formUpdate.assignmentFileData) {
-        formData.append("assignmentFileData", formUpdate.assignmentFileData);
-      } else {
-        formData.append("assignmentLink", formUpdate.assignmentLink);
-      }
-      formData.append(
-        "typeOfSubmission",
-        formUpdate.typeOfSubmission.toString()
-      );
-
-      const response = await axios.put(
-        `http://192.168.110.239:13311/api/Assignments/${formUpdate.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(response.data);
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Tugas Berhasil diperbarui!",
-        confirmButtonText: "Ok",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setFormUpdate({
-            assignmentName: "",
-            assignmentDate: "",
-            assignmentDeadline: "",
-            assignmentDescription: "",
-            assignmentFileData: "",
-            assignmentLink: "",
-            courseId: "",
-            courseName: "",
-            typeOfSubmission: 0,
-          });
-          setShowEditForm(false); // Tutup formulir setelah berhasil
-          refetchTugas();
-          queryClient.invalidateQueries("mapel");
-        }
-      });
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: error.toString(),
-        confirmButtonText: "Ok",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handler untuk mengubah file
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setFormUpdate({
-        ...formUpdate,
-        assignmentFileData: files[0],
-      });
-    }
-  };
-
-  const handleInputEditChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-
-    if (name === "assignmentDeadline") {
-      // Ubah format tanggal dan waktu dari elemen input ke format yang diinginkan oleh backend
-      const formattedDateTime = new Date(value).toISOString();
-      setFormUpdate((prevState) => ({
-        ...prevState,
-        [name]: formattedDateTime,
-      }));
-    } else {
-      // Jika bukan input 'assignmentDeadline', langsung set nilai tanpa perubahan
-      setFormUpdate((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    }
-  };
+		if (name === "assignmentDeadline") {
+			const formattedDateTime = new Date(value).toISOString();
+			setFormUpdate((prevState) => ({
+				...prevState,
+				[name]: formattedDateTime,
+			}));
+		} else {
+			setFormUpdate((prevState) => ({
+				...prevState,
+				[name]: value,
+			}));
+		}
+	};
 
   const filteredCourseData = dataMapel?.filter(
     (lesson) => lesson.lessonName === selectedLesson

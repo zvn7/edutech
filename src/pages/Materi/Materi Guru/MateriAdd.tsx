@@ -7,13 +7,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { UploadMateri } from "../../../types/materi";
 
 const MateriAdd = ({
-  handleCloseForms,
-  setShowAddForm,
+	setShowAddForm,
 }: {
-  handleCloseForms: () => void;
-  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
+	setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  // const [showEditForm, setShowEditForm] = useState(false);
   const [selectedOption, setSelectedOption] = useState("file");
 
   const handleOptionChange = (option: string) => {
@@ -283,6 +280,4 @@ const MateriAdd = ({
       </div>
     </form>
   );
-};
-
 export default MateriAdd;

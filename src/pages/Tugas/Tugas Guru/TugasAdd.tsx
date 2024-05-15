@@ -7,10 +7,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Tugas } from "../../../types/tugas";
 
 const TugasAdd = ({
-  handleCloseForms,
   setShowAddForm,
 }: {
-  handleCloseForms: () => void;
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [selectedOption, setSelectedOption] = useState("file");
@@ -278,7 +276,7 @@ const TugasAdd = ({
             htmlFor="nama_tugas"
             className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
           >
-            Deadline Tugas
+            Deadline Tugas   
           </label>
           <input
             type="datetime-local"

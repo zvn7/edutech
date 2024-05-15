@@ -8,48 +8,32 @@ import axios from "axios";
 const EditSiswa = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  // const [iconVisible, setIconVisible] = useState(false);
   const [formData, setFormData] = useState({
     nameStudent: "",
-    // className: "",
-    // password: "",
-    // nis: "",
-    // birthDate: "",
-    // birthPlace: "",
     address: "",
     phoneNumber: "",
-    // parentName: "",
-    // gender: 0,
     uniqueNumberOfClassRoom: "",
   });
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://192.168.110.239:13311/api/Account/student/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await axios.get(
+					`http://192.168.110.239:13311/api/Account/student/${id}`,
+					{
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+					}
+				);
 
         setFormData({
           ...formData,
-          // nis: response.data.nis || "",
-          // className: response.data.className || "",
           nameStudent: response.data.nameStudent || "",
-          // birthDate: response.data.birthDate || "",
-          // password: response.data.password || "",
-          // birthPlace: response.data.birthPlace || "",
           address: response.data.address || "",
           phoneNumber: response.data.phoneNumber || "",
-          // parentName: response.data.parentName || "",
-          // gender: response.data.gender || 0,
           uniqueNumberOfClassRoom: response.data.uniqueNumberOfClassRoom || "",
         });
         return response.data;
@@ -63,41 +47,35 @@ const EditSiswa = () => {
 
   const handleSubmitEdit = async (e: any) => {
     e.preventDefault();
-
-    setLoading(true);
-    try {
-      const response = await axios.put(
-        `http://192.168.110.239:13311/api/Account/edit/student/${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log(response.data);
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Siswa Berhasil diperbarui!",
-        confirmButtonText: "Ok",
-      }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-          navigate("/pengguna-siswa");
-        }
-      });
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal",
-        text: error.toString(),
-        confirmButtonText: "Ok",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+		setLoading(true);
+		try {
+			const response = await axios.put(
+				`http://192.168.110.239:13311/api/Account/edit/student/${id}`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
+			);
+			console.log(response.data);
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil",
+				text: "Siswa Berhasil diperbarui!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				/* Read more about isConfirmed, isDenied below */
+				if (result.isConfirmed) {
+					navigate("/pengguna-siswa");
+				}
+			});
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;

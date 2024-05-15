@@ -12,27 +12,17 @@ interface MateriEditProps {
   setisMobileModalOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MateriEditMobile = ({
-  id,
-  setisMobileModalOpenEdit,
-}: MateriEditProps) => {
-  const [selectedOption, setSelectedOption] = useState("file");
-  const [loading, setLoading] = useState(false);
-  const [formUpdate, setFormUpdate] = useState<{
-    id: string;
-    courseName: string;
-    description: string;
-    fileData: File | null;
-    linkCourse: string;
-    lessonName: string;
-  }>({
-    id: "",
-    courseName: "",
-    description: "",
-    fileData: null,
-    linkCourse: "",
-    lessonName: "",
-  });
+const MateriEditMobile = ({ id, setisMobileModalOpenEdit }: MateriEditProps) => {
+	const [selectedOption, setSelectedOption] = useState("file");
+	const [loading, setLoading] = useState(false);
+	const [formUpdate, setFormUpdate] = useState({
+		id: "",
+		courseName: "",
+		description: "",
+		fileData: null,
+		linkCourse: "",
+		lessonName: "",
+	});
 
   const queryMapel = useGetLessonByGuru();
   const { data: dataMapel } = queryMapel;
@@ -61,7 +51,6 @@ const MateriEditMobile = ({
         console.log(error);
       }
     };
-
     fetchMateri();
   }, [id]);
 
@@ -107,44 +96,43 @@ const MateriEditMobile = ({
         formData.append("linkCourse", formUpdate.linkCourse);
       }
 
-      const response = await axios.put(
-        `http://192.168.110.239:13311/api/Courses/${formUpdate.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(response.data);
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Materi Berhasil diperbarui!",
-        confirmButtonText: "Ok",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setFormUpdate({
-            id: "",
-            courseName: "",
-            description: "",
-            fileData: null,
-            linkCourse: "",
-            lessonName: "",
-          });
-          setisMobileModalOpenEdit(false); // Tutup formulir setelah berhasil
-        }
-      });
-    } catch (error) {
-      console.log(error);
-      if (error.response && error.response.data) {
-        console.log(error.response.data.errors);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+			const response = await axios.put(
+				`http://192.168.110.239:13311/api/Courses/${formUpdate.id}`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+						"Content-Type": "multipart/form-data",
+					},
+				}
+			);
+			console.log(response.data);
+			Swal.fire({
+				icon: "success",
+				title: "Berhasil!",
+				text: "Materi Berhasil diperbarui!",
+				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setFormUpdate({
+						id: "",
+						courseName: "",
+						description: "",
+						fileData: null,
+						linkCourse: "",
+						lessonName: "",
+					});
+					setisMobileModalOpenEdit(false);
+				}
+			});
+		} catch (error: any) {
+			if (error.response && error.response.data) {
+				console.log(error.response.data.errors);
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -168,39 +156,39 @@ const MateriEditMobile = ({
     }));
   };
 
-  return (
-    <form onSubmit={handleSubmitEdit}>
-      <label className="block">Nama Materi</label>
-      <TextInput
-        name="courseName"
-        value={formUpdate.courseName}
-        onChange={handleInputEditChange}
-        required
-      />
-      <label className="mt-2 block">Mata Pelajaran</label>
-      <select
-        name="lessonName"
-        value={formUpdate.lessonName}
-        onChange={handleInputEditChange}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 capitalize"
-      >
-        {dataMapel &&
-          dataMapel.map((mapel) => (
-            <option key={mapel.id} value={mapel.lessonName}>
-              {mapel.lessonName}
-            </option>
-          ))}
-      </select>
-      <label htmlFor="description" className="mt-2 block">
-        Deskripsi
-      </label>
-      <Textarea
-        name="description"
-        value={formUpdate.description}
-        onChange={handleInputEditChange}
-        required
-      />
-
+	return (
+		<form onSubmit={handleSubmitEdit}>
+			<label className="block">Nama Materi</label>
+			<TextInput
+				name="courseName"
+				value={formUpdate.courseName}
+				onChange={handleInputEditChange}
+				required
+			/>
+			<label className="mt-2 block">Mata Pelajaran</label>
+			<select
+				name="lessonName"
+				value={formUpdate.lessonName}
+				onChange={handleInputEditChange}
+				className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 capitalize"
+			>
+				{dataMapel &&
+					dataMapel.map((mapel) => (
+						<option key={mapel.lessonId} value={mapel.lessonName}>
+							{mapel.lessonName}
+						</option>
+					))}
+			</select>
+			<p>{formUpdate.lessonName}</p>
+			<label htmlFor="description" className="mt-2 block">
+				Deskripsi
+			</label>
+			<Textarea
+				name="description"
+				value={formUpdate.description}
+				onChange={handleInputEditChange}
+				required
+			/>
       <p className="mt-2">Modul</p>
       <div className="flex gap-5">
         <div

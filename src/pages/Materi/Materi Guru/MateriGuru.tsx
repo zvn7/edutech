@@ -40,13 +40,13 @@ const MateriGuru = () => {
     lessonName: "",
   });
 
-  useEffect(() => {
-    const handleResize = () => {
-      const windowWidth = window.innerWidth;
-      setIsMobile(windowWidth <= 768);
-      setIsTablet(windowWidth > 768 && windowWidth <= 1024);
-    };
-
+	useEffect(() => {
+		const handleResize = () => {
+			const windowWidth = window.innerWidth;
+			setIsMobile(windowWidth <= 768);
+			setIsTablet(windowWidth > 768 && windowWidth <= 1024);
+		};
+    
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
@@ -163,10 +163,10 @@ const MateriGuru = () => {
     }
   };
 
-  const handleShowModalAddFormMobile = () => {
-    setisMobileModalOpenAdd(true);
-    setisMobileModalOpenEdit(false);
-  };
+	const handleShowModalAddFormMobile = () => {
+		setisMobileModalOpenAdd(true);
+		setisMobileModalOpenEdit(false);
+	};
 
   const handleShowModalAddFormTablet = () => {
     setisTabletModalOpenAdd(true);
@@ -232,19 +232,29 @@ const MateriGuru = () => {
     }
   };
 
-  const handleShowModalEditFormTablet = (data: IMateriGuru) => {
-    setFormUpdate({
-      id: data.id,
-      courseName: data.courseName || "",
-      description: data.description || "",
-      fileData: data.fileData || "",
-      linkCourse: data.linkCourse || "",
-      lessonName: data.lessonName || "",
-    });
-    setisTabletModalOpenEdit(true);
-    setisTabletModalOpenAdd(false);
-  };
-
+	const handleCloseModalFormTablet = () => {
+		if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
+			Swal.fire({
+				title: "Anda yakin ingin meninggalkan halaman?",
+				text: "Perubahan yang Anda buat mungkin tidak disimpan.",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak, batalkan",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setisTabletModalOpenAdd(false);
+					setisTabletModalOpenEdit(false);
+				}
+			});
+		} else {
+			setisTabletModalOpenAdd(false);
+			setisTabletModalOpenEdit(false);
+		}
+	};
+  
   const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
 
   const queryMapel = useGetLessonByGuru();
@@ -257,21 +267,34 @@ const MateriGuru = () => {
           (materi) => materi.lessonName === selectedLesson
         );
 
-  const handleLessonChange = (e: any) => {
-    setSelectedLesson(e.target.value);
-  };
+	const handleShowModalEditFormTablet = (data: IMateriGuru) => {
+		setFormUpdate({
+			id: data.id,
+			courseName: data.courseName || "",
+			description: data.description || "",
+			fileData: data.fileData || "",
+			linkCourse: data.linkCourse || "",
+			lessonName: data.lessonName || "",
+		});
+		setisTabletModalOpenEdit(true);
+		setisTabletModalOpenAdd(false);
+	};
 
-  const [searchTerm, setSearchTerm] = useState("");
+	const handleLessonChange = (e: any) => {
+		setSelectedLesson(e.target.value);
+	};
 
-  const handleSearchChange = (e: any) => {
-    setSearchTerm(e.target.value);
-  };
-  const searchFilter = (lesson: any) => {
-    return (
-      lesson.courseName &&
-      lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
+	const [searchTerm, setSearchTerm] = useState("");
+
+	const handleSearchChange = (e: any) => {
+		setSearchTerm(e.target.value);
+	};
+	const searchFilter = (lesson: any) => {
+		return (
+			lesson.courseName &&
+			lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+		);
+	};
 
   return (
     <div>

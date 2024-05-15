@@ -3,8 +3,8 @@ import { Button, Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import {
-  useAssignmentsByTeacherId,
-  useGetLessonByGuru,
+	useAssignmentsByTeacherId,
+	useGetLessonByGuru,
 } from "../../../services/queries";
 import { useDeleteTugas } from "../../../services/mutation";
 import TugasEdit from "./TugasEdit";
@@ -25,8 +25,7 @@ const TugasGuru = () => {
   const [isTablet, setIsTablet] = useState(false);
   const assigmentQueries = useAssignmentsByTeacherId();
   const { data: assigmentData, isLoading } = assigmentQueries;
-
-  const [selectedLesson, setSelectedLesson] = useState("semua tugas");
+	const [selectedLesson, setSelectedLesson] = useState("semua tugas");
 
   const mapelQuery = useGetLessonByGuru();
   const { data: dataMapel } = mapelQuery;
@@ -49,12 +48,12 @@ const TugasGuru = () => {
     setSelectedLesson(e.target.value);
   };
 
-  const filteredData =
-    selectedLesson === "semua tugas"
-      ? assigmentData
-      : assigmentData?.filter(
-          ({ lessonName }) => lessonName === selectedLesson
-        );
+	const filteredData =
+		selectedLesson === "semua tugas"
+			? assigmentData
+			: assigmentData?.filter(
+					({ lessonName }) => lessonName === selectedLesson
+			  );
 
   const handleShowAddForm = () => {
     if (showEditForm) {
@@ -78,7 +77,7 @@ const TugasGuru = () => {
     }
   };
 
-  const [taskIdToEdit, setTaskIdToEdit] = useState(null);
+	const [taskIdToEdit, setTaskIdToEdit] = useState(null);
 
   const handleShowEditForm = (taskId: any) => {
     if (showAddForm) {
@@ -127,10 +126,10 @@ const TugasGuru = () => {
     }
   };
 
-  const handleShowModalAddFormMobile = () => {
-    setisMobileModalOpenAdd(true);
-    setisMobileModalOpenEdit(false);
-  };
+	const handleShowModalAddFormMobile = () => {
+		setisMobileModalOpenAdd(true);
+		setisMobileModalOpenEdit(false);
+	};
 
   const handleShowModalEditFormMobile = (taskId: any) => {
     if (showAddForm) {
@@ -162,10 +161,10 @@ const TugasGuru = () => {
     }
   };
 
-  const handleShowModalAddFormTablet = () => {
-    setisTabletModalOpenAdd(true);
-    setisTabletModalOpenEdit(false);
-  };
+	const handleShowModalAddFormTablet = () => {
+		setisTabletModalOpenAdd(true);
+		setisTabletModalOpenEdit(false);
+	};
 
   const handleShowModalEditFormTablet = (taskId: any) => {
     if (showAddForm) {
@@ -195,15 +194,15 @@ const TugasGuru = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredAssignments = (tugas: any) => {
-    return tugas.assignmentName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-  };
+	const filteredAssignments = (tugas: any) => {
+		return tugas.assignmentName
+			.toLowerCase()
+			.includes(searchTerm.toLowerCase());
+	};
 
-  const handleSearchChange = (e: any) => {
-    setSearchTerm(e.target.value);
-  };
+	const handleSearchChange = (e: any) => {
+		setSearchTerm(e.target.value);
+	};
 
   const deleteTugas = useDeleteTugas();
 
