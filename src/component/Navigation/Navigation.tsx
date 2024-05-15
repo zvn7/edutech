@@ -116,23 +116,22 @@ const Navigation = () => {
 
 	const [dataUser, setDataUser] = useState<any | null>([]);
 
-	useEffect(() => {
-		const fetchUserLogin = async () => {
-			try {
-				const response = await axios.get(
-					"http://192.168.110.239:13311/api/Account/userinfo",
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`,
-						},
-					}
-				);
-				setDataUser(response.data);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-
+  useEffect(() => {
+    const fetchUserLogin = async () => {
+      try {
+        const response = await axios.get(
+          "http://192.168.110.239:13311/api/Account/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDataUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 		fetchUserLogin();
 	}, []);
 

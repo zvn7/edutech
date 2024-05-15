@@ -91,7 +91,6 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 			alert("No file available to download");
 			return;
 		}
-
 		try {
 			const response = await axios.get(
 				`http://192.168.110.239:13311/api/Assignments/download/${id}`,
@@ -102,7 +101,6 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 					},
 				}
 			);
-
 			const blob = new Blob([response.data], { type: "application/pdf" });
 			const url = window.URL.createObjectURL(blob);
 			const link = document.createElement("a");
@@ -133,14 +131,12 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 
 	const createPengumpulan = useCreatePengumpulan();
 	const { register, handleSubmit, setValue, reset } = useForm<Pengumpulan>();
-
 	const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
 		// Memastikan assignmentId sudah diset
 		if (!data.assignmentId) {
 			console.error("Assignment ID is missing.");
 			return;
 		}
-
 		try {
 			// Membuat objek FormData
 			const formData = new FormData();
@@ -167,7 +163,7 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 						link: "",
 						FileData: "",
 					});
-					setUploadedFile(null); // Menetapkan nilai null untuk uploadedFile setelah pengumpulan berhasil
+					setUploadedFile(null);
 				}
 			});
 		} catch (error: any) {
@@ -189,133 +185,160 @@ const TugasSiswa = ({ id }: { id: (string | undefined)[] }) => {
 		setUploadedFile(file);
 	};
 
-	const filteredData =
-		selectedAssignment === "semua tugas"
-			? dataTugas
-			: dataTugas?.filter(
-					({ lessonName }) => lessonName === selectedAssignment
-			  );
-	return (
+  const filteredData =
+    selectedAssignment === "semua tugas"
+      ? dataTugas
+      : dataTugas?.filter(
+          ({ lessonName }) => lessonName === selectedAssignment
+        );
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (e: any) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const searchFilter = (tugas: any) => {
+    return tugas.assignmentName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+  };
+  return (
 		<div>
 			<Navigation />
 			<div className="p-4 sm:ml-64">
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
 					{/* left side */}
-					<div className="mt-14">
-						<h1 className="text-3xl font-bold">Tugas</h1>
-						<div className="flex flex-wrap justify-between mb-2 mt-4">
-							<div className="flex items-center w-80">
-								<input
-									type="text"
-									placeholder="Cari tugas"
-									className="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-								/>
-							</div>
-							<select
-								id="subject"
-								value={selectedLesson}
-								onChange={handleLessonChange}
-								className="block px-3 py-2 capitalize bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-							>
-								<option selected>semua tugas</option>
-								{formLesson?.map((item) => (
-									<option key={item?.id} value={item?.lessonName}>
-										{item?.lessonName}
-									</option>
-								))}
-							</select>
-						</div>
-						<div
-							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
-							style={{ scrollbarWidth: "none" }}
-						>
-							<div className="flex flex-col gap-3 mt-2">
-								{isLoadingTugas
-									? Array.from({ length: 5 }, (_, index) => (
-											<div
-												key={index}
-												className="flex justify-between items-center shadow-sm p-3 gap-2  bg-white border-b animate-pulse"
-											>
-												<div className="flex gap-3">
-													<div className="bg-blue-100 rounded-lg h-14 w-14"></div>
-													<div className="flex flex-col space-y-2">
-														<div className="bg-gray-200 h-4 w-40 rounded"></div>
-														<div className="bg-gray-200 h-4 w-48 rounded"></div>
-														<div className="bg-gray-200 h-4 w-32 rounded"></div>
-													</div>
-												</div>
-												<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize"></span>
-											</div>
-									  ))
-									: filteredData?.map((items) => (
-											<div
-												key={items?.id}
-												onClick={() => handleCardClick(items?.id)}
-												className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
-											>
-												<div
-													className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
-														selectedCardId === items?.id
-															? "bg-[#fff8e5] rounded-lg"
-															: ""
-													}`}
-												>
-													<div className="flex gap-3">
-														<div className="flex items-center bg-blue-100 rounded-lg h-14">
-															<svg
-																className="w-12 h-12 text-blue-600 dark:text-white"
-																aria-hidden="true"
-																xmlns="http://www.w3.org/2000/svg"
-																fill="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	fill-rule="evenodd"
-																	d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
-																	clip-rule="evenodd"
-																/>
-															</svg>
-														</div>
-														<div className="flex flex-col">
-															<p className="text-sm font-normal text-gray-500">
-																{items?.lessonName}
-															</p>
-															<h2 className="font-medium text-md">
-																{items?.assignmentName}
-															</h2>
-															<div className="flex flex-wrap gap-2 ">
-																<div className="flex gap-1">
-																	<svg
-																		className="w-5 h-5 text-gray-500"
-																		aria-hidden="true"
-																		xmlns="http://www.w3.org/2000/svg"
-																		fill="none"
-																		viewBox="0 0 24 24"
-																	>
-																		<path
-																			stroke="currentColor"
-																			strokeLinecap="round"
-																			strokeLinejoin="round"
-																			strokeWidth="2"
-																			d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
-																		/>
-																	</svg>
-																	<span className="text-sm text-gray-500">
-																		{formatDate(items?.assignmentDate)}
-																	</span>
-																</div>
-															</div>
-														</div>
-													</div>
-													<span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
-														{items?.assignmentSubmissionStatus}
-													</span>
-												</div>
-											</div>
-									  ))}
-							</div>
-						</div>
-					</div>
+					<div>
+            <div className="mt-14">
+              <h1 className="text-3xl font-bold">Tugas</h1>
+            </div>
+            <div className="flex justify-between mb-2 mt-8">
+              <div className="flex gap-2 items-center">
+                <label htmlFor="table-search" className="sr-only">
+                  Search
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                    <img
+                      src="/gif/search.gif"
+                      alt="search"
+                      className="w-5 h-5"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    id="table-search"
+                    className="block p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-white focus:ring-gray-200 focus:border-none capitalize"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="temukan tugas disini..."
+                  />
+                </div>
+              </div>
+              <select
+                id="subject"
+                value={selectedLesson}
+                onChange={handleLessonChange}
+                className="block px-3 py-2 capitalize bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              >
+                <option selected>semua tugas</option>
+                {formLesson?.map((item) => (
+                  <option key={item?.id} value={item?.lessonName}>
+                    {item?.lessonName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div
+              className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
+              style={{ scrollbarWidth: "none" }}
+            >
+              <div className="flex flex-col gap-3 mt-2">
+                {isLoadingTugas ? (
+                  <p>loading....</p>
+                ) : filteredData && filteredData.length > 0 ? (
+                  filteredData.filter(searchFilter).length > 0 ? (
+                    filteredData.filter(searchFilter).map((items) => (
+                      <div
+                        key={items?.id}
+                        onClick={() => handleCardClick(items?.id)}
+                        className={`cursor-pointer flex flex-col gap-3 bg-white rounded-lg `}
+                      >
+                        <div
+                          className={`flex justify-between items-center  shadow-sm p-3 gap-2 hover:bg-[#fdefc8] hover:rounded-lg ${
+                            selectedCardId === items?.id
+                              ? "bg-[#fff8e5] rounded-lg"
+                              : ""
+                          }`}
+                        >
+                          <div className="flex gap-3">
+                            <div className="flex items-center bg-blue-100 rounded-lg h-14">
+                              <svg
+                                className="w-12 h-12 text-blue-600 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <p className="text-sm font-normal text-gray-500">
+                                {items?.lessonName}
+                              </p>
+                              <h2 className="font-medium text-md">
+                                {items?.assignmentName}
+                              </h2>
+                              <div className="flex flex-wrap gap-2 ">
+                                <div className="flex gap-1">
+                                  <svg
+                                    className="w-5 h-5 text-gray-500"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M4 10h16M8 14h8m-4-7V4M7 7V4m10 3V4M5 20h14c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v12c0 .6.4 1 1 1Z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm text-gray-500">
+                                    {formatDate(items?.assignmentDate)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <span className="bg-orange-200 text-orange-500 text-xs w-32 md:w-24 md:sm font-medium px-1 py-1 md:px-1.5 md:py-1.5 rounded-full text-center border border-orange-500 capitalize">
+                            {items?.assignmentSubmissionStatus}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-400">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </p>
+                  )
+                ) : (
+                  <p className="text-center text-gray-400">
+                    Tidak ada data yang sesuai dengan pilihan tugas yang
+                    dipilih.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
 					{/* right side */}
 					{selectedCard &&
 						(isMobileView ? (

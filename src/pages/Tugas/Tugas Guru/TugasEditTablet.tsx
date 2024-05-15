@@ -6,8 +6,8 @@ import Swal from "sweetalert2";
 import { useQueryClient } from "@tanstack/react-query";
 
 type TugasEditProps = {
-	id: string;
-	setisTabletModalOpenEdit: Dispatch<SetStateAction<boolean>>;
+  id: string;
+  setisTabletModalOpenEdit: Dispatch<SetStateAction<boolean>>;
 };
 
 const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
@@ -56,10 +56,8 @@ const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
 				);
 				const tugas = response.data;
 				console.log(tugas);
-
-				// Mengambil hanya bagian tanggal dari assignmentDeadline
-				const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
-
+        // Mengambil hanya bagian tanggal dari assignmentDeadline
+        const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
 				setFormUpdate({
 					id: tugas.id,
 					assignmentName: tugas.assignmentName,
@@ -76,14 +74,12 @@ const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
 				console.log(error);
 			}
 		};
+    fetchTugas();
+  }, [id]);
 
-		fetchTugas();
-	}, [id]);
-
-	const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setLoading(true);
-
+  const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 		// Validasi data sebelum mengirim permintaan
 		if (
 			!formUpdate.assignmentName ||
@@ -98,18 +94,16 @@ const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
 			setLoading(false);
 			return;
 		}
-
-		// Tambahan validasi untuk opsi 'file' atau 'link'
-		if (selectedOption === "file" && !formUpdate.assignmentFileData) {
-			console.log("File harus diunggah jika opsi file dipilih!");
-			setLoading(false);
-			return;
-		} else if (selectedOption === "link" && !formUpdate.assignmentLink) {
-			console.log("Link harus disediakan jika opsi link dipilih!");
-			setLoading(false);
-			return;
-		}
-
+    // Tambahan validasi untuk opsi 'file' atau 'link'
+    if (selectedOption === "file" && !formUpdate.assignmentFileData) {
+      console.log("File harus diunggah jika opsi file dipilih!");
+      setLoading(false);
+      return;
+    } else if (selectedOption === "link" && !formUpdate.assignmentLink) {
+      console.log("Link harus disediakan jika opsi link dipilih!");
+      setLoading(false);
+      return;
+    }
 		try {
 			// Kirim permintaan PUT ke API
 			const formData = new FormData();
@@ -174,25 +168,23 @@ const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
 			setLoading(false);
 		}
 	};
+  // Handler untuk mengubah file
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setFormUpdate({
+        ...formUpdate,
+        assignmentFileData: files[0],
+      });
+    }
+  };
 
-	// Handler untuk mengubah file
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = event.target.files;
-		if (files && files.length > 0) {
-			setFormUpdate({
-				...formUpdate,
-				assignmentFileData: files[0],
-			});
-		}
-	};
-
-	const handleInputEditChange = (
-		e: React.ChangeEvent<
-			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		>
-	) => {
-		const { name, value } = e.target;
-
+  const handleInputEditChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
 		if (name === "assignmentDeadline") {
 			const formattedDateTime = new Date(value).toISOString();
 			setFormUpdate((prevState) => ({
@@ -206,7 +198,6 @@ const TugasEditTablet = ({ id, setisTabletModalOpenEdit }: TugasEditProps) => {
 			}));
 		}
 	};
-
 
 	const filteredCourseData = dataMapel?.filter(
 		(lesson) => lesson.lessonName === selectedLesson

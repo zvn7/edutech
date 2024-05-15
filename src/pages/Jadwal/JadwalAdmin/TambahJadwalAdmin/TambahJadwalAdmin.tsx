@@ -9,7 +9,6 @@ import Swal from "sweetalert2";
 
 const TambahJadwalAdmin = () => {
   const [selectedLesson, setSelectedLesson] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
   const [form, setForm] = useState({
     day: 0,
     startTime: 0,
@@ -23,10 +22,6 @@ const TambahJadwalAdmin = () => {
 
   const handleLessonChange = (e: any) => {
     setSelectedLesson(e.target.value);
-  };
-
-  const handleCLassChange = (e: any) => {
-    setSelectedClass(e.target.value);
   };
 
   const handleInputChange = (e: any) => {
@@ -45,17 +40,26 @@ const TambahJadwalAdmin = () => {
   const navigate = useNavigate();
   const handleCreateJadwalSubmit: SubmitHandler<Jadwal> = (data) => {
     createJadwalMutation.mutate(data, {
-      onSuccess: () => {  
+      onSuccess: () => {
         Swal.fire({
           icon: "success",
           title: "Berhasil",
-          text: "Siswa Berhasil ditambahkan!",
+          text: "Jadwal Pelajaran Berhasil ditambahkan!",
           confirmButtonText: "Ok",
         }).then((result) => {
           if (result.isConfirmed) {
             reset();
             navigate("/jadwal-admin");
           }
+        });
+      },
+
+      onError: (error: any) => {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
         });
       },
     });
@@ -65,11 +69,11 @@ const TambahJadwalAdmin = () => {
     Swal.fire({
       icon: "warning",
       title: "Peringatan",
-      text: "Apakah Anda yakin ingin membatalkan?",
+      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya",
+      confirmButtonText: "Ya, lanjutkan",
       cancelButtonText: "Tidak",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -141,35 +145,7 @@ const TambahJadwalAdmin = () => {
                       ))}
                     </select>
                   </div>
-                  {/* <div>
-                    <label
-                      htmlFor="category"
-                      className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-                    >
-                      jurusan
-                    </label>
-                    <select
-                      id="category"
-                      {...register("className")}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 capitalize"
-                      required
-                      onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        e.currentTarget.setCustomValidity(
-                          "Pilih kelas tidak boleh kosong!"
-                        )
-                      }
-                      onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        e.currentTarget.setCustomValidity("")
-                      }
-                    >
-                      <option selected>pilih kelas</option>
-                      {dataJadwal
-                        ?.find((lesson) => lesson.lessonName === selectedLesson)
-                        ?.className.map((item) => (
-                          <option value={item}>{item}</option>
-                        ))}
-                    </select>
-                  </div> */}
+
                   <div>
                     <label
                       htmlFor="category"

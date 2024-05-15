@@ -9,17 +9,17 @@ import axios from "axios";
 import TabsMateriSiswa from "../../../component/TabsMateriSiswa/TabsMateriSiswa";
 
 const MateriSiswa = () => {
-	const [selectedCard, setSelectedCard] = useState<any>(null);
-	const [selectedCardId, setSelectedCardId] = useState<any>(null);
-	const [isMobileView, setIsMobileView] = useState<boolean>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const lessonsQueries = useLessonsClassroom();
-	const { data: formLesson } = lessonsQueries;
-	const [selectedSubject, setSelectedSubject] = useState(
-		"semua mata pelajaran"
-	);
-	const courseClassroom = useCourseClassroom();
-	const { data: formData, isLoading: isLoadingCourse } = courseClassroom;
+  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [selectedCardId, setSelectedCardId] = useState<any>(null);
+  const [isMobileView, setIsMobileView] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const lessonsQueries = useLessonsClassroom();
+  const { data: formLesson } = lessonsQueries;
+  const [selectedSubject, setSelectedSubject] = useState(
+    "semua mata pelajaran"
+  );
+  const courseClassroom = useCourseClassroom();
+  const { data: formData, isLoading: isLoadingCourse } = courseClassroom;
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -46,7 +46,6 @@ const MateriSiswa = () => {
 				}
 			);
 			const data = await response.json();
-			console.log("data", data);
 
 			if (data) {
 				setSelectedCardId(id);
@@ -80,7 +79,6 @@ const MateriSiswa = () => {
 					},
 				}
 			);
-
 			const blob = new Blob([response.data], { type: "application/pdf" });
 			const url = window.URL.createObjectURL(blob);
 			const link = document.createElement("a");
@@ -179,7 +177,6 @@ const MateriSiswa = () => {
 																	/>
 																</svg>
 															</div>
-
 															<div className="flex flex-col">
 																<p className="text-sm capitalize text-gray-500">
 																	{course.lessonName}
@@ -208,7 +205,7 @@ const MateriSiswa = () => {
 											className="text-gray-500 hover:text-gray-700"
 											onClick={() => {
 												closeModal();
-												setSelectedCardId(null); // Atur selectedCardId menjadi null saat tombol close diklik
+												setSelectedCardId(null);
 											}}
 										>
 											<svg

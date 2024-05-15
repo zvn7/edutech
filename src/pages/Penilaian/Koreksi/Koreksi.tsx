@@ -21,40 +21,37 @@ const Koreksi = () => {
 		fileName: "",
 	});
 
-	const [loading, setLoading] = useState(false);
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`http://192.168.110.239:13311/api/AssignmentSubmissions/getSubmissionForTeacherBySubmissionId/${id}`,
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`,
-						},
-					}
-				);
-				const responseData = response.data;
-				setFormData({
-					...formData,
-					id: responseData.id,
-					nameStudent: responseData.nameStudent,
-					assignmentName: responseData.assignmentName,
-					submissionTime: responseData.submissionTime,
-					submissionTimeStatus: responseData.submissionTimeStatus,
-					comment: responseData.comment,
-					link: responseData.link,
-					grade: responseData.grade,
-					fileData: responseData.fileData,
-					fileName: responseData.fileName,
-				});
-				return response.data;
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		fetchData();
-	}, [id]);
-
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.110.239:13311/api/AssignmentSubmissions/getSubmissionForTeacherBySubmissionId/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setFormData({
+          ...formData,
+          nameStudent: response.data.nameStudent,
+          assignmentName: response.data.assignmentName,
+          submissionTime: response.data.submissionTime,
+          submissionTimeStatus: response.data.submissionTimeStatus,
+          comment: response.data.comment,
+          link: response.data.link,
+          grade: response.data.grade,
+          fileData: response.data.fileData,
+          fileName: response.data.fileName,
+        });
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [id]);
 	const shortenLink = (link, maxLength) => {
 		if (link.length > maxLength) {
 			return link.substring(0, maxLength) + "...";
@@ -63,36 +60,36 @@ const Koreksi = () => {
 		}
 	};
 
-	const handleSubmitEdit = async (e) => {
-		e.preventDefault();
-		setLoading(true);
-		try {
-			const response = await axios.put(
-				`http://192.168.110.239:13311/api/AssignmentSubmissions/teacher/${id}`,
-				formData,
-				{
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
-					},
-				}
-			);
-			console.log(response.data);
-			Swal.fire({
-				icon: "success",
-				title: "Berhasil",
-				text: "Penilaian Berhasil dilakukan!",
-				confirmButtonText: "Ok",
-			}).then((result) => {
-				if (result.isConfirmed) {
-					navigate("/penilaian");
-				}
-			});
-			navigate("/penilaian");
-		} catch (error) {
-			console.log(error);
-		}
-		setLoading(false);
-	};
+  const handleSubmitEdit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://192.168.110.239:13311/api/AssignmentSubmissions/teacher/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Penilaian Berhasil dilakukan!",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/penilaian");
+        }
+      });
+      navigate("/penilaian");
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
 
 	const handleInputChange = (e) => {
 		const { value, name } = e.target;

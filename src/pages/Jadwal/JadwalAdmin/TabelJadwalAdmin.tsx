@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { Button } from "flowbite-react";
-import {
-  useClassrooms,
-  useSchedulesAdmin,
-  useSchedulesIds,
-} from "../../../services/queries";
+import { useClassrooms, useSchedulesAdmin } from "../../../services/queries";
 import { useDeleteSchedules } from "../../../services/mutation";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 
 const TabelJadwalAdmin = () => {
-	const [pageSize, setPageSize] = useState(10);
-	const [currentPage, setCurrentPage] = useState(0);
-	const [selectedClass, setSelectedClass] = useState("semua");
-	const [searchTerm, setSearchTerm] = useState("");
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedClass, setSelectedClass] = useState("semua");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const kelasQuery = useClassrooms();
   const { data: dataKelas, isLoading: isKelasLoading } = kelasQuery;
@@ -21,167 +17,166 @@ const TabelJadwalAdmin = () => {
   const jadwalQuery = useSchedulesAdmin();
   const { data, isLoading: isJadwalLoading } = jadwalQuery;
 
-	const handlePageSizeChange = (e: any) => {
-		setPageSize(Number(e.target.value));
-	};
+  const handlePageSizeChange = (e: any) => {
+    setPageSize(Number(e.target.value));
+  };
 
-	const handleClassChange = (e: any) => {
-		setSelectedClass(e.target.value);
-	};
+  const handleClassChange = (e: any) => {
+    setSelectedClass(e.target.value);
+  };
 
-	const filteredData =
-		selectedClass === "semua"
-			? data
-			: data?.filter(({ className }) => className === selectedClass) || [];
+  const filteredData =
+    selectedClass === "semua"
+      ? data
+      : data?.filter(({ className }) => className === selectedClass) || [];
 
-	const totalPages = Math.ceil(
-		(filteredData ? filteredData.length : 0) / pageSize
-	);
+  const totalPages = Math.ceil(
+    (filteredData ? filteredData.length : 0) / pageSize
+  );
 
-	const goToPreviousPage = () => {
-		setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-	};
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
 
-	const goToNextPage = () => {
-		setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
-	};
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+  };
 
-	const goToPage = (pageNumber: number) => {
-		setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
-	};
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(Math.max(0, Math.min(pageNumber, totalPages - 1)));
+  };
 
-	const getDay = (day: number) => {
-		switch (day) {
-			case 1:
-				return "Senin";
-			case 2:
-				return "Selasa";
-			case 3:
-				return "Rabu";
-			case 4:
-				return "Kamis";
-			case 5:
-				return "Juma'at";
-			default:
-				return day;
-		}
-	};
+  const getDay = (day: number) => {
+    switch (day) {
+      case 1:
+        return "Senin";
+      case 2:
+        return "Selasa";
+      case 3:
+        return "Rabu";
+      case 4:
+        return "Kamis";
+      case 5:
+        return "Juma'at";
+      default:
+        return day;
+    }
+  };
 
-	const searchFilter = (jadwal: any) => {
-		return (
-			jadwal.lessonName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			jadwal.nameTeacher?.toLowerCase().includes(searchTerm.toLowerCase())
-		);
-	};
+  const searchFilter = (jadwal: any) => {
+    return (
+      jadwal.lessonName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      jadwal.nameTeacher?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
 
-	const deleteJadwal = useDeleteSchedules();
+  const deleteJadwal = useDeleteSchedules();
 
-	const handleDelete = async (id: any) => {
-		const confirmation = await Swal.fire({
-			title: "Anda yakin ingin menghapus jadwal ini?",
-			text: "Aksi ini tidak dapat dibatalkan!.",
-			icon: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Ya, hapus!",
-			cancelButtonText: "Batal",
-		});
-		if (confirmation.isConfirmed) {
-			try {
-				await deleteJadwal.mutateAsync(id);
+  const handleDelete = async (id: any) => {
+    const confirmation = await Swal.fire({
+      title: "Peringatan",
+      text: "Apakah anda yakin ingin menghapus jadwal ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, lanjutkan",
+      cancelButtonText: "Batal",
+    });
+    if (confirmation.isConfirmed) {
+      try {
+        await deleteJadwal.mutateAsync(id);
 
-				Swal.fire({
-					icon: "success",
-					title: "Berhasil",
-					text: "Jadwal Berhasil dihapus!",
-					confirmButtonText: "Ok",
-				});
-			} catch (error) {
-				console.log("gagal menghapus jadwal:", error);
-			}
-		}
-	};
-	return (
-		<>
-			<div className="shadow-md sm:rounded-lg bg-white">
-				<div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between">
-					<div className="flex gap-2 items-center flex-wrap">
-						<select
-							value={pageSize}
-							onChange={handlePageSizeChange}
-							className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
-						>
-							{[10, 20, 30, 40, 50].map((pageSize) => (
-								<option key={pageSize} value={pageSize}>
-									{pageSize} data
-								</option>
-							))}
-						</select>
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Jadwal Pelajaran Berhasil dihapus!",
+          confirmButtonText: "Ok",
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      }
+    }
+  };
+  return (
+    <>
+      <div className="shadow-md sm:rounded-lg bg-white">
+        <div className="p-4 capitalize">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-blue-500">Data Jadwal</h1>
+            <Link to="/jadwal-admin/tambah-jadwal">
+              <button
+                type="button"
+                className="flex items-center text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm p-2 capitalize"
+              >
+                <svg
+                  className="w-5 h-5 text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 12h14m-7 7V5"
+                  />
+                </svg>
+                <span className="ps-1 capitalize">tambah</span>
+              </button>
+            </Link>
+          </div>
+        </div>
+        <hr className="ml-3 mr-3 border-gray-200" />
+        <div className="p-2 ml-2 mr-2 mt-2 pt-4 mb-3 flex gap-2 justify-between flex-wrap">
+          <div className="flex gap-2 items-center ">
+            <select
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              className="border border-gray-300 bg-gray-50 p-2 rounded-lg capitalize"
+            >
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize} data
+                </option>
+              ))}
+            </select>
             <select
               value={selectedClass}
               onChange={handleClassChange}
-              className="border border-gray-300 bg-gray-50 p-1 rounded-lg capitalize"
+              className="border border-gray-300 bg-gray-50 p-2 rounded-lg capitalize"
             >
               <option selected>semua</option>
               {dataKelas?.map((item) => (
                 <option value={item.className}>{item.className}</option>
               ))}
             </select>
-            <div className="flex gap-2 items-center">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
-                  <svg
-                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  id="table-search"
-                  className="block p-1.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-56 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 capitalize"
-                  placeholder="Cari mapel & guru disini..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+          </div>
+          <div className="flex gap-2 items-center">
+            <label htmlFor="table-search" className="sr-only">
+              Search
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                <img src="/gif/search.gif" alt="search" className="w-6 h-6" />
               </div>
+              <input
+                type="text"
+                id="table-search"
+                className="block p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-gray-200 focus:border-none"
+                placeholder="Temukan mapel & guru disini..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
-          <Link to="/jadwal-admin/tambah-jadwal">
-            <button
-              type="button"
-              className="flex items-center text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm p-2 capitalize"
-            >
-              <svg
-                className="w-5 h-5 text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 12h14m-7 7V5"
-                />
-              </svg>
-              <span className="ps-1 capitalize">tambah</span>
-            </button>
-          </Link>
         </div>
         <div className="relative overflow-x-auto">
           <table className="w-full uppertext-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

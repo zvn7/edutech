@@ -5,36 +5,23 @@ const AbsensiAdmin = () => {
   return (
     <div>
       <Navigation />
+      <div>
+        <div className="bg-[#86d9ff] h-40 relative z-10"></div>
+      </div>
       <div className="p-4 sm:ml-64">
-        <div className=" mt-14">
-          <h1 className="text-3xl font-bold capitalize">recap absensi</h1>
-        </div>
-        <div className="mt-8">
-         
-          <div className="mt-6">
-            <TabelRekapAbsensi />
+        <div className="w-full">
+          <div className="h-20 bg-white p-4 rounded-sm shadow-md relative -top-11 z-20">
+            <div className="flex gap-3 items-center">
+              <img src="/gif/check.gif" alt="calendar" className="w-12 h-12" />
+              <h1 className="text-2xl font-bold text-gray-800 capitalize">
+                Rekap Absensi
+              </h1>
+            </div>
           </div>
-          {/* <Tabs aria-label="Tabs with underline" style="underline">
-            <Tabs.Item
-              active
-              title="Rekayasa Perangkat Lunak"
-              icon={FaComputer}
-            >
-              <TabelRekapAbsensi />
-            </Tabs.Item>
-            <Tabs.Item
-              title="Teknik Komputer Dan Jaringan"
-              icon={FaNetworkWired}
-            >
-              <TabelRekapAbsensi />
-            </Tabs.Item>
-            <Tabs.Item
-              title="Teknik Kendaraan Ringan"
-              icon={FaScrewdriverWrench}
-            >
-              <TabelRekapAbsensi />
-            </Tabs.Item>
-          </Tabs> */}
+        </div>
+
+        <div>
+          <TabelRekapAbsensi />
         </div>
       </div>
     </div>

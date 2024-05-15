@@ -11,7 +11,7 @@ const JadwalSiswa = () => {
 	// const schedules = useLessons(lessonsIdsQuery.data);
 	const {data: schedules} = lessonsIdsQuery;
 
-	const [lessonNames, setLessonNames] = useState({});
+  const [lessonNames, setLessonNames] = useState({});
 
 	useEffect(() => {
 		if (schedules && schedules.length > 0) {
@@ -26,20 +26,20 @@ const JadwalSiswa = () => {
 		}
 	}, [schedules]);
 
-	const renderSchedules = () => {
-		if (!schedulesIdsQuery.data) return null;
+  const renderSchedules = () => {
+    if (!schedulesIdsQuery.data) return null;
 
-		const groupedSchedules = {
-			1: [],
-			2: [],
-			3: [],
-			4: [],
-			5: [],
-		};
+    const groupedSchedules = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+    };
 
-		schedulesIdsQuery.data.forEach((schedule) => {
-			groupedSchedules[schedule.day].push(schedule);
-		});
+    schedulesIdsQuery.data.forEach((schedule) => {
+      groupedSchedules[schedule.day].push(schedule);
+    });
 
 		return Object.keys(groupedSchedules).map((day) => (
 			<div key={day}>
@@ -101,19 +101,19 @@ const JadwalSiswa = () => {
 		));
 	};
 
-	return (
-		<div>
-			<Navigation />
-			<div className="p-4 sm:ml-64">
-				<div className="mt-14">
-					<h1 className="text-3xl font-bold">Jadwal Pelajaran</h1>
-				</div>
-				<div className="mt-8 w bg-white shadow p-4 rounded grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-					{renderSchedules()}
-				</div>
-			</div>
-		</div>
-	);
+  return (
+    <div>
+      <Navigation />
+      <div className="p-4 sm:ml-64">
+        <div className="mt-14">
+          <h1 className="text-3xl font-bold">Jadwal Pelajaran</h1>
+        </div>
+        <div className="mt-8 w bg-white shadow p-4 rounded grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {renderSchedules()}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default JadwalSiswa;
