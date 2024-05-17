@@ -162,7 +162,7 @@ const TabelPenilaian = () => {
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <div className="bg-white shadow-md sm:rounded-lg">
             <div className="p-4">
-              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg w-full px-2.5">
                 <label htmlFor="countries" className="mr-4 text-gray-700">
                   Mapel
                   {/* <sup className="ml-1 text-red-500">*</sup> */}
@@ -171,29 +171,32 @@ const TabelPenilaian = () => {
                   id="countries"
                   value={selectedLesson}
                   onChange={handleLessonChange}
-                  className="w-full bg-transparent border-none"
+                  className="w-full bg-transparent border-none "
                 >
-                  <option selected>Pilih Mapel</option>
+                  <option selected disabled>
+                    Pilih Mapel
+                  </option>
                   {dataMapel?.map((item) => (
                     <option value={item.lessonId}>{item.lessonName}</option>
                   ))}
                 </select>
               </div>
-              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full px-2.5">
+              <div className="mt-4 flex items-center bg-white border border-gray-300 text-gray-900 text-sm rounded-lg w-full px-2.5">
                 <label
                   htmlFor="countries"
                   className="mr-4 text-gray-700 dark:text-white"
                 >
                   Tugas
-                  {/* <sup className="ml-1 text-red-500">*</sup> */}
                 </label>
                 <select
                   id="countries"
                   value={selectedAssignment}
                   onChange={handleAssignmentChange}
-                  className="w-full bg-transparent border-none"
+                  className="w-full bg-transparent border-none "
                 >
-                  <option selected>Pilih Tugas</option>
+                  <option selected disabled>
+                    Pilih Tugas
+                  </option>
 
                   {dataTugas
                     ?.filter((lesson) => lesson.lessonId === selectedLesson)

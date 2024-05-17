@@ -324,7 +324,7 @@ const TugasGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-7 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										placeholder="temukan tugas disini...."
 										value={searchTerm}
 										onChange={handleSearchChange}
