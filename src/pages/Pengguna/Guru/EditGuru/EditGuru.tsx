@@ -33,17 +33,17 @@ const EditGuru = () => {
     classNames: [],
   });
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`http://192.168.110.239:13311/api/Account/teacher/${id}`,
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`,
-						},
-					}
-				);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/Account/teacher/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
         setFormData({
           ...formData,
@@ -82,36 +82,36 @@ const EditGuru = () => {
 
   const [loading, setLoading] = useState(false);
 
-	const handleSubmitEdit = async (e: any) => {
-		e.preventDefault();
-		setLoading(true);
-		try {
-			const response = await axios.put(
-				`http://192.168.110.239:13311/api/Account/teacher/${id}`,
-				formData,
-				{
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
-					},
-				}
-			);
-			console.log(response.data);
-			Swal.fire({
-				icon: "success",
-				title: "Berhasil",
-				text: "Guru Berhasil diperbarui!",
-				confirmButtonText: "Ok",
-			}).then((result) => {
-				if (result.isConfirmed) {
-					navigate("/pengguna-guru");
-				}
-			});
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
+  const handleSubmitEdit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/Account/teacher/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Guru Berhasil diperbarui!",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/pengguna-guru");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;

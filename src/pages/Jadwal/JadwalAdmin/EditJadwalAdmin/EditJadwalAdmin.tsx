@@ -22,7 +22,7 @@ const EditJadwalAdmin = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.110.239:13311/api/Schedules/${id}`,
+          `${import.meta.env.VITE_API_URL}/Schedules/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -58,7 +58,7 @@ const EditJadwalAdmin = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://192.168.110.239:13311/api/Schedules/${id}`,
+        `${import.meta.env.VITE_API_URL}/Schedules/${id}`,
         formData,
         {
           headers: {

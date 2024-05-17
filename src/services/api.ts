@@ -18,13 +18,13 @@ import { Ikelas, Classrooms } from "../types/kelas";
 import { CountTeacher } from "../types/countTeacher";
 import { ToDoList } from "../types/todolist";
 
-const BASE_URL = "http://192.168.110.239:13311";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // login
 export const postLogin = async (data: LoginUser) => {
   try {
     const response = await axios.post<LoginUser>(
-      `${BASE_URL}/api/Account/login`,
+      `${BASE_URL}/Account/login`,
       data
     );
     return response.data;
@@ -37,7 +37,7 @@ export const postLogin = async (data: LoginUser) => {
 export const getUserInfo = async () => {
   try {
     const response = await axios.get<UserLogin>(
-      `${BASE_URL}/api/Account/userinfo`,
+      `${BASE_URL}/Account/userinfo`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -53,7 +53,7 @@ export const getUserInfo = async () => {
 // create mapel
 export const createMapel = async (data: IMapel) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/Lessons`, data, {
+    const response = await axios.post(`${BASE_URL}/Lessons`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -67,7 +67,7 @@ export const createMapel = async (data: IMapel) => {
 // get mapel by id
 export const getMapelIds = async () => {
   try {
-    const response = await axios.get<IMapel[]>(`${BASE_URL}/api/Lessons`, {
+    const response = await axios.get<IMapel[]>(`${BASE_URL}/Lessons`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -81,7 +81,7 @@ export const getMapelIds = async () => {
 // get data mapel
 export const getMapel = async (id: number) => {
   try {
-    const response = await axios.get<IMapel>(`${BASE_URL}/api/Lessons/${id}`, {
+    const response = await axios.get<IMapel>(`${BASE_URL}/Lessons/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -95,7 +95,7 @@ export const getMapel = async (id: number) => {
 export const getMapelClassroom = async () => {
   try {
     const response = await axios.get<Mapel[]>(
-      `${BASE_URL}/api/Lessons/lessonClassRoomId`,
+      `${BASE_URL}/Lessons/lessonClassRoomId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -112,7 +112,7 @@ export const getMapelClassroom = async () => {
 export const deleteMapel = async (id: string) => {
   try {
     const response = await axios.put(
-      `${BASE_URL}/api/Lessons/deactivate/${id}`,
+      `${BASE_URL}/Lessons/deactivate/${id}`,
       {},
       {
         headers: {
@@ -130,7 +130,7 @@ export const deleteMapel = async (id: string) => {
 export const createUserSiswa = async (data: UserSiswa) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/Account/register/student`,
+      `${BASE_URL}/Account/register/student`,
       data,
       {
         headers: {
@@ -148,7 +148,7 @@ export const createUserSiswa = async (data: UserSiswa) => {
 export const deleteSiswa = async (studentId: string) => {
   try {
     const response = await axios.put(
-      `${BASE_URL}/api/Account/student/delete/${studentId}`,
+      `${BASE_URL}/Account/student/delete/${studentId}`,
       {},
       {
         headers: {
@@ -165,7 +165,7 @@ export const deleteSiswa = async (studentId: string) => {
 export const getCourseIds = async () => {
   try {
     const response = await axios.get<IMateriGuru[]>(
-      `${BASE_URL}/api/Courses/getCourseByTeacherId`,
+      `${BASE_URL}/Courses/getCourseByTeacherId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -176,28 +176,15 @@ export const getCourseIds = async () => {
   } catch (error: any) {
     throw new Error(error.response.data);
   }
-  // return (
-  // 	await axios.get<IMateriGuru[]>(
-  // 		`${BASE_URL}/api/Courses/getCourseByTeacherId`,
-  // 		{
-  // 			headers: {
-  // 				Authorization: `Bearer ${localStorage.getItem("token")}`,
-  // 			},
-  // 		}
-  // 	)
-  // ).data.map((course) => course);
 };
 
 export const getCourse = async (id: number) => {
   try {
-    const response = await axios.get<IMateriGuru>(
-      `${BASE_URL}/api/Courses/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get<IMateriGuru>(`${BASE_URL}/Courses/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response.data);
@@ -206,7 +193,7 @@ export const getCourse = async (id: number) => {
 
 export const getAssignmentsIds = async () => {
   return (
-    await axios.get<Tugas[]>(`${BASE_URL}/api/Assignments`, {
+    await axios.get<Tugas[]>(`${BASE_URL}/Assignments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -217,7 +204,7 @@ export const getAssignmentsIds = async () => {
 export const getAssigmentByTeacherId = async () => {
   try {
     const response = await axios.get<Tugas[]>(
-      `${BASE_URL}/api/Assignments/getAssignmentByTeacherId`,
+      `${BASE_URL}/Assignments/getAssignmentByTeacherId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -228,33 +215,12 @@ export const getAssigmentByTeacherId = async () => {
   } catch (error: any) {
     throw new Error(error.response.data);
   }
-  // return (
-  // 	await axios.get<Tugas[]>(
-  // 		`${BASE_URL}/api/Assignments/getAssignmentByTeacherId`,
-  // 		{
-  // 			headers: {
-  // 				Authorization: `Bearer ${localStorage.getItem("token")}`,
-  // 			},
-  // 		}
-  // 	)
-  // ).data.map((assignments) => assignments);
 };
 
 export const getAssigmentByClassroomId = async () => {
-  // return (
-  // 	await axios.get<Tugas[]>(
-  // 		`${BASE_URL}/api/Assignments/getAssignmentByClassRoomId`,
-  // 		{
-  // 			headers: {
-  // 				Authorization: `Bearer ${localStorage.getItem("token")}`,
-  // 			},
-  // 		}
-  // 	)
-  // ).data.map((assignments) => assignments);
-
   try {
     const response = await axios.get<Tugas[]>(
-      `${BASE_URL}/api/Assignments/getAssignmentByClassRoomId`,
+      `${BASE_URL}/Assignments/getAssignmentByClassRoomId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -269,14 +235,11 @@ export const getAssigmentByClassroomId = async () => {
 
 export const getAssignments = async (id: string) => {
   try {
-    const response = await axios.get<Tugas>(
-      `${BASE_URL}/api/Assignments/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get<Tugas>(`${BASE_URL}/Assignments/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response.data);
@@ -285,7 +248,7 @@ export const getAssignments = async (id: string) => {
 
 export const createTugas = async (data: Tugas) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/Assignments`, data, {
+    const response = await axios.post(`${BASE_URL}/Assignments`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -300,7 +263,7 @@ export const createTugas = async (data: Tugas) => {
 export const deleteTugas = async (id: string) => {
   try {
     const response = await axios.put(
-      `${BASE_URL}/api/Assignments/deactivate/${id}`,
+      `${BASE_URL}/Assignments/deactivate/${id}`,
       {},
       {
         headers: {
@@ -316,14 +279,11 @@ export const deleteTugas = async (id: string) => {
 
 export const getClassRooms = async () => {
   try {
-    const response = await axios.get<Classrooms[]>(
-      `${BASE_URL}/api/ClassRooms`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await axios.get<Classrooms[]>(`${BASE_URL}/ClassRooms`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response.data);
@@ -333,7 +293,7 @@ export const getClassRooms = async () => {
 export const getAssignmentSubmissionsIds = async () => {
   try {
     const response = await axios.get<Pengumpulan[]>(
-      `${BASE_URL}/api/AssignmentSubmissions`,
+      `${BASE_URL}/AssignmentSubmissions`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -344,19 +304,12 @@ export const getAssignmentSubmissionsIds = async () => {
   } catch (error: any) {
     throw new Error(error.response.data);
   }
-  // return (
-  // 	await axios.get<Pengumpulan[]>(`${BASE_URL}/api/AssignmentSubmissions`, {
-  // 		headers: {
-  // 			Authorization: `Bearer ${localStorage.getItem("token")}`,
-  // 		},
-  // 	})
-  // ).data.map((assignmentSubmissions) => assignmentSubmissions);
 };
 
 export const createAssignmentSubmissions = async (data: Pengumpulan) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/AssignmentSubmissions`,
+      `${BASE_URL}/AssignmentSubmissions`,
       data,
       {
         headers: {
@@ -373,7 +326,7 @@ export const createAssignmentSubmissions = async (data: Pengumpulan) => {
 export const getAssignmentById = async (id: number) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/AssignmentSubmissions/${id}`,
+      `${BASE_URL}/AssignmentSubmissions/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -398,7 +351,7 @@ const getStudentIdFromToken = (): string | null => {
 
 export const getLessonsIds = async () => {
   try {
-    const response = await axios.get<Mapel[]>(`${BASE_URL}/api/Lessons`, {
+    const response = await axios.get<Mapel[]>(`${BASE_URL}/Lessons`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -411,7 +364,7 @@ export const getLessonsIds = async () => {
 
 export const getLessons = async (id: number) => {
   try {
-    const response = await axios.get<Mapel>(`${BASE_URL}/api/Lessons/${id}`, {
+    const response = await axios.get<Mapel>(`${BASE_URL}/Lessons/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -425,7 +378,7 @@ export const getLessons = async (id: number) => {
 export const getSchedulesIds = async () => {
   try {
     const response = await axios.get<Jadwal[]>(
-      `${BASE_URL}/api/Schedules/studentClassRoomId`,
+      `${BASE_URL}/Schedules/studentClassRoomId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -437,7 +390,7 @@ export const getSchedulesIds = async () => {
     throw new Error(error.response.data);
   }
   // return (
-  // 	await axios.get<Jadwal[]>(`${BASE_URL}/api/Schedules/studentClassRoomId`, {
+  // 	await axios.get<Jadwal[]>(`${BASE_URL}/Schedules/studentClassRoomId`, {
   // 		headers: {
   // 			Authorization: `Bearer ${localStorage.getItem("token")}`,
   // 		},
@@ -447,7 +400,7 @@ export const getSchedulesIds = async () => {
 
 export const getSchedulesAdmin = async () => {
   try {
-    const response = await axios.get<Jadwal[]>(`${BASE_URL}/api/Schedules`, {
+    const response = await axios.get<Jadwal[]>(`${BASE_URL}/Schedules`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -461,7 +414,7 @@ export const getSchedulesAdmin = async () => {
 // create jadwal admin
 export const createSchedules = async (data: Jadwal) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/schedules`, data, {
+    const response = await axios.post(`${BASE_URL}/schedules`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -475,7 +428,7 @@ export const createSchedules = async (data: Jadwal) => {
 // hapus jadwal
 export const deleteSchedule = async (id: string) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/api/Schedules/${id}`, {
+    const response = await axios.delete(`${BASE_URL}/Schedules/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -488,7 +441,7 @@ export const deleteSchedule = async (id: string) => {
 
 export const getAttendancesIds = async () => {
   return (
-    await axios.get<Kehadiran[]>(`${BASE_URL}/api/Attendances`, {
+    await axios.get<Kehadiran[]>(`${BASE_URL}/Attendances`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -503,7 +456,7 @@ export const getAttendances = async (id: number) => {
       throw new Error("StudentId not found in token");
     }
     const response = await axios.get<Kehadiran>(
-      `${BASE_URL}/api/Attendances/student/${studentId}`,
+      `${BASE_URL}/Attendances/student/${studentId}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -519,7 +472,7 @@ export const getAttendances = async (id: number) => {
 export const getCourseClassroom = async () => {
   try {
     const response = await axios.get<CourseClassroom[]>(
-      `${BASE_URL}/api/Courses/getCourseByClassRoomId`,
+      `${BASE_URL}/Courses/getCourseByClassRoomId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -535,7 +488,7 @@ export const getCourseClassroom = async () => {
 export const getSiswaIds = async () => {
   try {
     const response = await axios.get<UserSiswa[]>(
-      `${BASE_URL}/api/Account/students`,
+      `${BASE_URL}/Account/students`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -552,7 +505,7 @@ export const getSiswaIds = async () => {
 export const getSiswa = async (id: string) => {
   try {
     const response = await axios.get<UserSiswa>(
-      `${BASE_URL}/api/Account/student/${id}`,
+      `${BASE_URL}/Account/student/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -575,7 +528,7 @@ export const postDataExcelSiswa = async (formData: FormData) => {
     if (fileData instanceof File) {
       // Kirim data file ke server
       const response = await axios.post<UserSiswa[]>(
-        `${BASE_URL}/api/Account/seedexcel`,
+        `${BASE_URL}/Account/seedexcel`,
         formData,
         {
           headers: {
@@ -598,7 +551,7 @@ export const postDataExcelSiswa = async (formData: FormData) => {
 export const editSiswa = async (id: string, data: UserSiswa) => {
   try {
     const response = await axios.put<UserSiswa>(
-      `${BASE_URL}/api/Account/edit/student/${id}`,
+      `${BASE_URL}/Account/edit/student/${id}`,
       data,
       {
         headers: {
@@ -615,7 +568,7 @@ export const editSiswa = async (id: string, data: UserSiswa) => {
 // get absensi siswa
 export const getAbsensi = async () => {
   try {
-    const response = await axios.get<Absensi[]>(`${BASE_URL}/api/Attendances`, {
+    const response = await axios.get<Absensi[]>(`${BASE_URL}/Attendances`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -629,7 +582,7 @@ export const getAbsensi = async () => {
 export const getTeacherinfo = async () => {
   try {
     const response = await axios.get<IMateriGuru[]>(
-      `${BASE_URL}/api/Courses/getCourseByTeacherId`,
+      `${BASE_URL}/Courses/getCourseByTeacherId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -644,7 +597,7 @@ export const getTeacherinfo = async () => {
 
 export const createMateri = async (data: UploadMateri) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/Courses/`, data, {
+    const response = await axios.post(`${BASE_URL}/Courses/`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -659,7 +612,7 @@ export const createMateri = async (data: UploadMateri) => {
 export const getClassRoomsByTeacherId = async () => {
   try {
     const response = await axios.get<Ikelas>(
-      `${BASE_URL}/api/ClassRooms/classRoomTeacherId`,
+      `${BASE_URL}/ClassRooms/classRoomTeacherId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -678,7 +631,7 @@ export const getClassRoomsByTeacherId = async () => {
 export const getGuru = async () => {
   try {
     const response = await axios.get<UserGuru[]>(
-      `${BASE_URL}/api/Account/teachers`,
+      `${BASE_URL}/Account/teachers`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -695,7 +648,7 @@ export const getGuru = async () => {
 export const getLessonByTeacherId = async () => {
   try {
     const response = await axios.get<MapelTeacher[]>(
-      `${BASE_URL}/api/Lessons/lessonTeacherId`,
+      `${BASE_URL}/Lessons/lessonTeacherId`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -712,7 +665,7 @@ export const getLessonByTeacherId = async () => {
 export const getCourseById = async (id: string) => {
   try {
     const response = await axios.get<DetailMateri>(
-      `${BASE_URL}/api/Courses/${id}`,
+      `${BASE_URL}/Courses/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -729,7 +682,7 @@ export const getCourseById = async (id: string) => {
 export const getGuruById = async (id: string) => {
   try {
     const response = await axios.get<UserGuru>(
-      `${BASE_URL}/api/Account/teacher/${id}`,
+      `${BASE_URL}/Account/teacher/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -746,7 +699,7 @@ export const getGuruById = async (id: string) => {
 export const createGuru = async (data: UserGuru) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/Account/register/teacher`,
+      `${BASE_URL}/Account/register/teacher`,
       data,
       {
         headers: {
@@ -766,7 +719,7 @@ export const createGuru = async (data: UserGuru) => {
 export const createPengumpulan = async (data: Pengumpulan) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/AssignmentSubmissions`,
+      `${BASE_URL}/AssignmentSubmissions`,
       data,
       {
         headers: {
@@ -784,7 +737,7 @@ export const createPengumpulan = async (data: Pengumpulan) => {
 export const getAssignmentSubmissions = async (id: string) => {
   try {
     const response = await axios.get<Pengumpulan>(
-      `${BASE_URL}/api/AssignmentSubmissions/getSubmissionForStudentByAssignmentId/${id}`,
+      `${BASE_URL}/AssignmentSubmissions/getSubmissionForStudentByAssignmentId/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -800,7 +753,7 @@ export const getAssignmentSubmissions = async (id: string) => {
 // create absensi
 export const createAbsensi = async (data: CreateAbsensi) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/Attendances`, data, {
+    const response = await axios.post(`${BASE_URL}/Attendances`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -819,7 +772,7 @@ export const getListAssignment = async (
 ) => {
   try {
     const response = await axios.get<AssignmentSubmissionData>(
-      `${BASE_URL}/api/AssignmentSubmissions/GetListSubmissionForTeacherGrades?LessonId=${lessonId}&AssignmentId=${assignmentId}`,
+      `${BASE_URL}/AssignmentSubmissions/GetListSubmissionForTeacherGrades?LessonId=${lessonId}&AssignmentId=${assignmentId}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -840,7 +793,7 @@ export const getAttendancesCalculate = async (
 ) => {
   try {
     const response = await axios.get<AttendancesCalculate>(
-      `${BASE_URL}/api/Attendances/calculate?uniqueNumberOfClassRoom=${uniqueNumberOfClassRoom}&year=${year}&month=${month}`,
+      `${BASE_URL}/Attendances/calculate?uniqueNumberOfClassRoom=${uniqueNumberOfClassRoom}&year=${year}&month=${month}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -857,7 +810,7 @@ export const getAttendancesCalculate = async (
 export const getCountTeacher = async () => {
   try {
     const response = await axios.get<CountTeacher>(
-      `${BASE_URL}/api/Account/calculateTeacherStudent`,
+      `${BASE_URL}/Account/calculateTeacherStudent`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -873,7 +826,7 @@ export const getCountTeacher = async () => {
 // get Todo list
 export const getToDoLists = async () => {
   try {
-    const response = await axios.get<ToDoList[]>(`${BASE_URL}/api/ToDoLists`, {
+    const response = await axios.get<ToDoList[]>(`${BASE_URL}/ToDoLists`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -887,7 +840,7 @@ export const getToDoLists = async () => {
 // create Todo List
 export const createTodo = async (data: ToDoList) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/ToDoLists`, data, {
+    const response = await axios.post(`${BASE_URL}/ToDoLists`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -902,7 +855,7 @@ export const createTodo = async (data: ToDoList) => {
 export const editTodo = async (id: string, data: ToDoList) => {
   try {
     const response = await axios.put<ToDoList>(
-      `${BASE_URL}/api/ToDoLists/${id}`,
+      `${BASE_URL}/ToDoLists/${id}`,
       data,
       {
         headers: {
@@ -919,7 +872,7 @@ export const editTodo = async (id: string, data: ToDoList) => {
 export const editTodoCheck = async (id: string, data: ToDoList) => {
   try {
     const response = await axios.put<ToDoList>(
-      `${BASE_URL}/api/ToDoLists/ceklis/${id}`,
+      `${BASE_URL}/ToDoLists/ceklis/${id}`,
       data,
       {
         headers: {
@@ -936,7 +889,7 @@ export const editTodoCheck = async (id: string, data: ToDoList) => {
 // delete Todo List
 export const deleteTodo = async (id: string) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/api/ToDoLists/${id}`, {
+    const response = await axios.delete(`${BASE_URL}/ToDoLists/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
