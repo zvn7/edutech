@@ -111,7 +111,7 @@ const router = createBrowserRouter([
 	{
 		path: "/mapel",
 		element: (
-			<ProtectedRoute requiredRole="3">
+			<ProtectedRoute requiredRole="1">
 				<Mapel />
 			</ProtectedRoute>
 		),
@@ -167,7 +167,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-guru",
 		element: (
-			<ProtectedRoute requiredRole="2">
+			<ProtectedRoute requiredRole="1">
 				<Guru />
 			</ProtectedRoute>
 		),
@@ -175,7 +175,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-guru/tambah-guru",
 		element: (
-			<ProtectedRoute requiredRole="2">
+			<ProtectedRoute requiredRole="1">
 				<TambahGuru />
 			</ProtectedRoute>
 		),
@@ -183,7 +183,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-guru/edit-guru/:id",
 		element: (
-			<ProtectedRoute requiredRole="2">
+			<ProtectedRoute requiredRole="1">
 				<EditGuru />
 			</ProtectedRoute>
 		),
@@ -191,7 +191,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-siswa",
 		element: (
-			<ProtectedRoute requiredRole="3">
+			<ProtectedRoute requiredRole="1">
 				<Siswa />
 			</ProtectedRoute>
 		),
@@ -199,7 +199,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-siswa/tambah-siswa",
 		element: (
-			<ProtectedRoute requiredRole="3">
+			<ProtectedRoute requiredRole="1">
 				<TambahSiswa />
 			</ProtectedRoute>
 		),
@@ -207,7 +207,7 @@ const router = createBrowserRouter([
 	{
 		path: "/pengguna-siswa/edit-siswa/:id",
 		element: (
-			<ProtectedRoute requiredRole="3">
+			<ProtectedRoute requiredRole="1">
 				<EditSiswa />
 			</ProtectedRoute>
 		),

@@ -250,11 +250,19 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 									selectedCard?.assignmentSubmissionStatus ===
 									"Sudah mengerjakan"
 										? "opacity-50 cursor-not-allowed"
+										: selectedCard?.assignmentSubmissionStatus ===
+										  "Sudah dinilai"
+										? "opacity-50 cursor-not-allowed"
 										: ""
 								}`}
 								disabled={
 									selectedCard?.assignmentSubmissionStatus ===
 									"Sudah mengerjakan"
+										? true
+										: selectedCard?.assignmentSubmissionStatus ===
+										  "Sudah dinilai"
+										? true
+										: false
 								}
 							>
 								Kirim
