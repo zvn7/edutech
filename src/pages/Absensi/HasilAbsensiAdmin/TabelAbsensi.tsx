@@ -127,7 +127,9 @@ const TabelAbsensi = () => {
     setIsDownloading(true);
 
     fetch(
-      `http://192.168.110.239:13311/api/Attendances/download-attendance?uniqueNumberOfClassRoom=${selectedClass}&year=${selectedYear}&month=${selectedMonth}`,
+      `${
+        import.meta.env.VITE_API_URL
+      }/Attendances/download-attendance?uniqueNumberOfClassRoom=${selectedClass}&year=${selectedYear}&month=${selectedMonth}`,
       {
         method: "GET",
         headers: {
