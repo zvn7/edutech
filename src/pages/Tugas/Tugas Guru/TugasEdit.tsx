@@ -16,18 +16,20 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 	const queryMapel = useTeacherinfo();
 	const { data: dataMapel, refetch: refetchTugas } = queryMapel;
 	const queryClient = useQueryClient();
-	
+
 	const [formUpdate, setFormUpdate] = useState({
 		id: "",
 		assignmentName: "",
 		assignmentDate: "",
 		assignmentDeadline: "",
 		assignmentDescription: "",
-		assignmentFileData: null,
+		assignmentFilePath: "",
 		assignmentLink: "",
 		courseId: "",
 		courseName: "",
 		typeOfSubmission: 0,
+		assignmentFileName: "",
+		assignmentFileData: "",
 	});
 
 	const [selectedLesson, setSelectedLesson] = useState("");
@@ -55,25 +57,52 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 					}
 				);
 				const tugas = response.data;
-				const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
+				// const assignmentDeadlineDate = tugas.assignmentDeadline.split("T")[0];
 				setFormUpdate({
 					id: tugas.id,
 					assignmentName: tugas.assignmentName,
 					assignmentDate: tugas.assignmentDate,
-					assignmentDeadline: assignmentDeadlineDate,
+					assignmentDeadline: tugas.assignmentDeadline,
 					assignmentDescription: tugas.assignmentDescription,
-					assignmentFileData: tugas.assignmentFileData,
+					assignmentFilePath: tugas.assignmentFilePath,
 					assignmentLink: tugas.assignmentLink,
 					courseId: tugas.courseId,
 					courseName: tugas.courseName,
 					typeOfSubmission: tugas.typeOfSubmission,
+					assignmentFileName: tugas.assignmentFileName,
+					assignmentFileData: tugas.assignmentFileData,
 				});
+
+				if (tugas.assignmentFileData) {
+					setSelectedOption("file");
+				} else if (tugas.assignmentLink) {
+					setSelectedOption("link");
+				}
 			} catch (error) {
 				console.log(error);
 			}
 		};
 		fetchTugas();
 	}, [id]);
+
+	const formatDate = (dateString: any) => {
+		const date = new Date(dateString);
+		const isoString = date.toISOString();
+		return isoString.slice(0, 19) + "Z";
+	};
+
+	const handleInputEditChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>
+	) => {
+		const { name, value } = e.target;
+
+		setFormUpdate((prevState) => ({
+			...prevState,
+			[name]: value,
+		}));
+	};
 
 	const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -86,7 +115,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 			!formUpdate.assignmentDeadline ||
 			!formUpdate.assignmentDescription ||
 			!formUpdate.typeOfSubmission ||
-			(selectedOption === "file" && !formUpdate.assignmentFileData) ||
+			(selectedOption === "file" && !formUpdate.assignmentFilePath) ||
 			(selectedOption === "link" && !formUpdate.assignmentLink)
 		) {
 			setLoading(false);
@@ -94,7 +123,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 		}
 
 		// Tambahan validasi untuk opsi 'file' atau 'link'
-		if (selectedOption === "file" && !formUpdate.assignmentFileData) {
+		if (selectedOption === "file" && !formUpdate.assignmentFilePath) {
 			console.log("File harus diunggah jika opsi file dipilih!");
 			setLoading(false);
 			return;
@@ -110,13 +139,16 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 			formData.append("assignmentName", formUpdate.assignmentName);
 			formData.append("courseId", formUpdate.courseId);
 			formData.append("assignmentDate", formUpdate.assignmentDate);
-			formData.append("assignmentDeadline", formUpdate.assignmentDeadline);
+			formData.append(
+				"assignmentDeadline",
+				formatDate(formUpdate.assignmentDeadline)
+			); // Ubah format tanggal disini
 			formData.append(
 				"assignmentDescription",
 				formUpdate.assignmentDescription
 			);
-			if (selectedOption === "file" && formUpdate.assignmentFileData) {
-				formData.append("assignmentFileData", formUpdate.assignmentFileData);
+			if (selectedOption === "file" && formUpdate.assignmentFilePath) {
+				formData.append("assignmentFilePath", formUpdate.assignmentFilePath);
 			} else {
 				formData.append("assignmentLink", formUpdate.assignmentLink);
 			}
@@ -144,328 +176,317 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					setFormUpdate({
+						id: "",
 						assignmentName: "",
 						assignmentDate: "",
 						assignmentDeadline: "",
 						assignmentDescription: "",
-						assignmentFileData: "",
+						assignmentFilePath: "",
 						assignmentLink: "",
 						courseId: "",
 						courseName: "",
 						typeOfSubmission: 0,
+						assignmentFileName: "",
 					});
 					setShowEditForm(false); // Tutup formulir setelah berhasil
 					refetchTugas();
 					queryClient.invalidateQueries("mapel");
 				}
 			});
-		} catch (error) {
-			console.log(error);
-			if (error.response && error.response.data) {
-				console.log(error.response.data.errors);
-			}
+		} catch (error: any) {
+			Swal.fire({
+				icon: "error",
+				title: "Gagal",
+				text: error.toString(),
+				confirmButtonText: "Ok",
+			});
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	// Handler untuk mengubah file
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = event.target.files;
-		if (files && files.length > 0) {
-			setFormUpdate({
-				...formUpdate,
-				assignmentFileData: files[0],
-			});
-		}
+	const filteredCourseData = dataMapel?.filter(
+		(lesson) => lesson.lessonName === selectedLesson
+	);
+
+	const handleBatal = () => {
+		Swal.fire({
+			icon: "warning",
+			title: "Peringatan",
+			text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+			showCancelButton: true,
+			confirmButtonColor: "#d33",
+			cancelButtonColor: "#3085d6",
+			confirmButtonText: "Ya, lanjutkan",
+			cancelButtonText: "Tidak",
+		}).then((result) => {
+			if (result.isConfirmed) {
+				setShowEditForm(false);
+			}
+		});
 	};
+	return (
+		<>
+			<div>
+				<label
+					htmlFor="countries"
+					className="block mb-2 text-sm font-medium text-blue-600 capitalize dark:text-white"
+				>
+					Tugas
+				</label>
+				<select
+					id="countries"
+					value={selectedLesson}
+					onChange={handleLessonChange}
+					className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+				>
+					<option selected>Pilih Mapel</option>
 
-	const handleInputEditChange = (
-		e: React.ChangeEvent<
-			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		>
-	) => {
-		const { name, value } = e.target;
+					{Mapel?.map((mapel) => (
+						<option key={mapel.lessonId} value={mapel.lessonName}>
+							{mapel.lessonName}
+						</option>
+					))}
+				</select>
+			</div>
+			<form className="max-w-full mt-4" onSubmit={handleSubmitEdit}>
+				<div className="mb-5">
+					<label
+						htmlFor="materi"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Materi
+					</label>
+					<select
+						name="courseId"
+						onChange={handleInputEditChange}
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+							e.target.setCustomValidity("Materi harus dipilih")
+						}
+						onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+							e.target.setCustomValidity("")
+						}
+					>
+						<option value={formUpdate.courseId}>{formUpdate.courseName}</option>
+						{filteredCourseData?.map((mapel) => (
+							<option key={mapel.courseId} value={mapel.courseId}>
+								{mapel.courseName}
+							</option>
+						))}
+					</select>
+				</div>
+				<div className="mb-5">
+					<label
+						htmlFor="nama_tugas"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Nama Tugas
+					</label>
+					<input
+						type="text"
+						name="assignmentName"
+						value={formUpdate.assignmentName}
+						onChange={handleInputEditChange}
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						placeholder="Masukkan Nama Tugas"
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("Nama tugas tidak boleh kosong")
+						}
+						onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("")
+						}
+					/>
+				</div>
+				<div className="mb-5">
+					<label
+						htmlFor="nama_tugas"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Deskripsi Tugas
+					</label>
+					<textarea
+						name="assignmentDescription"
+						rows={4}
+						value={formUpdate.assignmentDescription}
+						onChange={handleInputEditChange}
+						className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						placeholder="Masukkan Deskripsi Tugas"
+						defaultValue={""}
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+							e.target.setCustomValidity("Deskripsi tidak boleh kosong")
+						}
+						onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+							e.target.setCustomValidity("")
+						}
+					/>
+				</div>
+				<div className="mb-5">
+					<label
+						htmlFor="nama_tugas"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Tanggal Tugas
+					</label>
+					<input
+						type="date"
+						name="assignmentDate"
+						value={formUpdate.assignmentDate}
+						onChange={handleInputEditChange}
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						placeholder="Masukkan Nama Tugas"
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("Tanggal tugas tidak boleh kosong")
+						}
+						onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("")
+						}
+					/>
+				</div>
+				<div className="mb-5">
+					<label
+						htmlFor="nama_tugas"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Deadline Tugas
+					</label>
+					<input
+						type="datetime-local"
+						name="assignmentDeadline"
+						value={
+							formUpdate.assignmentDeadline
+								? formUpdate.assignmentDeadline.replace("Z", "")
+								: ""
+						}
+						onChange={handleInputEditChange}
+						step="1"
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						placeholder="Masukkan Nama Tugas"
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("Deadline tidak boleh kosong")
+						}
+						onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+							e.target.setCustomValidity("")
+						}
+					/>
+				</div>
+				<div className="mb-5">
+					<label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
+						Tipe Pengumpulan
+					</label>
+					<select
+						value={formUpdate.typeOfSubmission}
+						onChange={handleInputEditChange}
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						required
+						onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+							e.target.setCustomValidity("Tipe Pengumpulan harus dipilih")
+						}
+						onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+							e.target.setCustomValidity("")
+						}
+					>
+						<option value="">Pilih Tipe Pengumpulan</option>
+						<option value="1">File</option>
+						<option value="2">Link</option>
+					</select>
+				</div>
+				<div className="mb-5">
+					<label
+						htmlFor="nama_tugas"
+						className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
+					>
+						Detail Tugas
+					</label>
+					<div className="flex gap-5">
+						<div
+							className="flex items-center gap-2"
+							onClick={() => handleOptionChange("file")}
+						>
+							<input
+								type="radio"
+								id="file"
+								name="submissionOption"
+								value="file"
+								checked={selectedOption === "file"}
+							/>
+							<label htmlFor="file">File</label>
+						</div>
+						<div
+							className="flex items-center gap-2"
+							onClick={() => handleOptionChange("link")}
+						>
+							<input
+								type="radio"
+								id="link"
+								name="submissionOption"
+								value="link"
+								checked={selectedOption === "link"}
+							/>
+							<label htmlFor="link">Link</label>
+						</div>
+					</div>
+					{selectedOption === "file" && (
+						<div id="fileUpload" className="mt-4">
+							{/* <input
+								type="file"
+								className="w-full bg-slate-100 border rounded-lg mb-4"
+								name="assignmentFile"
+								onChange={handleFileChange}
+								// value={formUpdate.assignmentFilePath}
+							/> */}
+							{formUpdate.assignmentFileName && (
+								<>
+									<div className="w-full bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-2 rounded ">
+										File sebelumnya: {formUpdate.assignmentFileName}
+									</div>
+									<span className="text-red-500 capitalize text-xs">
+										* file tidak dapat dirubah
+									</span>
+								</>
+							)}
+						</div>
+					)}
+					{selectedOption === "link" && (
+						<div id="linkInput" className="mt-4">
+							<TextInput
+								type="text"
+								name="assignmentLink"
+								value={formUpdate.assignmentLink}
+								onChange={handleInputEditChange}
+								placeholder="Masukkan url atau link yang valid disini"
+								required
+							/>
+						</div>
+					)}
+				</div>
 
-		if (name === "assignmentDeadline") {
-			const formattedDateTime = new Date(value).toISOString();
-			setFormUpdate((prevState) => ({
-				...prevState,
-				[name]: formattedDateTime,
-			}));
-		} else {
-			setFormUpdate((prevState) => ({
-				...prevState,
-				[name]: value,
-			}));
-		}
-	};
-
-  const filteredCourseData = dataMapel?.filter(
-    (lesson) => lesson.lessonName === selectedLesson
-  );
-
-  const handleBatal = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Peringatan",
-      text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, lanjutkan",
-      cancelButtonText: "Tidak",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setShowEditForm(false);
-      }
-    });
-  };
-  return (
-    <>
-      <div>
-        <label
-          htmlFor="countries"
-          className="block mb-2 text-sm font-medium text-blue-600 capitalize dark:text-white"
-        >
-          Tugas
-        </label>
-        <select
-          id="countries"
-          value={selectedLesson}
-          onChange={handleLessonChange}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        >
-          <option selected>Pilih Mapel</option>
-
-          {Mapel?.map((mapel) => (
-            <option key={mapel.lessonId} value={mapel.lessonName}>
-              {mapel.lessonName}
-            </option>
-          ))}
-        </select>
-      </div>
-      <form className="max-w-full mt-4" onSubmit={handleSubmitEdit}>
-        <div className="mb-5">
-          <label
-            htmlFor="materi"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Materi
-          </label>
-          <select
-            name="courseId"
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              e.target.setCustomValidity("Materi harus dipilih")
-            }
-            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              e.target.setCustomValidity("")
-            }
-          >
-            <option value={formUpdate.courseId}>{formUpdate.courseName}</option>
-            {filteredCourseData?.map((mapel) => (
-              <option key={mapel.courseId} value={mapel.courseId}>
-                {mapel.courseName}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="nama_tugas"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Nama Tugas
-          </label>
-          <input
-            type="text"
-            name="assignmentName"
-            value={formUpdate.assignmentName}
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Masukkan Nama Tugas"
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("Nama tugas tidak boleh kosong")
-            }
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("")
-            }
-          />
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="nama_tugas"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Deskripsi Tugas
-          </label>
-          <textarea
-            name="assignmentDescription"
-            rows={4}
-            value={formUpdate.assignmentDescription}
-            onChange={handleInputEditChange}
-            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Masukkan Deskripsi Tugas"
-            defaultValue={""}
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              e.target.setCustomValidity("Deskripsi tidak boleh kosong")
-            }
-            onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              e.target.setCustomValidity("")
-            }
-          />
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="nama_tugas"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Tanggal Tugas
-          </label>
-          <input
-            type="date"
-            name="assignmentDate"
-            value={formUpdate.assignmentDate}
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Masukkan Nama Tugas"
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("Tanggal tugas tidak boleh kosong")
-            }
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("")
-            }
-          />
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="nama_tugas"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Deadline Tugas
-          </label>
-          <input
-            type="datetime-local"
-            name="assignmentDeadline"
-            value={
-              formUpdate.assignmentDeadline
-                ? formUpdate.assignmentDeadline.replace("Z", "")
-                : ""
-            }
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Masukkan Nama Tugas"
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("Deadline tidak boleh kosong")
-            }
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("")
-            }
-          />
-        </div>
-        <div className="mb-5">
-          <label className="block mb-2 text-sm font-medium text-blue-600 dark:text-white">
-            Tipe Pengumpulan
-          </label>
-          <select
-            value={formUpdate.typeOfSubmission}
-            onChange={handleInputEditChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              e.target.setCustomValidity("Tipe Pengumpulan harus dipilih")
-            }
-            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              e.target.setCustomValidity("")
-            }
-          >
-            <option value="">Pilih Tipe Pengumpulan</option>
-            <option value="1">File</option>
-            <option value="2">Link</option>
-          </select>
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="nama_tugas"
-            className="block mb-2 text-sm font-medium text-blue-600 dark:text-white"
-          >
-            Detail Tugas
-          </label>
-          <div className="flex gap-5">
-            <div
-              className="flex items-center gap-2"
-              onClick={() => handleOptionChange("file")}
-            >
-              <input
-                type="radio"
-                id="file"
-                name="submissionOption"
-                value="file"
-                checked={selectedOption === "file"}
-              />
-              <label htmlFor="file">File</label>
-            </div>
-            <div
-              className="flex items-center gap-2"
-              onClick={() => handleOptionChange("link")}
-            >
-              <input
-                type="radio"
-                id="link"
-                name="submissionOption"
-                value="link"
-                checked={selectedOption === "link"}
-              />
-              <label htmlFor="link">Link</label>
-            </div>
-          </div>
-          {selectedOption === "file" && (
-            <div id="fileUpload" className="mt-4">
-              <FileInput name="assignmentFile" onChange={handleFileChange} />
-            </div>
-          )}
-          {selectedOption === "link" && (
-            <div id="linkInput" className="mt-4">
-              <TextInput
-                type="text"
-                name="assignmentLink"
-                value={formUpdate.assignmentLink}
-                onChange={handleInputEditChange}
-                placeholder="Masukkan url atau link yang valid disini"
-                required
-              />
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div className="flex items-center gap-3 mt-6">
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-4 flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
-            >
-              {loading ? "Loading..." : "Kirim"}
-            </button>
-            <button
-              onClick={handleBatal}
-              type="submit"
-              className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
-            >
-              batal
-            </button>
-          </div>
-        </div>
-      </form>
-    </>
-  );
+				<div>
+					<div className="flex items-center gap-3 mt-6">
+						<button
+							type="submit"
+							disabled={loading}
+							className="flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+						>
+							{loading ? "Loading..." : "Kirim"}
+						</button>
+						<button
+							onClick={handleBatal}
+							type="submit"
+							className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
+						>
+							batal
+						</button>
+					</div>
+				</div>
+			</form>
+		</>
+	);
 };
 
 export default TugasEdit;

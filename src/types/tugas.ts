@@ -6,13 +6,14 @@ export interface Tugas {
 	assignmentDate: string;
 	assignmentDeadline: string;
 	assignmentDescription: string;
-	assignmentFileData: string;
+	assignmentFilePath: string;
 	assignmentLink: string;
-	lessonId:string,
+	lessonId: string;
 	lessonName: string;
 	assignmentStatus: string;
 	assignmentSubmissionStatus: string;
 	courseId: string;
 	courseName: string;
+	assignmentFileData: string;
 	typeOfSubmission: number;
 }

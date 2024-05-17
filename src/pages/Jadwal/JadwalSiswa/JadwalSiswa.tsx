@@ -86,7 +86,7 @@ const JadwalSiswa = () => {
 									</span>
 								</div>
 								<p
-									className="m-1 text-md font-medium text-gray-700 capitalize"
+									className="m-1 text-md font-medium text-gray-700 capitalize hover:cursor-pointer"
 									title={schedule.nameTeacher}
 								>
 									{schedule.nameTeacher.length > 15
