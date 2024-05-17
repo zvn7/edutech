@@ -91,6 +91,7 @@ const MateriGuru = () => {
 				if (result.isConfirmed) {
 					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
+					setShowEditForm(true)
 					setFormUpdate({
 						id: data.id,
 						courseName: data.courseName || "",
@@ -116,6 +117,7 @@ const MateriGuru = () => {
 					if (result.isConfirmed) {
 						// Tampilkan form edit
 						setShowEditForm(true);
+						setShowAddForm(false)
 						setFormUpdate({
 							id: data.id,
 							courseName: data.courseName || "",
@@ -136,6 +138,7 @@ const MateriGuru = () => {
 					lessonName: data.lessonName || "",
 				});
 				setShowEditForm(true);
+				setShowAddForm(false)
 			}
 		}
 	};

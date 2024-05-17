@@ -541,7 +541,7 @@ const TugasGuru = () => {
 					{/* right side */}
 					{showAddForm && (
 						<div
-							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							className="overflow-y-auto"
 							style={{ scrollbarWidth: "none" }}
 						>
 							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
@@ -579,7 +579,7 @@ const TugasGuru = () => {
 					)}
 					{showEditForm && (
 						<div
-							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
+							className="overflow-y-auto"
 							style={{ scrollbarWidth: "none" }}
 						>
 							<div>

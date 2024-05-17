@@ -137,7 +137,7 @@ const MateriAddTablet = ({
 						{...register(`CourseName`, { required: true })}
 						onChange={handleInputChange}
 						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-						placeholder="Masukkan nama lengkap"
+						placeholder="Masukkan nama materi"
 						required
 						onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
 							e.target.setCustomValidity("Nama materi tidak boleh kosong")
@@ -186,7 +186,7 @@ const MateriAddTablet = ({
 						id="Description"
 						{...register(`Description`, { required: true })}
 						onChange={handleInputChange}
-						placeholder="Masukkan deskripsi tugas disini..."
+						placeholder="Masukkan deskripsi materi disini..."
 						required
 						onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
 							e.target.setCustomValidity("Deskripsi tidak boleh kosong")
@@ -244,6 +244,9 @@ const MateriAddTablet = ({
 									handleFileChange(e);
 								}}
 							/>
+							<span className="text-gray-500 capitalize text-xs">
+								* pastikan file yang di upload sudah benar
+							</span>
 						</div>
 					)}
 					{selectedOption === "link" && (
