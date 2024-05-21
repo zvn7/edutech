@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useClassrooms, useGetMapelId } from "../../services/queries";
 import { Button, Modal, ModalBody } from "flowbite-react";
 import { useCreateMapel, useDeleteMapel } from "../../services/mutation";
@@ -111,31 +111,68 @@ const TabelMapel = () => {
   };
 
   const handleCreateMapelSubmit: SubmitHandler<IMapel> = (data) => {
-    createMapelMutation.mutate(data, {
-      onSuccess: () => {
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil",
-          text: "Mata Pelajaran Berhasil ditambahkan!",
-          confirmButtonText: "Ok",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setSelectedJurusan([]);
-            setIsModalOpen(false);
-            reset();
-          }
-        });
-      },
+    try {
+      createMapelMutation.mutate(data, {
+        onSuccess: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: "Mata Pelajaran Berhasil ditambahkan!",
+            confirmButtonText: "Ok",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              setSelectedJurusan([]);
+              setIsModalOpen(false);
+              reset();
+            }
+          });
+        },
 
-      onError: (error: any) => {
+        onError: (error: any) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            const errorMessage = Object.values(error.response.data.errors)
+              .flat()
+              .join(", ");
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: errorMessage,
+              confirmButtonText: "Ok",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: error.toString(),
+              confirmButtonText: "Ok",
+            });
+          }
+        },
+      });
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: errorMessage,
+          confirmButtonText: "Ok",
+        });
+      } else {
         Swal.fire({
           icon: "error",
           title: "Gagal",
           text: error.toString(),
           confirmButtonText: "Ok",
         });
-      },
-    });
+      }
+    }
   };
 
   const deleteMapel = useDeleteMapel();
@@ -359,68 +396,74 @@ const TabelMapel = () => {
                     </td>
                   </tr>
                 ))
-              ) : !isMapelLoading &&
-                filteredData &&
+              ) : !isMapelLoading && filteredData && filteredData.length > 0 ? (
                 filteredData.filter(searchFilter).length > 0 ? (
-                filteredData
-                  .filter(searchFilter)
-                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                  .map((mapel, index) => (
-                    <tr
-                      key={index}
-                      className="bg-white border-b hover:bg-gray-50"
-                    >
-                      <td
-                        scope="row"
-                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap"
+                  filteredData
+                    .filter(searchFilter)
+                    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                    .map((mapel, index) => (
+                      <tr
+                        key={index}
+                        className="bg-white border-b hover:bg-gray-50"
                       >
-                        {index + 1}
-                      </td>
-                      <td
-                        scope="row"
-                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
-                      >
-                        {mapel.lessonName}
-                      </td>
-                      <td
-                        scope="row"
-                        className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
-                      >
-                        {mapel.className}
-                      </td>
-                      <td
-                        scope="row"
-                        className={`px-6 py-4 font-normal whitespace-nowrap capitalize ${
-                          mapel.nameTeacher === "Belum Ada Guru"
-                            ? "text-gray-500"
-                            : "text-gray-900"
-                        }`}
-                      >
-                        {mapel.nameTeacher}
-                      </td>
+                        <td
+                          scope="row"
+                          className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap"
+                        >
+                          {index + 1}
+                        </td>
+                        <td
+                          scope="row"
+                          className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
+                        >
+                          {mapel.lessonName}
+                        </td>
+                        <td
+                          scope="row"
+                          className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize"
+                        >
+                          {mapel.className}
+                        </td>
+                        <td
+                          scope="row"
+                          className={`px-6 py-4 font-normal whitespace-nowrap capitalize ${
+                            mapel.nameTeacher === "Belum Ada Guru"
+                              ? "text-gray-500"
+                              : "text-gray-900"
+                          }`}
+                        >
+                          {mapel.nameTeacher}
+                        </td>
 
-                      <td>
-                        <Button.Group>
-                          <Button
-                            color="warning"
-                            onClick={() => handleEdit(mapel)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            color="failure"
-                            onClick={() => handleDelete(mapel.id)}
-                          >
-                            Hapus
-                          </Button>
-                        </Button.Group>
-                      </td>
-                    </tr>
-                  ))
+                        <td>
+                          <Button.Group>
+                            <Button
+                              color="warning"
+                              onClick={() => handleEdit(mapel)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              color="failure"
+                              onClick={() => handleDelete(mapel.id)}
+                            >
+                              Hapus
+                            </Button>
+                          </Button.Group>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center p-10">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </td>
+                  </tr>
+                )
               ) : (
                 <tr>
-                  <td colSpan={5} className="text-center p-10">
-                    Tidak ada hasil pencarian yang sesuai.
+                  <td colSpan={6} className="py-4 text-center capitalize">
+                    Data belum tersedia.
                   </td>
                 </tr>
               )}
