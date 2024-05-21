@@ -214,10 +214,10 @@ const MateriEditTablet = ({
             value={formUpdate.courseName}
             onChange={handleInputEditChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-            placeholder="Masukkan nama lengkap"
+            placeholder="Masukkan nama materi"
             required
             onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-              e.target.setCustomValidity("Nama Lengkap tidak boleh kosong")
+              e.target.setCustomValidity("Nama materi tidak boleh kosong")
             }
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
               e.target.setCustomValidity("")
@@ -261,6 +261,7 @@ const MateriEditTablet = ({
             value={formUpdate.description}
             onChange={handleInputEditChange}
             className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+            placeholder="masukkan deskripsi materi"
             required
             onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               e.target.setCustomValidity("Deskripsi tidak boleh kosong")
@@ -313,6 +314,7 @@ const MateriEditTablet = ({
           </div>
           {selectedOption === "file" && (
             <div id="fileUpload" className="mt-4">
+
               {formUpdate.fileName && (
                 <>
                   <div className="w-full bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-2 rounded ">
