@@ -145,8 +145,13 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
           text: "Siswa Berhasil dinonaktifkan!",
           confirmButtonText: "Ok",
         });
-      } catch (error) {
-        console.log("gagal");
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
       }
     }
   };
@@ -279,64 +284,70 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
                     </td>
                   </tr>
                 ))
-              ) : !isSiswaLoading &&
-                filteredData &&
+              ) : !isSiswaLoading && filteredData && filteredData.length > 0 ? (
                 filteredData.filter(searchFilter).length > 0 ? (
-                filteredData
-                  .filter(searchFilter)
-                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                  .map((siswa, index) => (
-                    <tr
-                      key={siswa.id}
-                      className="bg-white border-b hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {index + 1}
-                      </td>
+                  filteredData
+                    .filter(searchFilter)
+                    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                    .map((siswa, index) => (
+                      <tr
+                        key={siswa.id}
+                        className="bg-white border-b hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                          {index + 1}
+                        </td>
 
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {siswa.nameStudent}
-                      </td>
+                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                          {siswa.nameStudent}
+                        </td>
 
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {siswa.nis}
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {siswa.className}
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {siswa.birthPlace},{" "}
-                        {formatBirthDate(
-                          siswa.birthDate || "No birth date available"
-                        )}
-                      </td>
-                      <td>
-                        <Button.Group>
-                          <Button
-                            color="info"
-                            onClick={() => handleDetailClick(siswa.id)}
-                          >
-                            Detail
-                          </Button>
-                          <Link to={`/pengguna-siswa/edit-siswa/${siswa.id}`}>
-                            <Button color="warning" className="rounded-none">
-                              Edit
+                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                          {siswa.nis}
+                        </td>
+                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                          {siswa.className}
+                        </td>
+                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                          {siswa.birthPlace},{" "}
+                          {formatBirthDate(
+                            siswa.birthDate || "No birth date available"
+                          )}
+                        </td>
+                        <td>
+                          <Button.Group>
+                            <Button
+                              color="info"
+                              onClick={() => handleDetailClick(siswa.id)}
+                            >
+                              Detail
                             </Button>
-                          </Link>
-                          <Button
-                            color="failure"
-                            onClick={() => handleDelete(siswa.id)}
-                          >
-                            Hapus
-                          </Button>
-                        </Button.Group>
-                      </td>
-                    </tr>
-                  ))
+                            <Link to={`/pengguna-siswa/edit-siswa/${siswa.id}`}>
+                              <Button color="warning" className="rounded-none">
+                                Edit
+                              </Button>
+                            </Link>
+                            <Button
+                              color="failure"
+                              onClick={() => handleDelete(siswa.id)}
+                            >
+                              Hapus
+                            </Button>
+                          </Button.Group>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center p-10">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </td>
+                  </tr>
+                )
               ) : (
                 <tr>
-                  <td colSpan={5} className="text-center p-10">
-                    Tidak ada hasil pencarian yang sesuai.
+                  <td colSpan={6} className="py-4 text-center capitalize">
+                    Data belum tersedia.
                   </td>
                 </tr>
               )}

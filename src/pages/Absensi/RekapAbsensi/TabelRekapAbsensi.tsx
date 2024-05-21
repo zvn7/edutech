@@ -46,11 +46,27 @@ const TabelRekapAbsensi = () => {
     return new Date().toISOString().split("T")[0];
   };
 
+  const isWeekend = (dateString: any) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDay();
+    return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+  };
+
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
     const index = parseInt(name.split(".")[1]); // Mendapatkan indeks dari nama input
+
+    if (isWeekend(selectedDate)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Tanggal tidak valid",
+        text: "Tanggal yang dipilih jatuh pada hari Sabtu atau Minggu, silakan pilih tanggal lain.",
+        confirmButtonText: "Ok",
+      });
+      return; // Exit the function if it's a weekend
+    }
+
     if (filteredData) {
-      // Periksa apakah filteredData tidak bernilai undefined
       const newData = [...filteredData]; // Membuat salinan data yang sudah ada
       newData[index].status = parseInt(value).toString(); // Menetapkan nilai status yang baru
       setForm({
@@ -63,40 +79,90 @@ const TabelRekapAbsensi = () => {
   const createAbsensiMutation = useCreateAbsensi();
 
   const navigate = useNavigate();
-  const handleCreateAbsensiSubmit: SubmitHandler<CreateAbsensi> = (data) => {
-    const attendanceStudentCreate =
-      data.attendanceStudentCreate?.map((entry) => ({
-        status: +entry.status, // Menggunakan operator + untuk konversi ke number
-        studentId: entry.studentId,
-      })) || [];
+  const handleCreateAbsensiSubmit: SubmitHandler<CreateAbsensi> = async (
+    data
+  ) => {
+    try {
+      const confirmationResult = await Swal.fire({
+        title: "Konfirmasi",
+        text: "Apakah data sudah benar?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, simpan",
+        cancelButtonText: "Batal",
+      });
 
-    const formattedData: any = {
-      date: data.date,
-      attendanceStudentCreate: attendanceStudentCreate,
-    };
+      if (confirmationResult.isConfirmed) {
+        const attendanceStudentCreate =
+          data.attendanceStudentCreate?.map((entry) => ({
+            status: +entry.status, // Menggunakan operator + untuk konversi ke number
+            studentId: entry.studentId,
+          })) || [];
 
-    createAbsensiMutation.mutate(formattedData, {
-      onSuccess: () => {
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil",
-          text: "Absensi Berhasil ditambahkan!",
-          confirmButtonText: "Ok",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/data-absensi");
-          }
+        const formattedData: any = {
+          date: data.date,
+          attendanceStudentCreate: attendanceStudentCreate,
+        };
+
+        createAbsensiMutation.mutate(formattedData, {
+          onSuccess: () => {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil",
+              text: "Absensi Berhasil ditambahkan!",
+              confirmButtonText: "Ok",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/data-absensi");
+              }
+            });
+          },
+          onError: (error: any) => {
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.errors
+            ) {
+              const errorMessage = Object.values(error.response.data.errors)
+                .flat()
+                .join(", ");
+              Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: errorMessage,
+                confirmButtonText: "Ok",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: error.toString(),
+                confirmButtonText: "Ok",
+              });
+            }
+          },
         });
-      },
-      onError: (error) => {
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: errorMessage,
+          confirmButtonText: "Ok",
+        });
+      } else {
         Swal.fire({
           icon: "error",
           title: "Gagal",
           text: error.toString(),
           confirmButtonText: "Ok",
         });
-      },
-    });
+      }
+    }
   };
 
   return (
@@ -141,7 +207,17 @@ const TabelRekapAbsensi = () => {
               value={selectedDate}
               min={getTwoDaysAgo()}
               max={getToday()}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                if (isWeekend(e.target.value)) {
+                  Swal.fire({
+                    icon: "warning",
+                    title: "Tanggal tidak valid",
+                    text: "Tanggal yang dipilih jatuh pada hari Sabtu atau Minggu, silakan pilih tanggal lain.",
+                    confirmButtonText: "Ok",
+                  });
+                }
+              }}
               required
               onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
                 e.target.setCustomValidity("Tanggal tidak boleh kosong!")
@@ -175,83 +251,90 @@ const TabelRekapAbsensi = () => {
             </thead>
 
             <tbody>
-              {isSiswaLoading
-                ? Array.from({ length: 5 }).map((_, index) => (
-                    <tr key={index} className="bg-white border-b animate-pulse">
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-20 mb-4" />
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
-                      </td>
-                    </tr>
-                  ))
-                : filteredData &&
-                  filteredData.map((item, index) => (
-                    <tr
-                      key={index}
-                      className="bg-white border-b hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        {item.nameStudent}
-                        <input
-                          type="text"
-                          value={item.id}
-                          {...register(
-                            `attendanceStudentCreate.${index}.studentId` as const
-                          )}
-                          onChange={handleInputChange}
-                          className="hidden"
-                        />
-                      </td>
+              {isSiswaLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="bg-white border-b animate-pulse">
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-20 mb-4" />
+                    </td>
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
+                    </td>
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+                    </td>
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
+                    </td>
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
+                    </td>
+                  </tr>
+                ))
+              ) : filteredData && filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      {item.nameStudent}
+                      <input
+                        type="text"
+                        value={item.id}
+                        {...register(
+                          `attendanceStudentCreate.${index}.studentId` as const
+                        )}
+                        onChange={handleInputChange}
+                        className="hidden"
+                      />
+                    </td>
 
-                      <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <input
-                          type="radio"
-                          value={1}
-                          {...register(
-                            `attendanceStudentCreate.${index}.status` as const
-                          )}
-                          onChange={handleInputChange}
-                          required
-                        />{" "}
-                      </td>
-                      <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <input
-                          type="radio"
-                          value={2}
-                          {...register(
-                            `attendanceStudentCreate.${index}.status` as const
-                          )}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </td>
-                      <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                        <input
-                          type="radio"
-                          value={3}
-                          {...register(
-                            `attendanceStudentCreate.${index}.status` as const
-                          )}
-                          onChange={handleInputChange}
-                          required
-                        />{" "}
-                      </td>
-                    </tr>
-                  ))}
+                    <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <input
+                        type="radio"
+                        value={1}
+                        {...register(
+                          `attendanceStudentCreate.${index}.status` as const
+                        )}
+                        onChange={handleInputChange}
+                        required
+                      />{" "}
+                    </td>
+                    <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <input
+                        type="radio"
+                        value={2}
+                        {...register(
+                          `attendanceStudentCreate.${index}.status` as const
+                        )}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </td>
+                    <td className="text-center px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                      <input
+                        type="radio"
+                        value={3}
+                        {...register(
+                          `attendanceStudentCreate.${index}.status` as const
+                        )}
+                        onChange={handleInputChange}
+                        required
+                      />{" "}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center p-8 capitalize">
+                    Data belum tersedia.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -262,31 +345,27 @@ const TabelRekapAbsensi = () => {
               className="w-30 bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-2.5 rounded"
             >
               {createAbsensiMutation.isPending ? (
-                // <svg
-                //   className="animate-spin w-5 h-5 mr-3"
-                //   xmlns="http://www.w3.org/2000/svg"
-                //   fill="none"
-                //   viewBox="0 0 24 24"
-                // >
-                //   <circle
-                //     className="opacity-25"
-                //     cx="12"
-                //     cy="12"
-                //     r="10"
-                //     stroke="currentColor"
-                //     strokeWidth="4"
-                //   ></circle>
-                //   <path
-                //     className="opacity-75"
-                //     fill="currentColor"
-                //     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0112 4.472v3.585l-2.829 2.829zm0 8.446a8.045 8.045 0 01-2.38-2.38l2.38-2.83v5.21zM12 20.528a7.995 7.995 0 01-4-.943v-3.585L9.172 16.7c.258.258.563.465.896.605zm4-1.947l2.829-2.83 2.83 2.83-2.83 2.83v-5.22a8.045 8.045 0 01-2.38 2.38zm2.39-8.38L19.528 12h-5.21l2.83-2.829 2.83 2.829zM12 5.473V1.548A8.045 8.045 0 0115.473 4.39L12 7.863zm-2.829-.707L7.17 4.39A8.045 8.045 0 0110.39 1.548l-1.219 1.218zm1.219 13.123l-1.22 1.219a8.045 8.045 0 012.38 2.38l1.22-1.22zM16.832 16.7l1.219 1.22a8.045 8.045 0 012.38-2.38l-1.218-1.219z"
-                //   ></path>
-                // </svg>
-                <img
-                  src="/gif/loading.gif"
-                  alt="loader"
-                  className="w-8 h-8 animate-spin"
-                />
+                <div className="text-center">
+                  <div role="status">
+                    <svg
+                      aria-hidden="true"
+                      className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill"
+                      />
+                    </svg>
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                </div>
               ) : (
                 "Simpan"
               )}

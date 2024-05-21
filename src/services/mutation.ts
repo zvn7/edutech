@@ -5,7 +5,6 @@ import {
   createMapel,
   deleteMapel,
   createUserSiswa,
-  editSiswa,
   createGuru,
   createSchedules,
   deleteSchedule,
@@ -18,6 +17,7 @@ import {
   editTodo,
   deleteTodo,
   editTodoCheck,
+  deleteGuru,
 } from "./api";
 import { IMapel } from "../types/mapel";
 import { UserGuru, UserSiswa } from "../types/user";
@@ -198,7 +198,7 @@ export function useDeleteSchedules() {
     },
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      await queryClient.invalidateQueries({ queryKey: ["schedulesAdmin"] });
     },
   });
 }
@@ -217,6 +217,25 @@ export function useCreateUserGuru() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["userguru"] });
+    },
+  });
+}
+
+// delete guru
+export function useDeleteGuru() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["deleteGuru"],
+    mutationFn: (teacherId: string) => deleteGuru(teacherId),
+
+    onError: () => {
+      console.log("error");
+    },
+
+    onSuccess: async (data: any) => {
+      console.log("success", data);
+      await queryClient.invalidateQueries({ queryKey: ["guru"] });
     },
   });
 }

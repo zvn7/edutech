@@ -173,9 +173,7 @@ const TabelPenilaian = () => {
                   onChange={handleLessonChange}
                   className="w-full bg-transparent border-none "
                 >
-                  <option selected disabled>
-                    Pilih Mapel
-                  </option>
+                  <option selected>Pilih Mapel</option>
                   {dataMapel?.map((item) => (
                     <option value={item.lessonId}>{item.lessonName}</option>
                   ))}
@@ -194,9 +192,7 @@ const TabelPenilaian = () => {
                   onChange={handleAssignmentChange}
                   className="w-full bg-transparent border-none "
                 >
-                  <option selected disabled>
-                    Pilih Tugas
-                  </option>
+                  <option selected>Pilih Tugas</option>
 
                   {dataTugas
                     ?.filter((lesson) => lesson.lessonId === selectedLesson)

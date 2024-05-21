@@ -406,7 +406,21 @@ const MateriGuru = () => {
             >
               <div className="flex flex-col gap-3 mt-6 ">
                 {isLoading ? (
-                  <p>Loading...</p>
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center shadow-sm p-3 gap-2 bg-white mb-2 rounded-lg animate-pulse"
+                    >
+                      <div className="flex gap-3">
+                        <div className="bg-blue-100 rounded-lg h-14 w-14"></div>
+                        <div className="flex flex-col space-y-2">
+                          <div className="bg-gray-200 h-4 w-40 rounded"></div>
+                          <div className="bg-gray-200 h-4 w-48 rounded"></div>
+                          <div className="bg-gray-200 h-4 w-32 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 ) : filteredData && filteredData.length > 0 ? (
                   filteredData.filter(searchFilter).length > 0 ? (
                     filteredData.filter(searchFilter).map((card) => (
