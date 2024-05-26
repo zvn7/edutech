@@ -359,8 +359,8 @@ const TabelAbsensi = () => {
                       Nama lengkap
                     </th>
                     <th
-                      colSpan={8}
-                      className="sticky top-0 z-20 px-6 py-3 bg-gray-200 left-[219px] text-center"
+                      colSpan={10}
+                      className="sticky top-0 z-20 px-6 py-3 bg-gray-200 left-[160px] text-center"
                     >
                       Tanggal
                     </th>
@@ -378,12 +378,6 @@ const TabelAbsensi = () => {
                     {datesInMonth.map((date) => (
                       <th key={date} className="px-6 py-3 text-center">
                         keterangan
-                        <button
-                          key={date}
-                          className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mt-5"
-                        >
-                          Edit
-                        </button>
                       </th>
                     ))}
                   </tr>
@@ -421,80 +415,91 @@ const TabelAbsensi = () => {
                     ))
                   ) : !isAbsensiLoading &&
                     filteredData &&
-                    filteredData?.filter(searchFilter).length > 0 ? (
-                    filteredData.filter(searchFilter).map((absensi, index) => (
-                      <tr className="bg-white border-2 hover:bg-gray-50">
-                        {index >= currentPage * pageSize &&
-                          index < (currentPage + 1) * pageSize && (
-                            <>
-                              <td className="sticky left-0 px-6 py-4 font-medium text-gray-900 capitalize bg-white ">
-                                {index + 1}
-                              </td>
-                              <td className="sticky px-4 py-4 font-medium text-gray-900 capitalize bg-white border-2 left-16 whitespace-nowrap">
-                                {absensi.nameStudent}
-                              </td>
+                    filteredData.length > 0 ? (
+                    filteredData.filter(searchFilter).length > 0 ? (
+                      filteredData
+                        .filter(searchFilter)
+                        .map((absensi, index) => (
+                          <tr className="bg-white border-2 hover:bg-gray-50">
+                            {index >= currentPage * pageSize &&
+                              index < (currentPage + 1) * pageSize && (
+                                <>
+                                  <td className="sticky left-0 px-6 py-4 font-medium text-gray-900 capitalize bg-white ">
+                                    {index + 1}
+                                  </td>
+                                  <td className="sticky px-4 py-4 font-medium text-gray-900 capitalize bg-white border-2 left-16 whitespace-nowrap">
+                                    {absensi.nameStudent}
+                                  </td>
 
-                              {Array.from(
-                                {
-                                  length: getDaysInMonth(
-                                    selectedMonth,
-                                    selectedYear
-                                  ),
-                                },
-                                (_, index) => {
-                                  // Gunakan indeks dari map sebagai tanggal
-                                  const date = index + 2;
-                                  const absensiDate = new Date(
-                                    selectedYear,
-                                    selectedMonth - 1,
-                                    date
-                                  );
+                                  {Array.from(
+                                    {
+                                      length: getDaysInMonth(
+                                        selectedMonth,
+                                        selectedYear
+                                      ),
+                                    },
+                                    (_, index) => {
+                                      // Gunakan indeks dari map sebagai tanggal
+                                      const date = index + 2;
+                                      const absensiDate = new Date(
+                                        selectedYear,
+                                        selectedMonth - 1,
+                                        date
+                                      );
 
-                                  // Ubah tanggal menjadi string dengan format "YYYY-MM-DD"
-                                  const absensiDateString = absensiDate
-                                    .toISOString()
-                                    .slice(0, 10);
-                                  // Temukan status kehadiran siswa untuk tanggal yang bersangkutan
-                                  const attendanceStatus =
-                                    absensi?.attendanceStudent?.find(
-                                      (attendance) =>
-                                        attendance.date === absensiDateString
-                                    )?.status;
+                                      // Ubah tanggal menjadi string dengan format "YYYY-MM-DD"
+                                      const absensiDateString = absensiDate
+                                        .toISOString()
+                                        .slice(0, 10);
+                                      // Temukan status kehadiran siswa untuk tanggal yang bersangkutan
+                                      const attendanceStatus =
+                                        absensi?.attendanceStudent?.find(
+                                          (attendance) =>
+                                            attendance.date ===
+                                            absensiDateString
+                                        )?.status;
 
-                                  return (
-                                    <td
-                                      key={index}
-                                      className="font-medium text-center text-black border-2"
-                                    >
-                                      {attendanceStatus ? (
-                                        attendanceStatus === 1 ? (
-                                          <span className="bg-blue-100 text-blue-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
-                                            Hadir
-                                          </span>
-                                        ) : attendanceStatus === 2 ? (
-                                          <span className="bg-yellow-100 text-yellow-600 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
-                                            Ijin
-                                          </span>
-                                        ) : (
-                                          <span className="bg-red-100 text-red-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
-                                            Alfa
-                                          </span>
-                                        )
-                                      ) : (
-                                        "-"
-                                      )}
-                                    </td>
-                                  );
-                                }
+                                      return (
+                                        <td
+                                          key={index}
+                                          className="font-medium text-center text-black border-2"
+                                        >
+                                          {attendanceStatus ? (
+                                            attendanceStatus === 1 ? (
+                                              <span className="bg-blue-100 text-blue-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                                Hadir
+                                              </span>
+                                            ) : attendanceStatus === 2 ? (
+                                              <span className="bg-yellow-100 text-yellow-600 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                                Ijin
+                                              </span>
+                                            ) : (
+                                              <span className="bg-red-100 text-red-800 text-base font-medium me-2 px-2.5 py-0.5 rounded capitalize">
+                                                Alfa
+                                              </span>
+                                            )
+                                          ) : (
+                                            "-"
+                                          )}
+                                        </td>
+                                      );
+                                    }
+                                  )}
+                                </>
                               )}
-                            </>
-                          )}
+                          </tr>
+                        ))
+                    ) : (
+                      <tr>
+                        <td colSpan={10} className="p-4 text-center">
+                          Tidak ada hasil pencarian yang sesuai
+                        </td>
                       </tr>
-                    ))
+                    )
                   ) : (
                     <tr>
-                      <td colSpan={10} className="p-4 text-center">
-                        Tidak ada hasil pencarian yang sesuai
+                      <td colSpan={10} className="text-center p-8 capitalize">
+                        Data belum tersedia.
                       </td>
                     </tr>
                   )}

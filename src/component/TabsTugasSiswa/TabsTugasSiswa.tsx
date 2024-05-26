@@ -4,100 +4,100 @@ import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { Pengumpulan } from "../../types/pengumpulan";
 
 interface TabsTugasSiswaProps {
-	isLoading: boolean;
-	selectedCard: {
-		id: string;
-		assignmentDescription?: string;
-		assignmentFileName?: string;
-		assignmentLink?: string;
-		assignmentName?: string;
-		assignmentDeadline?: string;
-		assignmentSubmissionStatus?: string;
-		typeOfSubmission?: number;
-	} | null;
-	handleFileDownload: (id: string, fileName: string) => void;
-	handleSubmit: UseFormHandleSubmit<Pengumpulan>;
-	handleCreatePengumpulanSubmit: (data: Pengumpulan) => void;
-	handleOptionChange: (option: string) => void;
-	selectedOption: string;
-	handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	register: UseFormRegister<Pengumpulan>;
-	dataSubmissions: {
-		submissionTimeStatus?: string;
-		grade?: string;
-		comment?: string;
-	} | null;
-	formatDate: (date: string) => string;
+  isLoading: boolean;
+  selectedCard: {
+    id: string;
+    assignmentDescription?: string;
+    assignmentFileName?: string;
+    assignmentLink?: string;
+    assignmentName?: string;
+    assignmentDeadline?: string;
+    assignmentSubmissionStatus?: string;
+    typeOfSubmission?: number;
+  } | null;
+  handleFileDownload: (id: string, fileName: string) => void;
+  handleSubmit: UseFormHandleSubmit<Pengumpulan>;
+  handleCreatePengumpulanSubmit: (data: Pengumpulan) => void;
+  handleOptionChange: (option: string) => void;
+  selectedOption: string;
+  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  register: UseFormRegister<Pengumpulan>;
+  dataSubmissions: {
+    submissionTimeStatus?: string;
+    grade?: string;
+    comment?: string;
+  } | null;
+  formatDate: (date: string) => string;
 }
 
 const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
-	isLoading,
-	selectedCard,
-	handleFileDownload,
-	handleSubmit,
-	handleCreatePengumpulanSubmit,
-	handleOptionChange,
-	selectedOption,
-	handleFileChange,
-	register,
-	dataSubmissions,
-	formatDate,
+  isLoading,
+  selectedCard,
+  handleFileDownload,
+  handleSubmit,
+  handleCreatePengumpulanSubmit,
+  handleOptionChange,
+  selectedOption,
+  handleFileChange,
+  register,
+  dataSubmissions,
+  formatDate,
 }) => {
-	const [activeTab, setActiveTab] = useState("Deskripsi");
+  const [activeTab, setActiveTab] = useState("Deskripsi");
 
-	return (
-		<div>
-			<div className="bg-white">
-				<nav className="flex flex-col sm:flex-row mb-2">
-					<button
-						onClick={() => setActiveTab("Deskripsi")}
-						className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
-							activeTab === "Deskripsi"
-								? "border-b-2 font-medium border-blue-500"
-								: ""
-						}`}
-					>
-						Deskripsi
-					</button>
-					<button
-						onClick={() => setActiveTab("Pengumpulan")}
-						className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
-							activeTab === "Pengumpulan"
-								? "border-b-2 font-medium border-blue-500"
-								: ""
-						}`}
-					>
-						Pengumpulan
-					</button>
-					<button
-						onClick={() => setActiveTab("Nilai")}
-						className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
-							activeTab === "Nilai"
-								? "border-b-2 font-medium border-blue-500"
-								: ""
-						}`}
-					>
-						Nilai
-					</button>
-				</nav>
-			</div>
+  return (
+    <div>
+      <div className="bg-white">
+        <nav className="flex flex-col sm:flex-row mb-2">
+          <button
+            onClick={() => setActiveTab("Deskripsi")}
+            className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
+              activeTab === "Deskripsi"
+                ? "border-b-2 font-medium border-blue-500"
+                : ""
+            }`}
+          >
+            Deskripsi
+          </button>
+          <button
+            onClick={() => setActiveTab("Pengumpulan")}
+            className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
+              activeTab === "Pengumpulan"
+                ? "border-b-2 font-medium border-blue-500"
+                : ""
+            }`}
+          >
+            Pengumpulan
+          </button>
+          <button
+            onClick={() => setActiveTab("Nilai")}
+            className={`text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none ${
+              activeTab === "Nilai"
+                ? "border-b-2 font-medium border-blue-500"
+                : ""
+            }`}
+          >
+            Nilai
+          </button>
+        </nav>
+      </div>
 
-			{activeTab === "Deskripsi" && (
-				<div className="p-4">
-					<p>
-						{isLoading
-							? "Memuat File ..."
-							: selectedCard?.assignmentDescription}
-					</p>
+      {activeTab === "Deskripsi" && (
+        <div className="p-4">
+          <p>
+            {isLoading
+              ? "Memuat File ..."
+              : selectedCard?.assignmentDescription}
+          </p>
 
 					<p className="mt-8 text-lg font-bold">Tugas</p>
-					{selectedCard?.assignmentfileName ? (
+					{selectedCard?.assignmentFileName ? (
 						<div
 							className="mt-2 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
 							onClick={() =>
 								handleFileDownload(
 									selectedCard.id,
-									selectedCard.assignmentfileName
+									selectedCard.assignmentFileName
 								)
 							}
 							style={{ cursor: "pointer" }}
@@ -143,186 +143,186 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 				</div>
 			)}
 
-			{activeTab === "Pengumpulan" && (
-				<div className="p-4">
-					<p className="font-bold text-lg">Informasi Pengumpulan</p>
-					<div className="relative mt-4 overflow-x-auto">
-						<table className="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
-							<tbody>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Judul Tugas</td>
-									<td className="px-6 py-4 float-end">
-										{isLoading
-											? "Memuat File ..."
-											: selectedCard.assignmentName}
-									</td>
-								</tr>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Jenis Pengumpulan</td>
-									<td className="px-6 py-4 float-end">
-										{isLoading
-											? "Memuat File ..."
-											: selectedCard.typeOfSubmission === 1
-											? "File"
-											: "Link"}
-									</td>
-								</tr>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Batas Pengumpulan</td>
-									<td className="px-6 py-4 float-end">
-										<div className="w-32 p-1 bg-orange-200 border-2 border-orange-400 rounded-2xl">
-											<h2 className="text-sm font-semibold text-center text-orange-500">
-												{isLoading
-													? "Memuat File ..."
-													: formatDate(selectedCard.assignmentDeadline)}
-											</h2>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div>
-						<form
-							action=""
-							onSubmit={handleSubmit(handleCreatePengumpulanSubmit)}
-						>
-							<input type="hidden" {...register("assignmentId")} />
-							<p className="mt-4 font-bold text-md">Pengumpulan Tugas</p>
-							<div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
-								<h2 className="p-2 text-sm font-semibold text-orange-500">
-									Mengumpulkan ataupun mengubah jawaban setelah deadline
-									berakhir akan dikenai pengurangan nilai
-								</h2>
-							</div>
-							<div className="flex gap-5">
-								<div
-									className="flex items-center gap-2 mt-5"
-									onClick={() => handleOptionChange("file")}
-								>
-									<input
-										type="radio"
-										id="file"
-										name="submissionOption"
-										value="file"
-										checked={selectedOption === "file"}
-									/>
-									<label htmlFor="file">File</label>
-								</div>
-								<div
-									className="flex items-center gap-2 mt-5"
-									onClick={() => handleOptionChange("link")}
-								>
-									<input
-										type="radio"
-										id="link"
-										name="submissionOption"
-										value="link"
-										checked={selectedOption === "link"}
-									/>
-									<label htmlFor="link">Link</label>
-								</div>
-							</div>
-							{selectedOption === "file" && (
-								<div id="fileUpload" className="mt-4">
-									<FileInput
-										id="fileData"
-										{...register("fileData")}
-										onChange={(e) => {
-											handleFileChange(e);
-										}}
-									/>
-								</div>
-							)}
-							{selectedOption === "link" && (
-								<div id="linkInput" className="mt-4">
-									<TextInput
-										id="link"
-										type="text"
-										placeholder="Masukkan url atau link yang valid disini"
-										{...register("link")}
-									/>
-								</div>
-							)}
-							<button
-								type="submit"
-								className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32 ${
-									selectedCard?.assignmentSubmissionStatus ===
-									"Sudah mengerjakan"
-										? "opacity-50 cursor-not-allowed"
-										: selectedCard?.assignmentSubmissionStatus ===
-										  "Sudah dinilai"
-										? "opacity-50 cursor-not-allowed"
-										: ""
-								}`}
-								disabled={
-									selectedCard?.assignmentSubmissionStatus ===
-									"Sudah mengerjakan"
-										? true
-										: selectedCard?.assignmentSubmissionStatus ===
-										  "Sudah dinilai"
-										? true
-										: false
-								}
-							>
-								Kirim
-							</button>
-						</form>
-					</div>
-				</div>
-			)}
+      {activeTab === "Pengumpulan" && (
+        <div className="p-4">
+          <p className="font-bold text-lg">Informasi Pengumpulan</p>
+          <div className="relative mt-4 overflow-x-auto">
+            <table className="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
+              <tbody>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Judul Tugas</td>
+                  <td className="px-6 py-4 float-end">
+                    {isLoading
+                      ? "Memuat File ..."
+                      : selectedCard.assignmentName}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Jenis Pengumpulan</td>
+                  <td className="px-6 py-4 float-end">
+                    {isLoading
+                      ? "Memuat File ..."
+                      : selectedCard.typeOfSubmission === 1
+                      ? "File"
+                      : "Link"}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Batas Pengumpulan</td>
+                  <td className="px-6 py-4 float-end">
+                    <div className="w-32 p-1 bg-orange-200 border-2 border-orange-400 rounded-2xl">
+                      <h2 className="text-sm font-semibold text-center text-orange-500">
+                        {isLoading
+                          ? "Memuat File ..."
+                          : formatDate(selectedCard.assignmentDeadline)}
+                      </h2>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <form
+              action=""
+              onSubmit={handleSubmit(handleCreatePengumpulanSubmit)}
+            >
+              <input type="hidden" {...register("assignmentId")} />
+              <p className="mt-4 font-bold text-md">Pengumpulan Tugas</p>
+              <div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
+                <h2 className="p-2 text-sm font-semibold text-orange-500">
+                  Mengumpulkan ataupun mengubah jawaban setelah deadline
+                  berakhir akan dikenai pengurangan nilai
+                </h2>
+              </div>
+              <div className="flex gap-5">
+                <div
+                  className="flex items-center gap-2 mt-5"
+                  onClick={() => handleOptionChange("file")}
+                >
+                  <input
+                    type="radio"
+                    id="file"
+                    name="submissionOption"
+                    value="file"
+                    checked={selectedOption === "file"}
+                  />
+                  <label htmlFor="file">File</label>
+                </div>
+                <div
+                  className="flex items-center gap-2 mt-5"
+                  onClick={() => handleOptionChange("link")}
+                >
+                  <input
+                    type="radio"
+                    id="link"
+                    name="submissionOption"
+                    value="link"
+                    checked={selectedOption === "link"}
+                  />
+                  <label htmlFor="link">Link</label>
+                </div>
+              </div>
+              {selectedOption === "file" && (
+                <div id="fileUpload" className="mt-4">
+                  <FileInput
+                    id="fileData"
+                    {...register("fileData")}
+                    onChange={(e) => {
+                      handleFileChange(e);
+                    }}
+                  />
+                </div>
+              )}
+              {selectedOption === "link" && (
+                <div id="linkInput" className="mt-4">
+                  <TextInput
+                    id="link"
+                    type="text"
+                    placeholder="Masukkan url atau link yang valid disini"
+                    {...register("link")}
+                  />
+                </div>
+              )}
+              <button
+                type="submit"
+                className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 w-32 ${
+                  selectedCard?.assignmentSubmissionStatus ===
+                  "Sudah mengerjakan"
+                    ? "opacity-50 cursor-not-allowed"
+                    : selectedCard?.assignmentSubmissionStatus ===
+                      "Sudah dinilai"
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                disabled={
+                  selectedCard?.assignmentSubmissionStatus ===
+                  "Sudah mengerjakan"
+                    ? true
+                    : selectedCard?.assignmentSubmissionStatus ===
+                      "Sudah dinilai"
+                    ? true
+                    : false
+                }
+              >
+                Kirim
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
-			{activeTab === "Nilai" && (
-				<div className="p-4">
-					<p className="font-bold text-lg">Informasi Tugas</p>
-					<div className="relative mt-4 overflow-x-auto sm:rounded-lg">
-						<table className="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
-							<tbody>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Judul Tugas</td>
-									<td className="px-6 py-4 float-end">
-										{isLoading
-											? "Memuat File ..."
-											: selectedCard?.assignmentName}
-									</td>
-								</tr>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Batas Pengumpulan</td>
-									<td className="px-6 py-4 float-end">
-										{isLoading
-											? "Memuat File ..."
-											: formatDate(selectedCard?.assignmentDeadline)}
-									</td>
-								</tr>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Status</td>
-									<td className="px-6 py-4 float-end">
-										{dataSubmissions
-											? dataSubmissions.submissionTimeStatus
-											: "-"}
-									</td>
-								</tr>
-								<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-									<td className="px-6 py-4">Nilai</td>
-									<td className="px-6 py-4 float-end">
-										{dataSubmissions ? dataSubmissions.grade : "Belum Dinilai"}
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div>
-						<p className="mt-4 font-bold text-md">Review Guru</p>
-						<div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
-							<h2 className="p-2 text-sm font-semibold text-orange-500">
-								{dataSubmissions ? dataSubmissions.comment : "-"}
-							</h2>
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
+      {activeTab === "Nilai" && (
+        <div className="p-4">
+          <p className="font-bold text-lg">Informasi Tugas</p>
+          <div className="relative mt-4 overflow-x-auto sm:rounded-lg">
+            <table className="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
+              <tbody>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Judul Tugas</td>
+                  <td className="px-6 py-4 float-end">
+                    {isLoading
+                      ? "Memuat File ..."
+                      : selectedCard?.assignmentName}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Batas Pengumpulan</td>
+                  <td className="px-6 py-4 float-end">
+                    {isLoading
+                      ? "Memuat File ..."
+                      : formatDate(selectedCard?.assignmentDeadline)}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Status</td>
+                  <td className="px-6 py-4 float-end">
+                    {dataSubmissions
+                      ? dataSubmissions.submissionTimeStatus
+                      : "-"}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="px-6 py-4">Nilai</td>
+                  <td className="px-6 py-4 float-end">
+                    {dataSubmissions ? dataSubmissions.grade : "Belum Dinilai"}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <p className="mt-4 font-bold text-md">Review Guru</p>
+            <div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
+              <h2 className="p-2 text-sm font-semibold text-orange-500">
+                {dataSubmissions ? dataSubmissions.comment : "-"}
+              </h2>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default TabsTugasSiswa;
