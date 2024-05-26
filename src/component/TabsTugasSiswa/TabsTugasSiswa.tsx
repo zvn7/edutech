@@ -91,13 +91,13 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 					</p>
 
 					<p className="mt-8 text-lg font-bold">Tugas</p>
-					{selectedCard?.assignmentfileName ? (
+					{selectedCard?.assignmentFileName ? (
 						<div
 							className="mt-2 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
 							onClick={() =>
 								handleFileDownload(
 									selectedCard.id,
-									selectedCard.assignmentfileName
+									selectedCard.assignmentFileName
 								)
 							}
 							style={{ cursor: "pointer" }}

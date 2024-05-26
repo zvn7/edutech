@@ -23,7 +23,7 @@ const TugasAdd = ({
     assignmentDate: "",
     assignmentDeadline: "",
     assignmentDescription: "",
-    assignmentFilePath: "",
+    AssignmentFileData: "",
     assignmentLink: "",
     courseId: "",
     typeOfSubmission: 0,
@@ -57,7 +57,7 @@ const TugasAdd = ({
 
       // Menambahkan file jika ada
       if (uploadedFile) {
-        formData.append("assignmentFilePath", uploadedFile);
+        formData.append("AssignmentFileData", uploadedFile);
       }
       // Menambahkan link jika ada
       if (data.assignmentLink) {
@@ -85,7 +85,7 @@ const TugasAdd = ({
                 assignmentDate: "",
                 assignmentDeadline: "",
                 assignmentDescription: "",
-                assignmentFilePath: "",
+                AssignmentFileData: "",
                 assignmentLink: "",
                 courseId: "",
                 typeOfSubmission: 0,
@@ -395,8 +395,8 @@ const TugasAdd = ({
           {selectedOption === "file" && (
             <div id="fileUpload" className="mt-4">
               <FileInput
-                id="assignmentFilePath"
-                {...register("assignmentFilePath")}
+                id="AssignmentFileData"
+                {...register("AssignmentFileData")}
                 onChange={(e) => {
                   handleFileChange(e);
                 }}
