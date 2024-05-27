@@ -3,8 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Dropdown,
-  DropdownHeader,
-  DropdownItem,
   Navbar,
   NavbarBrand,
   NavbarToggle,
@@ -152,7 +150,7 @@ const Navigation = () => {
       <Navbar className="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
         <div className="flex gap-4">
           <NavbarToggle onClick={toggleSidebar} />
-          <NavbarBrand href="/img/logo-edutech.png">
+          <NavbarBrand href="#">
             <img
               src="/img/logo-edutech.png"
               className="h-8 md:h-9 lg:h-9"
