@@ -91,7 +91,7 @@ const Login = () => {
 						</a>
 						<div>
 							<h1 className="pt-5 text-xl font-bold leading-tight tracking-tight text-center text-gray-900 md:text-2xl dark:text-white">
-								Selamat Datang! Ya
+								Selamat Datang!
 							</h1>
 							<p className="mb-2 font-light text-center text-gray-500 text-md dark:text-gray-400">
 								Masukkan Nama Pengguna & Kata Sandi Anda!
