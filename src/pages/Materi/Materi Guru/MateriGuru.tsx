@@ -12,69 +12,69 @@ import MateriAddTablet from "./MateriAddTablet";
 import MateriEditTablet from "./MateriEditTablet";
 
 const MateriGuru = () => {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
-  const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
-  const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
-  const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
+	const [showAddForm, setShowAddForm] = useState(false);
+	const [showEditForm, setShowEditForm] = useState(false);
+	const [isMobileModalOpenAdd, setisMobileModalOpenAdd] = useState(false);
+	const [isMobileModalOpenEdit, setisMobileModalOpenEdit] = useState(false);
+	const [isTabletModalOpenAdd, setisTabletModalOpenAdd] = useState(false);
+	const [isTabletModalOpenEdit, setisTabletModalOpenEdit] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
+	const [isTablet, setIsTablet] = useState(false);
 
-  const teacherinfo = useTeacherinfo();
-  const { data: formData } = teacherinfo;
+	const teacherinfo = useTeacherinfo();
+	const { data: formData } = teacherinfo;
 
-  const [formUpdate, setFormUpdate] = useState<{
-    id: string;
-    courseName: string;
-    description: string;
-    fileData: string;
-    linkCourse: string;
-    lessonName: string;
-  }>({
-    id: "",
-    courseName: "",
-    description: "",
-    fileData: "",
-    linkCourse: "",
-    lessonName: "",
-  });
+	const [formUpdate, setFormUpdate] = useState<{
+		id: string;
+		courseName: string;
+		description: string;
+		fileData: string;
+		linkCourse: string;
+		lessonName: string;
+	}>({
+		id: "",
+		courseName: "",
+		description: "",
+		fileData: "",
+		linkCourse: "",
+		lessonName: "",
+	});
 
-  useEffect(() => {
-    const handleResize = () => {
-      const windowWidth = window.innerWidth;
-      setIsMobile(windowWidth <= 768);
-      setIsTablet(windowWidth > 768 && windowWidth <= 1024);
-    };
+	useEffect(() => {
+		const handleResize = () => {
+			const windowWidth = window.innerWidth;
+			setIsMobile(windowWidth <= 768);
+			setIsTablet(windowWidth > 768 && windowWidth <= 1024);
+		};
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+		handleResize();
+		window.addEventListener("resize", handleResize);
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
 
-  const handleShowAddForm = () => {
-    if (showEditForm) {
-      Swal.fire({
-        title: "Peringatan",
-        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setShowEditForm(false);
-          setShowAddForm(true);
-        }
-      });
-    } else {
-      setShowAddForm(!showAddForm);
-    }
-  };
+	const handleShowAddForm = () => {
+		if (showEditForm) {
+			Swal.fire({
+				title: "Peringatan",
+				text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "#3085d6",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setShowEditForm(false);
+					setShowAddForm(true);
+				}
+			});
+		} else {
+			setShowAddForm(!showAddForm);
+		}
+	};
 
 	const handleShowEditForm = async (data: IMateriGuru) => {
 		if (showAddForm) {
@@ -91,7 +91,6 @@ const MateriGuru = () => {
 				if (result.isConfirmed) {
 					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
-					setShowEditForm(true);
 					setFormUpdate({
 						id: data.id,
 						courseName: data.courseName || "",
@@ -143,266 +142,266 @@ const MateriGuru = () => {
 		}
 	};
 
-  const handleCloseForms = () => {
-    if (showAddForm || showEditForm) {
-      Swal.fire({
-        title: "Peringatan",
-        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setShowAddForm(false);
-          setShowEditForm(false);
-        }
-      });
-    } else {
-      setShowAddForm(false);
-      setShowEditForm(false);
-    }
-  };
+	const handleCloseForms = () => {
+		if (showAddForm || showEditForm) {
+			Swal.fire({
+				title: "Peringatan",
+				text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "#3085d6",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setShowAddForm(false);
+					setShowEditForm(false);
+				}
+			});
+		} else {
+			setShowAddForm(false);
+			setShowEditForm(false);
+		}
+	};
 
-  const handleShowModalAddFormMobile = () => {
-    setisMobileModalOpenAdd(true);
-    setisMobileModalOpenEdit(false);
-  };
+	const handleShowModalAddFormMobile = () => {
+		setisMobileModalOpenAdd(true);
+		setisMobileModalOpenEdit(false);
+	};
 
-  const handleShowModalAddFormTablet = () => {
-    setisTabletModalOpenAdd(true);
-    setisTabletModalOpenEdit(false);
-  };
+	const handleShowModalAddFormTablet = () => {
+		setisTabletModalOpenAdd(true);
+		setisTabletModalOpenEdit(false);
+	};
 
-  const handleShowModalEditFormMobile = (data: IMateriGuru) => {
-    setFormUpdate({
-      id: data.id,
-      courseName: data.courseName || "",
-      description: data.description || "",
-      fileData: data.fileData || "",
-      linkCourse: data.linkCourse || "",
-      lessonName: data.lessonName || "",
-    });
-    setisMobileModalOpenEdit(true);
-    setisMobileModalOpenAdd(false);
-  };
+	const handleShowModalEditFormMobile = (data: IMateriGuru) => {
+		setFormUpdate({
+			id: data.id,
+			courseName: data.courseName || "",
+			description: data.description || "",
+			fileData: data.fileData || "",
+			linkCourse: data.linkCourse || "",
+			lessonName: data.lessonName || "",
+		});
+		setisMobileModalOpenEdit(true);
+		setisMobileModalOpenAdd(false);
+	};
 
-  const handleCloseModalFormMobile = () => {
-    if (isMobileModalOpenAdd || isMobileModalOpenEdit) {
-      Swal.fire({
-        title: "Peringatan",
-        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setisMobileModalOpenAdd(false);
-          setisMobileModalOpenEdit(false);
-        }
-      });
-    } else {
-      setisMobileModalOpenAdd(false);
-      setisMobileModalOpenEdit(false);
-    }
-  };
+	const handleCloseModalFormMobile = () => {
+		if (isMobileModalOpenAdd || isMobileModalOpenEdit) {
+			Swal.fire({
+				title: "Peringatan",
+				text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "#3085d6",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setisMobileModalOpenAdd(false);
+					setisMobileModalOpenEdit(false);
+				}
+			});
+		} else {
+			setisMobileModalOpenAdd(false);
+			setisMobileModalOpenEdit(false);
+		}
+	};
 
-  const handleCloseModalFormTablet = () => {
-    if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
-      Swal.fire({
-        title: "Peringatan",
-        text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Ya, lanjutkan",
-        cancelButtonText: "Tidak",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setisTabletModalOpenAdd(false);
-          setisTabletModalOpenEdit(false);
-        }
-      });
-    } else {
-      setisTabletModalOpenAdd(false);
-      setisTabletModalOpenEdit(false);
-    }
-  };
+	const handleCloseModalFormTablet = () => {
+		if (isTabletModalOpenAdd || isTabletModalOpenEdit) {
+			Swal.fire({
+				title: "Peringatan",
+				text: "Apakah Anda yakin? Perubahan tidak akan tersimpan!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "#3085d6",
+				confirmButtonText: "Ya, lanjutkan",
+				cancelButtonText: "Tidak",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setisTabletModalOpenAdd(false);
+					setisTabletModalOpenEdit(false);
+				}
+			});
+		} else {
+			setisTabletModalOpenAdd(false);
+			setisTabletModalOpenEdit(false);
+		}
+	};
 
-  const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
+	const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
 
-  const queryMapel = useGetLessonByGuru();
-  const { data: dataMapel, isLoading } = queryMapel;
+	const queryMapel = useGetLessonByGuru();
+	const { data: dataMapel, isLoading } = queryMapel;
 
-  const filteredData: IMateriGuru[] =
-    selectedLesson === "semua mata pelajaran"
-      ? formData || []
-      : (formData || []).filter(
-          (materi) => materi.lessonName === selectedLesson
-        );
+	const filteredData: IMateriGuru[] =
+		selectedLesson === "semua mata pelajaran"
+			? formData || []
+			: (formData || []).filter(
+					(materi) => materi.lessonName === selectedLesson
+			  );
 
-  const handleShowModalEditFormTablet = (data: IMateriGuru) => {
-    setFormUpdate({
-      id: data.id,
-      courseName: data.courseName || "",
-      description: data.description || "",
-      fileData: data.fileData || "",
-      linkCourse: data.linkCourse || "",
-      lessonName: data.lessonName || "",
-    });
-    setisTabletModalOpenEdit(true);
-    setisTabletModalOpenAdd(false);
-  };
+	const handleShowModalEditFormTablet = (data: IMateriGuru) => {
+		setFormUpdate({
+			id: data.id,
+			courseName: data.courseName || "",
+			description: data.description || "",
+			fileData: data.fileData || "",
+			linkCourse: data.linkCourse || "",
+			lessonName: data.lessonName || "",
+		});
+		setisTabletModalOpenEdit(true);
+		setisTabletModalOpenAdd(false);
+	};
 
-  const handleLessonChange = (e: any) => {
-    setSelectedLesson(e.target.value);
-  };
+	const handleLessonChange = (e: any) => {
+		setSelectedLesson(e.target.value);
+	};
 
-  const [searchTerm, setSearchTerm] = useState("");
+	const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearchChange = (e: any) => {
-    setSearchTerm(e.target.value);
-  };
-  const searchFilter = (lesson: any) => {
-    return (
-      lesson.courseName &&
-      lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
+	const handleSearchChange = (e: any) => {
+		setSearchTerm(e.target.value);
+	};
+	const searchFilter = (lesson: any) => {
+		return (
+			lesson.courseName &&
+			lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+		);
+	};
 
-  return (
-    <div>
-      <Navigation />
-      <div className="p-4 sm:ml-64">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-          {/* left side */}
-          <div>
-            <div className="flex items-center justify-between mt-16 mb-2">
-              <h1 className="text-3xl font-bold capitalize">Materi</h1>
+	return (
+		<div>
+			<Navigation />
+			<div className="p-4 sm:ml-64">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
+					{/* left side */}
+					<div>
+						<div className="flex items-center justify-between mt-16 mb-2">
+							<h1 className="text-3xl font-bold capitalize">Materi</h1>
 
-              {isMobile && (
-                <button
-                  type="button"
-                  onClick={handleShowModalAddFormMobile}
-                  className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Tugas
-                </button>
-              )}
-              {isTablet && (
-                <button
-                  type="button"
-                  onClick={handleShowModalAddFormTablet}
-                  className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Tugas
-                </button>
-              )}
-              {!isMobile && !isTablet && (
-                <button
-                  type="button"
-                  onClick={handleShowAddForm}
-                  className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  <svg
-                    className="w-5 h-5 text-white dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 12h14m-7 7V5"
-                    />
-                  </svg>
-                  Materi
-                </button>
-              )}
-            </div>
+							{isMobile && (
+								<button
+									type="button"
+									onClick={handleShowModalAddFormMobile}
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									<svg
+										className="w-5 h-5 text-white dark:text-white"
+										aria-hidden="true"
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M5 12h14m-7 7V5"
+										/>
+									</svg>
+									Tugas
+								</button>
+							)}
+							{isTablet && (
+								<button
+									type="button"
+									onClick={handleShowModalAddFormTablet}
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									<svg
+										className="w-5 h-5 text-white dark:text-white"
+										aria-hidden="true"
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M5 12h14m-7 7V5"
+										/>
+									</svg>
+									Tugas
+								</button>
+							)}
+							{!isMobile && !isTablet && (
+								<button
+									type="button"
+									onClick={handleShowAddForm}
+									className="flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									<svg
+										className="w-5 h-5 text-white dark:text-white"
+										aria-hidden="true"
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M5 12h14m-7 7V5"
+										/>
+									</svg>
+									Materi
+								</button>
+							)}
+						</div>
 
-            <div className="flex justify-between gap-4 mt-5">
-              <form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
-                <label
-                  htmlFor="default-search"
-                  className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-                >
-                  Search
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-                    <img
-                      src="/gif/search.gif"
-                      alt="search"
-                      className="w-5 h-5"
-                    />
-                  </div>
-                  <input
-                    type="search"
-                    id="default-search"
-                    className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
-                    placeholder="temukan materi disini...."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                  />
-                </div>
-              </form>
-              <select
-                value={selectedLesson}
-                onChange={handleLessonChange}
-                className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
-              >
-                <option selected>semua mata pelajaran</option>
-                {dataMapel?.map((item) => (
-                  <option value={item.lessonName}>{item.lessonName}</option>
-                ))}
-              </select>
-            </div>
+						<div className="flex justify-between gap-4 mt-5">
+							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
+								<label
+									htmlFor="default-search"
+									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+								>
+									Search
+								</label>
+								<div className="relative">
+									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
+										<img
+											src="/gif/search.gif"
+											alt="search"
+											className="w-5 h-5"
+										/>
+									</div>
+									<input
+										type="search"
+										id="default-search"
+										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										placeholder="temukan materi disini...."
+										value={searchTerm}
+										onChange={handleSearchChange}
+									/>
+								</div>
+							</form>
+							<select
+								value={selectedLesson}
+								onChange={handleLessonChange}
+								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
+							>
+								<option selected>semua mata pelajaran</option>
+								{dataMapel?.map((item) => (
+									<option value={item.lessonName}>{item.lessonName}</option>
+								))}
+							</select>
+						</div>
 						<div
 							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
 							style={{ scrollbarWidth: "none" }}
@@ -655,50 +654,50 @@ const MateriGuru = () => {
 										</svg>
 									</button>
 								</div>
-                <MateriAddTablet
-                  setisTabletModalOpenAdd={setisTabletModalOpenAdd}
-                  handleCloseForms={handleCloseForms}
-                />
-              </div>
-            </div>
-          )}
-          {isTabletModalOpenEdit && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-              <div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
-                <div className="flex justify-between">
-                  <p className="text-xl font-bold text-gray-500">Edit Materi</p>
-                  <button
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={handleCloseModalFormTablet}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-6 h-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <hr className="my-3" />
-                <MateriEditTablet
-                  id={formUpdate.id}
-                  setisTabletModalOpenEdit={setisTabletModalOpenEdit}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+								<MateriAddTablet
+									setisTabletModalOpenAdd={setisTabletModalOpenAdd}
+									handleCloseForms={handleCloseForms}
+								/>
+							</div>
+						</div>
+					)}
+					{isTabletModalOpenEdit && (
+						<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+							<div className="w-full p-4 bg-white rounded-lg sm:max-w-md">
+								<div className="flex justify-between">
+									<p className="text-xl font-bold text-gray-500">Edit Materi</p>
+									<button
+										className="text-gray-500 hover:text-gray-700"
+										onClick={handleCloseModalFormTablet}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="w-6 h-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+								</div>
+								<hr className="my-3" />
+								<MateriEditTablet
+									id={formUpdate.id}
+									setisTabletModalOpenEdit={setisTabletModalOpenEdit}
+								/>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default MateriGuru;

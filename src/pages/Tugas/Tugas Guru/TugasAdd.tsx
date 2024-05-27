@@ -23,11 +23,7 @@ const TugasAdd = ({
     assignmentDate: "",
     assignmentDeadline: "",
     assignmentDescription: "",
-<<<<<<< HEAD
-    AssignmentFileData: "",
-=======
     assignmentFileData: "",
->>>>>>> 5834949 (perbaikan fungsi pengumpulan dan perbaikan tampilan)
     assignmentLink: "",
     courseId: "",
     typeOfSubmission: 0,
@@ -61,11 +57,7 @@ const TugasAdd = ({
 
       // Menambahkan file jika ada
       if (uploadedFile) {
-<<<<<<< HEAD
-        formData.append("AssignmentFileData", uploadedFile);
-=======
         formData.append("assignmentFileData", uploadedFile);
->>>>>>> 5834949 (perbaikan fungsi pengumpulan dan perbaikan tampilan)
       }
       // Menambahkan link jika ada
       if (data.assignmentLink) {
@@ -93,11 +85,7 @@ const TugasAdd = ({
                 assignmentDate: "",
                 assignmentDeadline: "",
                 assignmentDescription: "",
-<<<<<<< HEAD
-                AssignmentFileData: "",
-=======
                 assignmentFileData: "",
->>>>>>> 5834949 (perbaikan fungsi pengumpulan dan perbaikan tampilan)
                 assignmentLink: "",
                 courseId: "",
                 typeOfSubmission: 0,
@@ -113,9 +101,6 @@ const TugasAdd = ({
             error.response.data &&
             error.response.data.errors
           ) {
-            const errors = error.response.data.errors;
-            const errorMessage = Object.keys(errors)
-              .map((key) => errors[key].join(", "))
             const errors = error.response.data.errors;
             const errorMessage = Object.keys(errors)
               .map((key) => errors[key].join(", "))
@@ -138,9 +123,6 @@ const TugasAdd = ({
       });
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.errors) {
-        const errors = error.response.data.errors;
-        const errorMessage = Object.keys(errors)
-          .map((key) => errors[key].join(", "))
         const errors = error.response.data.errors;
         const errorMessage = Object.keys(errors)
           .map((key) => errors[key].join(", "))
@@ -415,13 +397,8 @@ const TugasAdd = ({
           {selectedOption === "file" && (
             <div id="fileUpload" className="mt-4">
               <FileInput
-<<<<<<< HEAD
-                id="AssignmentFileData"
-                {...register("AssignmentFileData")}
-=======
                 id="assignmentFileData"
                 {...register("assignmentFileData")}
->>>>>>> 5834949 (perbaikan fungsi pengumpulan dan perbaikan tampilan)
                 onChange={(e) => {
                   handleFileChange(e);
                 }}
