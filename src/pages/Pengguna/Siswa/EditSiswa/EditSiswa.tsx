@@ -70,8 +70,25 @@ const EditSiswa = () => {
           navigate("/pengguna-siswa");
         }
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: errorMessage,
+          confirmButtonText: "Ok",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -84,7 +101,7 @@ const EditSiswa = () => {
     if (name === "phoneNumber" && value.length === 1 && value !== "0") {
       return; // Mencegah input jika angka pertama bukan 0
     }
-    if (name === "phoneNumber" && value.length > 15) {
+    if (name === "phoneNumber" && value.length > 13) {
       return;
     }
 
@@ -217,7 +234,7 @@ const EditSiswa = () => {
                   <div className="flex gap-2 items-center">
                     <button
                       type="submit"
-                      className="flex w-20 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+                      className="flex w-32 items-center text-center justify-center  px-5 py-2.5  text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
                       disabled={loading}
                       onClick={handleSubmitEdit}
                     >
@@ -226,7 +243,7 @@ const EditSiswa = () => {
                           <div role="status">
                             <svg
                               aria-hidden="true"
-                              className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                              className="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                               viewBox="0 0 100 101"
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"

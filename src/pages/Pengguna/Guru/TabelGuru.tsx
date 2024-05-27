@@ -183,7 +183,7 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                 Array.from({ length: pageSize }).map((_, index) => (
                   <tr key={index} className="bg-white border-b animate-pulse">
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5 max-w-[360px]" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
                       <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />

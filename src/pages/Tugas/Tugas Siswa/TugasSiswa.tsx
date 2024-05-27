@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import Navigation from "../../../component/Navigation/Navigation";
 import { useCreatePengumpulan } from "../../../services/mutation";
 import {
-	useAssignments,
-	useAssignmentSubmissionsById,
-	useLessonsClassroom,
+  useAssignments,
+  useAssignmentSubmissionsById,
+  useLessonsClassroom,
 } from "../../../services/queries";
 import { Pengumpulan } from "../../../types/pengumpulan";
 import axios from "axios";
@@ -13,189 +13,242 @@ import Swal from "sweetalert2";
 import TabsTugasSiswa from "../../../component/TabsTugasSiswa/TabsTugasSiswa";
 
 const TugasSiswa = () => {
-	const [selectedCard, setSelectedCard] = useState<any>(null);
-	const [isMobileView, setIsMobileView] = useState<boolean>(false);
-	const [selectedOption, setSelectedOption] = useState("file");
-	const [selectedAssignment, setSelectedAssignment] = useState("semua tugas");
-	const assignmentsIdsQuery = useAssignments();
-	const { data: dataTugas, isLoading: isLoadingTugas } = assignmentsIdsQuery;
-	const selectedCardId = selectedCard ? selectedCard.id : ""; // Ambil ID dari selectedCard atau gunakan string kosong jika tidak ada
+  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [isMobileView, setIsMobileView] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState("file");
+  const [selectedAssignment, setSelectedAssignment] = useState("semua tugas");
+  const assignmentsIdsQuery = useAssignments();
+  const { data: dataTugas, isLoading: isLoadingTugas } = assignmentsIdsQuery;
+  const selectedCardId = selectedCard ? selectedCard.id : "";
+  const assignmentSubmission = useAssignmentSubmissionsById(selectedCardId);
+  const { data: dataSubmissions } = assignmentSubmission;
 
-	const assignmentSubmission = useAssignmentSubmissionsById(selectedCardId);
-	const { data: dataSubmissions } = assignmentSubmission;
+  const lessonsQueries = useLessonsClassroom();
+  const { data: formLesson } = lessonsQueries;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const lessonsQueries = useLessonsClassroom();
-	const { data: formLesson } = lessonsQueries;
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+  const handleOptionChange = (option: string) => {
+    setSelectedOption(option);
+  };
 
-	const handleOptionChange = (option: string) => {
-		setSelectedOption(option);
-	};
+  const handleCardClick = (id: any) => {
+    const clickedCard = dataTugas?.find((item) => item.id === id);
+    if (clickedCard) {
+      setValue("assignmentId", id); // Set assignmentId pada form
+      setSelectedCard(clickedCard);
+      setUploadedFile(null);
+    }
+  };
 
-	const handleCardClick = (id: any) => {
-		const clickedCard = dataTugas?.find((item) => item.id === id);
-		if (clickedCard) {
-			setValue("assignmentId", id); // Set assignmentId pada form
-			setSelectedCard(clickedCard);
-			setUploadedFile(null);
-		}
-	};
+  useEffect(() => {
+    const handleResize = () => {
+      // Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
+      setIsMobileView(window.innerWidth < 768);
+    };
 
-	useEffect(() => {
-		const handleResize = () => {
-			// Fungsi untuk menentukan apakah tampilan sedang pada mode mobile atau tidak
-			setIsMobileView(window.innerWidth < 768);
-		};
+    window.addEventListener("resize", handleResize);
 
-		window.addEventListener("resize", handleResize);
+    // Pengecekan awal saat komponen dipasang
+    handleResize();
 
-		// Pengecekan awal saat komponen dipasang
-		handleResize();
+    // Membersihkan event listener saat komponen di-unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
-		// Membersihkan event listener saat komponen di-unmount
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
+  // Fungsi untuk menutup modal
+  const closeModal = () => {
+    setSelectedCard(null);
+  };
 
-	// Fungsi untuk menutup modal
-	const closeModal = () => {
-		setSelectedCard(null);
-	};
+  const formatDate = (dateString: any) => {
+    try {
+      const parsedDate = new Date(dateString);
+      // Periksa apakah parsedDate adalah waktu yang valid
+      if (isNaN(parsedDate.getTime())) {
+        // Jika parsedDate tidak valid, kembalikan string "Invalid Date"
+        return "Invalid Date";
+      }
+      const options = {
+        day: "numeric",
+        month: "long",
+        year: "numeric" as const,
+      };
+      const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
+      return dateFormatter.format(parsedDate);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      // Jika terjadi kesalahan dalam pemformatan, kembalikan string kosong
+      return "";
+    }
+  };
 
-	const formatDate = (dateString: any) => {
-		try {
-			const parsedDate = new Date(dateString);
-			// Periksa apakah parsedDate adalah waktu yang valid
-			if (isNaN(parsedDate.getTime())) {
-				// Jika parsedDate tidak valid, kembalikan string "Invalid Date"
-				return "Invalid Date";
-			}
-			const options = {
-				day: "numeric",
-				month: "long",
-				year: "numeric" as const,
-			};
-			const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
-			return dateFormatter.format(parsedDate);
-		} catch (error) {
-			console.error("Error formatting date:", error);
-			// Jika terjadi kesalahan dalam pemformatan, kembalikan string kosong
-			return "";
-		}
-	};
+  const handleFileDownload = async (id: any, assignmentfileName: any) => {
+    if (id === "No File available") {
+      alert("No file available to download");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Assignments/download/${id}`,
+        {
+          responseType: "blob",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", assignmentfileName);
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errors = error.response.data.errors;
+        const errorMessage = Object.keys(errors)
+          .map((key) => errors[key].join(", "))
+          .join(", ");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: errorMessage,
+          confirmButtonText: "Ok",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      }
+    }
+  };
 
-	const handleFileDownload = async (id: any, assignmentfileName: any) => {
-		if (id === "No File available") {
-			alert("No file available to download");
-			return;
-		}
-		try {
-			const response = await axios.get(
-				`${import.meta.env.VITE_API_URL}/Assignments/download/${id}`,
-				{
-					responseType: "blob",
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
-					},
-				}
-			);
-			const blob = new Blob([response.data], { type: "application/pdf" });
-			const url = window.URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", assignmentfileName);
-			document.body.appendChild(link);
-			link.click();
-			window.URL.revokeObjectURL(url);
-		} catch (error) {
-			console.error("Error downloading file:", error);
-			alert("Error downloading file. Please try again later.");
-		}
-	};
+  // filter
+  const [selectedLesson, setSelectedLesson] = useState("semua tugas");
 
-	// filter
-	const [selectedLesson, setSelectedLesson] = useState("semua tugas");
+  const handleLessonChange = (e: any) => {
+    setSelectedLesson(e.target.value);
+  };
 
-	// Event handler untuk mengubah nilai terpilih dari dropdown
-	const handleLessonChange = (e: any) => {
-		setSelectedLesson(e.target.value);
-	};
+  const createPengumpulan = useCreatePengumpulan();
+  const { register, handleSubmit, setValue, reset } = useForm<Pengumpulan>();
+  const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
+    if (!data.assignmentId) {
+      console.error("Assignment ID is missing.");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("assignmentId", data.assignmentId.toString());
+      formData.append("link", data.link);
+      if (uploadedFile) {
+        formData.append("fileData", uploadedFile);
+      }
 
-	const [form, setForm] = useState({
-		assigmentId: "",
-		link: "",
-		FileData: "",
-	});
+      const pengumpulanData: Pengumpulan = {
+        id: "",
+        assignmentId: data.assignmentId,
+        classroomId: 0,
+        submissionTime: "",
+        status: "",
+        submissionTimeStatus: "",
+        link: data.link,
+        fileData: uploadedFile ? uploadedFile : "",
+      };
 
-	const createPengumpulan = useCreatePengumpulan();
-	const { register, handleSubmit, setValue, reset } = useForm<Pengumpulan>();
-	const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
-		// Memastikan assignmentId sudah diset
-		if (!data.assignmentId) {
-			console.error("Assignment ID is missing.");
-			return;
-		}
-		try {
-			// Membuat objek FormData
-			const formData = new FormData();
-			formData.append("assignmentId", data.assignmentId.toString());
-			formData.append("link", data.link);
-			if (uploadedFile) {
-				formData.append("fileData", uploadedFile);
-			}
+      await createPengumpulan.mutateAsync(pengumpulanData, {
+        onSuccess: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil!",
+            text: "Tugas berhasil dikumpulkan!",
+            confirmButtonText: "Ok",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              setSelectedCard(null);
+              reset();
+              setUploadedFile(null);
+            }
+          });
+        },
 
-			// Lakukan pengiriman data pengumpulan ke API menggunakan method mutate
-			await createPengumpulan.mutateAsync(formData);
-			// Jika sukses, lakukan tindakan setelah pengumpulan berhasil
-			Swal.fire({
-				icon: "success",
-				title: "Berhasil!",
-				text: "Tugas berhasil dikumpulkan!",
-				confirmButtonText: "Ok",
-			}).then((result) => {
-				if (result.isConfirmed) {
-					setSelectedCard(null);
-					reset();
-					setForm({
-						assigmentId: "",
-						link: "",
-						FileData: "",
-					});
-					setUploadedFile(null);
-				}
-			});
-		} catch (error: any) {
-			Swal.fire({
-				icon: "error",
-				title: "Error!",
-				text: error.toString(),
-				confirmButtonText: "Ok",
-			});
-		}
-	};
+        onError: (error: any) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            const errors = error.response.data.errors;
+            const errorMessage = Object.keys(errors)
+              .map((key) => errors[key].join(", "))
+              .join(", ");
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: errorMessage,
+              confirmButtonText: "Ok",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: error.toString(),
+              confirmButtonText: "Ok",
+            });
+          }
+        },
+      });
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errors = error.response.data.errors;
+        const errorMessage = Object.keys(errors)
+          .map((key) => errors[key].join(", "))
+          .join(", ");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: errorMessage,
+          confirmButtonText: "Ok",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      }
+    }
+  };
 
-	// State untuk menyimpan file yang diunggah
-	const [uploadedFile, setUploadedFile] = useState(null);
+  // State untuk menyimpan file yang diunggah
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-	// Handler untuk mengubah file
-	const handleFileChange = (e: any) => {
-		const file = e.target.files[0];
-		setUploadedFile(file);
-	};
+  // Handler untuk mengubah file
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    setUploadedFile(file);
+  };
 
-	const filteredData =
-		selectedAssignment === "semua tugas"
-			? dataTugas
-			: dataTugas?.filter(
-					({ lessonName }) => lessonName === selectedAssignment
-			  );
+  const filteredData =
+    selectedAssignment === "semua tugas"
+      ? dataTugas
+      : dataTugas?.filter(
+          ({ lessonName }) => lessonName === selectedAssignment
+        );
 
-	const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-	const handleSearchChange = (e: any) => {
-		setSearchTerm(e.target.value);
-	};
+  const handleSearchChange = (e: any) => {
+    setSearchTerm(e.target.value);
+  };
 
   const searchFilter = (tugas: any) => {
     return tugas.assignmentName
@@ -339,7 +392,7 @@ const TugasSiswa = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-gray-400">
+                    <p className="text-center text-gray-500">
                       Tidak ada hasil pencarian yang sesuai.
                     </p>
                   )
@@ -362,7 +415,7 @@ const TugasSiswa = () => {
                       className="text-gray-500 hover:text-gray-700"
                       onClick={() => {
                         closeModal();
-                        setSelectedCardId(null);
+                        setSelectedCard(null);
                       }}
                     >
                       <svg
