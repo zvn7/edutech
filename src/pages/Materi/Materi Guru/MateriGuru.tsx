@@ -91,7 +91,7 @@ const MateriGuru = () => {
 				if (result.isConfirmed) {
 					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
-					setShowEditForm(true)
+					setShowEditForm(true);
 					setFormUpdate({
 						id: data.id,
 						courseName: data.courseName || "",
@@ -117,7 +117,7 @@ const MateriGuru = () => {
 					if (result.isConfirmed) {
 						// Tampilkan form edit
 						setShowEditForm(true);
-						setShowAddForm(false)
+						setShowAddForm(false);
 						setFormUpdate({
 							id: data.id,
 							courseName: data.courseName || "",
@@ -138,7 +138,7 @@ const MateriGuru = () => {
 					lessonName: data.lessonName || "",
 				});
 				setShowEditForm(true);
-				setShowAddForm(false)
+				setShowAddForm(false);
 			}
 		}
 	};
@@ -285,44 +285,6 @@ const MateriGuru = () => {
 					<div>
 						<div className="flex items-center justify-between mt-16 mb-2">
 							<h1 className="text-3xl font-bold capitalize">Materi</h1>
-							<select
-								value={selectedLesson}
-								onChange={handleLessonChange}
-								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
-							>
-								<option selected>semua mata pelajaran</option>
-								{dataMapel?.map((item) => (
-									<option value={item.lessonName}>{item.lessonName}</option>
-								))}
-							</select>
-						</div>
-
-						<div className="flex justify-between gap-4 mt-5 mb-2">
-							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
-								<label
-									htmlFor="default-search"
-									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-								>
-									Search
-								</label>
-								<div className="relative">
-									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-										<img
-											src="/gif/search.gif"
-											alt="search"
-											className="w-5 h-5"
-										/>
-									</div>
-									<input
-										type="search"
-										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
-										placeholder="temukan materi disini...."
-										value={searchTerm}
-										onChange={handleSearchChange}
-									/>
-								</div>
-							</form>
 							{isMobile && (
 								<button
 									type="button"
@@ -401,6 +363,44 @@ const MateriGuru = () => {
 									Materi
 								</button>
 							)}
+						</div>
+
+						<div className="flex justify-between gap-4 mt-5 mb-2">
+							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
+								<label
+									htmlFor="default-search"
+									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+								>
+									Search
+								</label>
+								<div className="relative">
+									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
+										<img
+											src="/gif/search.gif"
+											alt="search"
+											className="w-5 h-5"
+										/>
+									</div>
+									<input
+										type="search"
+										id="default-search"
+										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										placeholder="temukan materi disini...."
+										value={searchTerm}
+										onChange={handleSearchChange}
+									/>
+								</div>
+							</form>
+							<select
+								value={selectedLesson}
+								onChange={handleLessonChange}
+								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
+							>
+								<option selected>semua mata pelajaran</option>
+								{dataMapel?.map((item) => (
+									<option value={item.lessonName}>{item.lessonName}</option>
+								))}
+							</select>
 						</div>
 
 						<div
@@ -655,7 +655,6 @@ const MateriGuru = () => {
 										</svg>
 									</button>
 								</div>
-
 								<MateriAddTablet
 									setisTabletModalOpenAdd={setisTabletModalOpenAdd}
 									handleCloseForms={handleCloseForms}

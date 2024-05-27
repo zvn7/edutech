@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useGetGuru, useGuruDetail } from "../../../services/queries";
 import { Button, Modal } from "flowbite-react";
+import { useDeleteGuru } from "../../../services/mutation";
+import Swal from "sweetalert2";
 
 const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -64,6 +66,39 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
     ];
 
     return `${date} ${months[month - 1]} ${year}`;
+  };
+
+  const deleteGuru = useDeleteGuru();
+
+  const handleDelete = async (id: any) => {
+    const confirmation = await Swal.fire({
+      title: "Anda yakin ingin menonaktifkan guru ini?",
+      text: "Aksi ini tidak dapat dibatalkan!.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+    if (confirmation.isConfirmed) {
+      try {
+        await deleteGuru.mutateAsync(id);
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Guru Berhasil dinonaktifkan!",
+          confirmButtonText: "Ok",
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: error.toString(),
+          confirmButtonText: "Ok",
+        });
+      }
+    }
   };
 
   return (
@@ -148,79 +183,82 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                 Array.from({ length: pageSize }).map((_, index) => (
                   <tr key={index} className="bg-white border-b animate-pulse">
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5 max-w-[360px]" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5" />
-                    </td>
-                    <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5" />
                     </td>
                   </tr>
                 ))
-              ) : !isGuruLoading &&
-                data &&
+              ) : !isGuruLoading && data && data.length > 0 ? (
                 data.filter(searchFilter).length > 0 ? (
-                data
-                  ?.filter(searchFilter)
-                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                  .map((item, index) => (
-                    <tr
-                      key={index}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 "
-                    >
-                      <td className="px-6 py-4">{index + 1}</td>
-                      <td className="px-6 py-4">{item.nameTeacher}</td>
-                      <td className="px-6 py-4">
-                        {item.lessonNames.map((item) => (
-                          <div className="text-gray-900 font-medium capitalize">
-                            {item}
-                          </div>
-                        ))}
-                      </td>
-                      <td className="px-6 py-4">
-                        {item.classNames.map((item) => (
-                          <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                            {item}
-                          </span>
-                        ))}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Button.Group>
-                          <Button
-                            color="info"
-                            onClick={() => handleDetailClick(item.id)}
-                          >
-                            Detail
-                          </Button>
-                          <Link to={`/pengguna-guru/edit-guru/${item.id}`}>
-                            <Button color="warning" className="rounded-none">
-                              Edit
+                  data
+                    ?.filter(searchFilter)
+                    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                    .map((item, index) => (
+                      <tr
+                        key={index}
+                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 "
+                      >
+                        <td className="px-6 py-4">{index + 1}</td>
+                        <td className="px-6 py-4">{item.nameTeacher}</td>
+                        <td className="px-6 py-4">
+                          {item.lessonNames.map((item) => (
+                            <div className="text-gray-900 font-medium capitalize">
+                              {item}
+                            </div>
+                          ))}
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.classNames.map((item) => (
+                            <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+                              {item}
+                            </span>
+                          ))}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Button.Group>
+                            <Button
+                              color="info"
+                              onClick={() => handleDetailClick(item.id)}
+                            >
+                              Detail
                             </Button>
-                          </Link>
-                          <Button
-                            color="failure"
-                            // onClick={() => handleDetailClick(siswa.id)}
-                          >
-                            Hapus
-                          </Button>
-                        </Button.Group>
-                      </td>
-                    </tr>
-                  ))
+                            <Link to={`/pengguna-guru/edit-guru/${item.id}`}>
+                              <Button color="warning" className="rounded-none">
+                                Edit
+                              </Button>
+                            </Link>
+                            <Button
+                              color="failure"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              Hapus
+                            </Button>
+                          </Button.Group>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center p-10">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </td>
+                  </tr>
+                )
               ) : (
                 <tr>
-                  <td colSpan={5} className="text-center p-10">
-                    Tidak ada hasil pencarian yang sesuai.
+                  <td colSpan={6} className="py-4 text-center capitalize">
+                    Data belum tersedia.
                   </td>
                 </tr>
               )}
@@ -312,16 +350,6 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                       {selectedGuru?.nameTeacher}
                     </td>
                   </tr>
-                  {/* <tr>
-                    <td className="pr-10 py-2 font-medium text-[16px] text-gray-900 capitalize">
-                      jenis kelamin
-                    </td>
-                    <td className="px-1 py-2 text-[16px]">:</td>
-
-                    <td className="px-2 py-2 capitalize text-[16px]">
-                      {getGender(selectedGuru?.gender || 0)}
-                    </td>
-                  </tr> */}
 
                   <tr>
                     <td className="pr-10 py-2 font-medium text-[16px] text-gray-900 capitalize">

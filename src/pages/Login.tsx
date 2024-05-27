@@ -26,6 +26,8 @@ const Login = () => {
 	const loginMutation = useLogin();
 	const navigate = useNavigate();
 	const onSubmit = async () => {
+		console.log(loginMutation);
+		
 		try {
 			const result = await loginMutation.mutateAsync({
 				username: username,

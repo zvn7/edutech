@@ -12,7 +12,7 @@ const TabelJadwalAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const kelasQuery = useClassrooms();
-  const { data: dataKelas, isLoading: isKelasLoading } = kelasQuery;
+  const { data: dataKelas} = kelasQuery;
 
   const jadwalQuery = useSchedulesAdmin();
   const { data, isLoading: isJadwalLoading } = jadwalQuery;
@@ -94,12 +94,28 @@ const TabelJadwalAdmin = () => {
           confirmButtonText: "Ok",
         });
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal",
-          text: error.toString(),
-          confirmButtonText: "Ok",
-        });
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          const errorMessage = Object.values(error.response.data.errors)
+            .flat()
+            .join(", ");
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: errorMessage,
+            confirmButtonText: "Ok",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: error.toString(),
+            confirmButtonText: "Ok",
+          });
+        }
       }
     }
   };
@@ -214,61 +230,74 @@ const TabelJadwalAdmin = () => {
                 ))
               ) : !isJadwalLoading &&
                 filteredData &&
+                filteredData.length > 0 ? (
                 filteredData.filter(searchFilter).length > 0 ? (
-                filteredData
-                  .filter(searchFilter)
-                  .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                  .map((jadwal, index) => (
-                    <tr
-                      key={jadwal.id}
-                      className="bg-white border-b hover:bg-gray-50"
-                    >
-                      <>
-                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                          {jadwal.lessonName}
-                        </td>
-                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                          {getDay(jadwal.day)}
-                        </td>
-                        <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
-                          {jadwal.startTime.toString().slice(0, -3)} -{" "}
-                          {jadwal.endTime.toString().slice(0, -3)} wib
-                        </td>
-                        <td
-                          scope="row"
-                          className={`px-6 py-4 font-normal whitespace-nowrap capitalize ${
-                            jadwal.nameTeacher === "Belum Ada Guru"
-                              ? "text-gray-500"
-                              : "text-gray-900"
-                          }`}
-                        >
-                          {jadwal.nameTeacher}
-                        </td>
-                        <td>
-                          <Button.Group>
-                            <Link to={`/jadwal-admin/edit-jadwal/${jadwal.id}`}>
-                              <Button color="warning" className="rounded-e-sm">
-                                Edit
+                  filteredData
+                    .filter(searchFilter)
+                    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                    .map((jadwal, index) => (
+                      <tr
+                        key={jadwal.id}
+                        className="bg-white border-b hover:bg-gray-50"
+                      >
+                        <>
+                          <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                            {jadwal.lessonName}
+                          </td>
+                          <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
+                            {getDay(jadwal.day)}
+                          </td>
+                          <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap uppercase">
+                            {jadwal.startTime.toString().slice(0, -3)} -{" "}
+                            {jadwal.endTime.toString().slice(0, -3)} wib
+                          </td>
+                          <td
+                            scope="row"
+                            className={`px-6 py-4 font-normal whitespace-nowrap capitalize ${
+                              jadwal.nameTeacher === "Belum Ada Guru"
+                                ? "text-gray-500"
+                                : "text-gray-900"
+                            }`}
+                          >
+                            {jadwal.nameTeacher}
+                          </td>
+                          <td>
+                            <Button.Group>
+                              <Link
+                                to={`/jadwal-admin/edit-jadwal/${jadwal.id}`}
+                              >
+                                <Button
+                                  color="warning"
+                                  className="rounded-e-sm"
+                                >
+                                  Edit
+                                </Button>
+                              </Link>
+                              <Button
+                                color="failure"
+                                onClick={() => handleDelete(jadwal.id)}
+                              >
+                                Hapus
                               </Button>
-                            </Link>
-                            <Button
-                              color="failure"
-                              onClick={() => handleDelete(jadwal.id)}
-                            >
-                              Hapus
-                            </Button>
-                          </Button.Group>
-                        </td>
-                      </>
-                    </tr>
-                  ))
+                            </Button.Group>
+                          </td>
+                        </>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center p-10">
+                      Tidak ada hasil pencarian yang sesuai.
+                    </td>
+                  </tr>
+                )
               ) : (
                 <tr>
-                  <td colSpan={5} className="text-center p-10">
-                    Tidak ada hasil pencarian yang sesuai.
+                  <td colSpan={6} className="py-4 text-center capitalize">
+                    Data belum tersedia.
                   </td>
                 </tr>
               )}

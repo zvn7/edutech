@@ -130,7 +130,7 @@ export const deleteMapel = async (id: string) => {
 export const createUserSiswa = async (data: UserSiswa) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/Account/register/student`,
+      `${BASE_URL}/Account/register/student2`,
       data,
       {
         headers: {
@@ -389,13 +389,6 @@ export const getSchedulesIds = async () => {
   } catch (error: any) {
     throw new Error(error.response.data);
   }
-  // return (
-  // 	await axios.get<Jadwal[]>(`${BASE_URL}/Schedules/studentClassRoomId`, {
-  // 		headers: {
-  // 			Authorization: `Bearer ${localStorage.getItem("token")}`,
-  // 		},
-  // 	})
-  // ).data.map((schedules) => schedules);
 };
 
 export const getSchedulesAdmin = async () => {
@@ -701,6 +694,23 @@ export const createGuru = async (data: UserGuru) => {
     const response = await axios.post(
       `${BASE_URL}/Account/register/teacher`,
       data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response.data);
+  }
+};
+
+export const deleteGuru = async (teacherId: string) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/Account/teacher/delete/${teacherId}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

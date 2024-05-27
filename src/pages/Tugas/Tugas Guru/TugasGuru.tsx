@@ -290,48 +290,6 @@ const TugasGuru = () => {
 					<div>
 						<div className="mt-14 flex justify-between">
 							<h1 className="text-3xl font-bold font-mono">Tugas</h1>
-							<select
-								id="countries"
-								value={selectedLesson}
-								onChange={handleLessonChange}
-								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
-							>
-								<option selected>semua tugas</option>
-								{dataMapel?.map((mapel) => (
-									<option key={mapel.lessonId} value={mapel.lessonName}>
-										{mapel.lessonName}
-									</option>
-								))}
-							</select>
-						</div>
-
-						<div className="mt-5 flex justify-between gap-4 mb-2">
-							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
-								<label
-									htmlFor="default-search"
-									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-								>
-									Search
-								</label>
-								<div className="relative">
-									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-										<img
-											src="/gif/search.gif"
-											alt="search"
-											className="w-5 h-5"
-										/>
-									</div>
-									<input
-										type="search"
-										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
-										placeholder="temukan tugas disini...."
-										value={searchTerm}
-										onChange={handleSearchChange}
-										required
-									/>
-								</div>
-							</form>
 							{isMobile && (
 								<button
 									type="button"
@@ -410,6 +368,48 @@ const TugasGuru = () => {
 									Tugas
 								</button>
 							)}
+						</div>
+
+						<div className="mt-5 flex justify-between gap-4 mb-2">
+							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
+								<label
+									htmlFor="default-search"
+									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+								>
+									Search
+								</label>
+								<div className="relative">
+									<div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
+										<img
+											src="/gif/search.gif"
+											alt="search"
+											className="w-5 h-5"
+										/>
+									</div>
+									<input
+										type="search"
+										id="default-search"
+										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										placeholder="temukan tugas disini...."
+										value={searchTerm}
+										onChange={handleSearchChange}
+										required
+									/>
+								</div>
+							</form>
+							<select
+								id="countries"
+								value={selectedLesson}
+								onChange={handleLessonChange}
+								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
+							>
+								<option selected>semua tugas</option>
+								{dataMapel?.map((mapel) => (
+									<option key={mapel.lessonId} value={mapel.lessonName}>
+										{mapel.lessonName}
+									</option>
+								))}
+							</select>
 						</div>
 
 						<div
@@ -541,7 +541,7 @@ const TugasGuru = () => {
 					{/* right side */}
 					{showAddForm && (
 						<div
-							className="overflow-y-auto"
+							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
 							style={{ scrollbarWidth: "none" }}
 						>
 							<div className="border rounded-lg shadow-sm p-3 mt-14 bg-white">
@@ -579,7 +579,7 @@ const TugasGuru = () => {
 					)}
 					{showEditForm && (
 						<div
-							className="overflow-y-auto"
+							className="fixed right-4 top-6 w-2/5 h-screen overflow-y-auto pb-16"
 							style={{ scrollbarWidth: "none" }}
 						>
 							<div>
@@ -609,9 +609,9 @@ const TugasGuru = () => {
 										</button>
 									</div>
 									<hr className="my-3" />
-									{/* Tambahkan logika untuk menampilkan formulir edit berdasarkan ID yang disimpan */}
+
 									<TugasEdit
-										id={taskIdToEdit}
+										id={taskIdToEdit!}
 										setShowEditForm={setShowEditForm}
 									/>
 								</div>
@@ -629,7 +629,6 @@ const TugasGuru = () => {
 								<div className="add-form">
 									<TugasAddMobile
 										setisMobileModalOpenAdd={setisMobileModalOpenAdd}
-										handleCloseForms={handleCloseForms}
 									/>
 								</div>
 							</Modal.Body>
