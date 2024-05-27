@@ -116,6 +116,9 @@ const TugasAdd = ({
             const errors = error.response.data.errors;
             const errorMessage = Object.keys(errors)
               .map((key) => errors[key].join(", "))
+            const errors = error.response.data.errors;
+            const errorMessage = Object.keys(errors)
+              .map((key) => errors[key].join(", "))
               .join(", ");
             Swal.fire({
               icon: "error",
@@ -135,6 +138,9 @@ const TugasAdd = ({
       });
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.errors) {
+        const errors = error.response.data.errors;
+        const errorMessage = Object.keys(errors)
+          .map((key) => errors[key].join(", "))
         const errors = error.response.data.errors;
         const errorMessage = Object.keys(errors)
           .map((key) => errors[key].join(", "))
