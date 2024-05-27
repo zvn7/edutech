@@ -9,6 +9,8 @@ interface TabsTugasSiswaProps {
     id: string;
     assignmentDescription?: string;
     assignmentFileName?: string;
+    assignmentFileData?: string;
+    assignmentFilePath?: string;
     assignmentLink?: string;
     assignmentName?: string;
     assignmentDeadline?: string;
@@ -44,7 +46,29 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
   formatDate,
 }) => {
   const [activeTab, setActiveTab] = useState("Deskripsi");
+  const [isDownLoading, setIsDownLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const handleDownLoadClick = async (id: any, fileName: any) => {
+    setIsDownLoading(true);
+    try {
+      await handleFileDownload(id, fileName);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsDownLoading(false);
+    }
+  };
 
+  const handleCreateAssignment = async (assignmentId: any) => {
+    setCreateLoading(true);
+    try {
+      await handleCreatePengumpulanSubmit(assignmentId);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
   return (
     <div>
       <div className="bg-white">
@@ -90,6 +114,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
               : selectedCard?.assignmentDescription}
           </p>
 
+<<<<<<< HEAD
 					<p className="mt-8 text-lg font-bold">Tugas</p>
 					{selectedCard?.assignmentFileName ? (
 						<div
@@ -142,6 +167,71 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 					)}
 				</div>
 			)}
+=======
+          <p className="mt-8 text-lg font-bold">Tugas</p>
+          {selectedCard ? (
+            selectedCard.assignmentFilePath ? (
+              <div
+                className="mt-2 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]"
+                onClick={() =>
+                  handleDownLoadClick(
+                    selectedCard.id,
+                    selectedCard.assignmentFilePath
+                  )
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <div className="flex gap-3">
+                  <div className="flex items-center bg-white rounded-lg h-14">
+                    <svg
+                      className="w-12 h-12 text-blue-600 dark:text-white"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M9 2.2V7H4.2l.4-.5 3.9-4 .5-.3Zm2-.2v5a2 2 0 0 1-2 2H4v11c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.3 9.3c.4.4.4 1 0 1.4L9.4 14l1.3 1.3a1 1 0 0 1-1.4 1.4l-2-2a1 1 0 0 1 0-1.4l2-2a1 1 0 0 1 1.4 0Zm2.6 1.4a1 1 0 0 1 1.4-1.4l2 2c.4.4.4 1 0 1.4l-2 2a1 1 0 0 1-1.4-1.4l1.3-1.3-1.3-1.3Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <p className="text-lg font-semibold">
+                      {isDownLoading
+                        ? "Download File ..."
+                        : selectedCard.assignmentFileName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              selectedCard.assignmentLink && (
+                <div className="mt-2 flex justify-between items-center border rounded-lg shadow-sm p-3 gap-2 bg-[#E7F6FF]">
+                  <div className="flex gap-3">
+                    <a
+                      href={selectedCard.assignmentLink}
+                      className="hover:text-blue-500 hover:underline w-96 h-auto dark:text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {isDownLoading
+                        ? "Memuat Link ..."
+                        : selectedCard.assignmentLink.length > 100
+                        ? `${selectedCard.assignmentLink.slice(0, 100)}...`
+                        : selectedCard.assignmentLink}
+                    </a>
+                  </div>
+                </div>
+              )
+            )
+          ) : (
+            <p>No assignment selected</p>
+          )}
+        </div>
+      )}
+>>>>>>> 5834949 (perbaikan fungsi pengumpulan dan perbaikan tampilan)
 
       {activeTab === "Pengumpulan" && (
         <div className="p-4">
@@ -154,7 +244,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
                   <td className="px-6 py-4 float-end">
                     {isLoading
                       ? "Memuat File ..."
-                      : selectedCard.assignmentName}
+                      : selectedCard?.assignmentName}
                   </td>
                 </tr>
                 <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -162,7 +252,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
                   <td className="px-6 py-4 float-end">
                     {isLoading
                       ? "Memuat File ..."
-                      : selectedCard.typeOfSubmission === 1
+                      : selectedCard?.typeOfSubmission === 1
                       ? "File"
                       : "Link"}
                   </td>
@@ -174,7 +264,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
                       <h2 className="text-sm font-semibold text-center text-orange-500">
                         {isLoading
                           ? "Memuat File ..."
-                          : formatDate(selectedCard.assignmentDeadline)}
+                          : formatDate(selectedCard?.assignmentDeadline)}
                       </h2>
                     </div>
                   </td>
@@ -183,10 +273,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
             </table>
           </div>
           <div>
-            <form
-              action=""
-              onSubmit={handleSubmit(handleCreatePengumpulanSubmit)}
-            >
+            <form action="" onSubmit={handleSubmit(handleCreateAssignment)}>
               <input type="hidden" {...register("assignmentId")} />
               <p className="mt-4 font-bold text-md">Pengumpulan Tugas</p>
               <div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
@@ -265,7 +352,31 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
                     : false
                 }
               >
-                Kirim
+                {createLoading ? (
+                  <div className="text-center">
+                    <div role="status">
+                      <svg
+                        aria-hidden="true"
+                        className="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                          fill="currentColor"
+                        />
+                        <path
+                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                          fill="currentFill"
+                        />
+                      </svg>
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                ) : (
+                  "Kirim"
+                )}
               </button>
             </form>
           </div>

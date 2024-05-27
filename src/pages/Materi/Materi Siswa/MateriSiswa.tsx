@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Navigation from "../../../component/Navigation/Navigation";
-import { Tabs } from "flowbite-react";
 import {
   useCourseClassroom,
   useLessonsClassroom,
@@ -15,9 +14,7 @@ const MateriSiswa = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const lessonsQueries = useLessonsClassroom();
   const { data: formLesson } = lessonsQueries;
-  const [selectedSubject, setSelectedSubject] = useState(
-    "semua mata pelajaran"
-  );
+  const [selectedSubject, setSelectedSubject] = useState("semua mapel");
   const courseClassroom = useCourseClassroom();
   const { data: formData, isLoading: isLoadingCourse } = courseClassroom;
 
@@ -34,7 +31,7 @@ const MateriSiswa = () => {
     };
   }, []);
 
-  const handleCardClick = async (id) => {
+  const handleCardClick = async (id: any) => {
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -94,7 +91,7 @@ const MateriSiswa = () => {
   };
 
   const filteredCourses =
-    selectedSubject === "semua mata pelajaran"
+    selectedSubject === "semua mapel"
       ? formData
       : formData?.filter(({ lessonName }) => lessonName === selectedSubject) ||
         [];
@@ -118,7 +115,7 @@ const MateriSiswa = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <div className="mt-14">
             <h1 className="text-3xl font-bold">Materi</h1>
-            <div className="flex flex-wrap justify-between mb-2 mt-4">
+            <div className="flex flex-wrap justify-between mb-2 mt-8">
               <div className="flex items-center w-80">
                 <label
                   htmlFor="default-search"
@@ -137,7 +134,7 @@ const MateriSiswa = () => {
                   <input
                     type="search"
                     id="default-search"
-                    className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+                    className="block md:w-80 w-56 p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
                     placeholder="temukan materi disini...."
                     value={searchTerm}
                     onChange={handleSearchChange}
@@ -150,7 +147,7 @@ const MateriSiswa = () => {
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
-                <option selected>semua mata pelajaran</option>
+                <option selected>semua mapel</option>
                 {formLesson?.map((item) => (
                   <option key={item?.id} value={item?.lessonName}>
                     {item?.lessonName}
@@ -224,7 +221,7 @@ const MateriSiswa = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center p-10">
+                    <p className="text-center text-gray-500">
                       Tidak ada hasil pencarian yang sesuai.
                     </p>
                   )
