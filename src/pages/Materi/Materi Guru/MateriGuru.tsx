@@ -91,7 +91,6 @@ const MateriGuru = () => {
 				if (result.isConfirmed) {
 					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
-					setShowEditForm(true);
 					setFormUpdate({
 						id: data.id,
 						courseName: data.courseName || "",
@@ -285,6 +284,7 @@ const MateriGuru = () => {
 					<div>
 						<div className="flex items-center justify-between mt-16 mb-2">
 							<h1 className="text-3xl font-bold capitalize">Materi</h1>
+
 							{isMobile && (
 								<button
 									type="button"
@@ -365,7 +365,7 @@ const MateriGuru = () => {
 							)}
 						</div>
 
-						<div className="flex justify-between gap-4 mt-5 mb-2">
+						<div className="flex justify-between gap-4 mt-5">
 							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
 								<label
 									htmlFor="default-search"
@@ -402,7 +402,6 @@ const MateriGuru = () => {
 								))}
 							</select>
 						</div>
-
 						<div
 							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
 							style={{ scrollbarWidth: "none" }}

@@ -113,6 +113,31 @@ const TambahGuru = () => {
             }
           });
         },
+        onError: (error: any) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            const errors = error.response.data.errors;
+            const errorMessage = Object.keys(errors)
+              .map((key) => errors[key].join(", "))
+              .join(", ");
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: errorMessage,
+              confirmButtonText: "Ok",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: error.toString(),
+              confirmButtonText: "Ok",
+            });
+          }
+        },
       });
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.errors) {
@@ -461,7 +486,7 @@ const TambahGuru = () => {
                   <div className="flex gap-2 items-center">
                     <button
                       type="submit"
-                      className="w-30 bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-2.5 rounded"
+                      className="w-32 bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-2.5 rounded"
                       disabled={createGuruMutation.isPending}
                     >
                       {createGuruMutation.isPending ? (
@@ -469,7 +494,7 @@ const TambahGuru = () => {
                           <div role="status">
                             <svg
                               aria-hidden="true"
-                              className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                              className="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                               viewBox="0 0 100 101"
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"

@@ -55,7 +55,14 @@ const JadwalSiswa = () => {
 					) : (
 						<>
 							{(() => {
-								if (!schedules) return null;
+								if (!schedules)
+									return (
+										<div className="flex items-center justify-center h-full w-full">
+											<div className="py-4 text-center capitalize text-gray-500">
+												Data belum tersedia.
+											</div>
+										</div>
+									);
 
 								const groupedSchedules: { [key: number]: any[] } = {
 									1: [],

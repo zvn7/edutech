@@ -446,13 +446,6 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 					</div>
 					{selectedOption === "file" && (
 						<div id="fileUpload" className="mt-4">
-							{/* <input
-								type="file"
-								className="w-full bg-slate-100 border rounded-lg mb-4"
-								name="assignmentFile"
-								onChange={handleFileChange}
-								// value={formUpdate.assignmentFilePath}
-							/> */}
 							{formUpdate.assignmentFileName && (
 								<>
 									<div className="w-full bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-2 rounded ">
@@ -491,7 +484,7 @@ const TugasEdit = ({ id, setShowEditForm }: TugasEditProps) => {
 									<div role="status">
 										<svg
 											aria-hidden="true"
-											className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+											className="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
 											viewBox="0 0 100 101"
 											fill="none"
 											xmlns="http://www.w3.org/2000/svg"

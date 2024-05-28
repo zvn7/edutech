@@ -19,8 +19,7 @@ const TugasSiswa = () => {
 	const [selectedAssignment, setSelectedAssignment] = useState("semua tugas");
 	const assignmentsIdsQuery = useAssignments();
 	const { data: dataTugas, isLoading: isLoadingTugas } = assignmentsIdsQuery;
-	const selectedCardId = selectedCard ? selectedCard.id : ""; // Ambil ID dari selectedCard atau gunakan string kosong jika tidak ada
-
+	const selectedCardId = selectedCard ? selectedCard.id : "";
 	const assignmentSubmission = useAssignmentSubmissionsById(selectedCardId);
 	const { data: dataSubmissions } = assignmentSubmission;
 
@@ -108,36 +107,44 @@ const TugasSiswa = () => {
 			document.body.appendChild(link);
 			link.click();
 			window.URL.revokeObjectURL(url);
-		} catch (error) {
-			console.error("Error downloading file:", error);
-			alert("Error downloading file. Please try again later.");
+		} catch (error: any) {
+			if (error.response && error.response.data && error.response.data.errors) {
+				const errors = error.response.data.errors;
+				const errorMessage = Object.keys(errors)
+					.map((key) => errors[key].join(", "))
+					.join(", ");
+				Swal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: errorMessage,
+					confirmButtonText: "Ok",
+				});
+			} else {
+				Swal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: error.toString(),
+					confirmButtonText: "Ok",
+				});
+			}
 		}
 	};
 
 	// filter
 	const [selectedLesson, setSelectedLesson] = useState("semua tugas");
 
-	// Event handler untuk mengubah nilai terpilih dari dropdown
 	const handleLessonChange = (e: any) => {
 		setSelectedLesson(e.target.value);
 	};
 
-	const [form, setForm] = useState({
-		assigmentId: "",
-		link: "",
-		FileData: "",
-	});
-
 	const createPengumpulan = useCreatePengumpulan();
 	const { register, handleSubmit, setValue, reset } = useForm<Pengumpulan>();
 	const handleCreatePengumpulanSubmit = async (data: Pengumpulan) => {
-		// Memastikan assignmentId sudah diset
 		if (!data.assignmentId) {
 			console.error("Assignment ID is missing.");
 			return;
 		}
 		try {
-			// Membuat objek FormData
 			const formData = new FormData();
 			formData.append("assignmentId", data.assignmentId.toString());
 			formData.append("link", data.link);
@@ -145,33 +152,79 @@ const TugasSiswa = () => {
 				formData.append("fileData", uploadedFile);
 			}
 
-			// Lakukan pengiriman data pengumpulan ke API menggunakan method mutate
-			await createPengumpulan.mutateAsync(formData);
-			// Jika sukses, lakukan tindakan setelah pengumpulan berhasil
-			Swal.fire({
-				icon: "success",
-				title: "Berhasil!",
-				text: "Tugas berhasil dikumpulkan!",
-				confirmButtonText: "Ok",
-			}).then((result) => {
-				if (result.isConfirmed) {
-					setSelectedCard(null);
-					reset();
-					setForm({
-						assigmentId: "",
-						link: "",
-						FileData: "",
+			const pengumpulanData: Pengumpulan = {
+				id: "",
+				assignmentId: data.assignmentId,
+				classroomId: 0,
+				submissionTime: "",
+				status: "",
+				submissionTimeStatus: "",
+				link: data.link,
+				fileData: uploadedFile ? uploadedFile : "",
+			};
+
+			await createPengumpulan.mutateAsync(pengumpulanData, {
+				onSuccess: () => {
+					Swal.fire({
+						icon: "success",
+						title: "Berhasil!",
+						text: "Tugas berhasil dikumpulkan!",
+						confirmButtonText: "Ok",
+					}).then((result) => {
+						if (result.isConfirmed) {
+							setSelectedCard(null);
+							reset();
+							setUploadedFile(null);
+						}
 					});
-					setUploadedFile(null);
-				}
+				},
+
+				onError: (error: any) => {
+					if (
+						error.response &&
+						error.response.data &&
+						error.response.data.errors
+					) {
+						const errors = error.response.data.errors;
+						const errorMessage = Object.keys(errors)
+							.map((key) => errors[key].join(", "))
+							.join(", ");
+						Swal.fire({
+							icon: "error",
+							title: "Gagal",
+							text: errorMessage,
+							confirmButtonText: "Ok",
+						});
+					} else {
+						Swal.fire({
+							icon: "error",
+							title: "Gagal",
+							text: error.toString(),
+							confirmButtonText: "Ok",
+						});
+					}
+				},
 			});
 		} catch (error: any) {
-			Swal.fire({
-				icon: "error",
-				title: "Error!",
-				text: error.toString(),
-				confirmButtonText: "Ok",
-			});
+			if (error.response && error.response.data && error.response.data.errors) {
+				const errors = error.response.data.errors;
+				const errorMessage = Object.keys(errors)
+					.map((key) => errors[key].join(", "))
+					.join(", ");
+				Swal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: errorMessage,
+					confirmButtonText: "Ok",
+				});
+			} else {
+				Swal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: error.toString(),
+					confirmButtonText: "Ok",
+				});
+			}
 		}
 	};
 
@@ -228,7 +281,7 @@ const TugasSiswa = () => {
 									<input
 										type="text"
 										id="table-search"
-										className="block p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-56 p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										value={searchTerm}
 										onChange={handleSearchChange}
 										placeholder="temukan tugas disini..."
@@ -339,7 +392,7 @@ const TugasSiswa = () => {
 											</div>
 										))
 									) : (
-										<p className="text-center text-gray-400">
+										<p className="text-center text-gray-500">
 											Tidak ada hasil pencarian yang sesuai.
 										</p>
 									)
@@ -362,7 +415,7 @@ const TugasSiswa = () => {
 											className="text-gray-500 hover:text-gray-700"
 											onClick={() => {
 												closeModal();
-												setSelectedCardId(null);
+												setSelectedCard(null);
 											}}
 										>
 											<svg
