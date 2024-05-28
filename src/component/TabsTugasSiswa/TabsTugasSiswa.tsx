@@ -69,6 +69,12 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 			setCreateLoading(false);
 		}
 	};
+
+	const getFormattedDate = (date?: string) => {
+		return date ? formatDate(date) : "Tanggal tidak tersedia";
+	};
+
+
 	return (
 		<div>
 			<div className="bg-white  flex flex-col">
@@ -209,7 +215,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 												<h2 className="text-sm font-semibold text-center text-orange-500">
 													{isLoading
 														? "Memuat File ..."
-														: formatDate(selectedCard?.assignmentDeadline)}
+														: getFormattedDate(selectedCard?.assignmentDeadline)}
 												</h2>
 											</div>
 										</td>
@@ -283,7 +289,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 										"Sudah mengerjakan"
 											? "opacity-50 cursor-not-allowed"
 											: selectedCard?.assignmentSubmissionStatus ===
-											  "Sudah dinilai"
+											"Sudah dinilai"
 											? "opacity-50 cursor-not-allowed"
 											: ""
 									}`}
@@ -292,7 +298,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 										"Sudah mengerjakan"
 											? true
 											: selectedCard?.assignmentSubmissionStatus ===
-											  "Sudah dinilai"
+											"Sudah dinilai"
 											? true
 											: false
 									}
@@ -347,7 +353,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 										<td className="px-6 py-4 float-end">
 											{isLoading
 												? "Memuat File ..."
-												: formatDate(selectedCard?.assignmentDeadline)}
+												: getFormattedDate(selectedCard?.assignmentDeadline)}
 										</td>
 									</tr>
 									<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
