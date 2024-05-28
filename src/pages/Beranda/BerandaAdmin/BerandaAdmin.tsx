@@ -123,6 +123,37 @@ const BerandaAdmin = () => {
 	const activeStudentCount = countData ? countData.activeStudentCount : 0;
 	const activeTeacherCount = countData ? countData.activeTeacherCount : 0;
 
+	const getnameAdminFromToken = (): {
+		nameAdmin: string | null;
+	} => {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const payload = token.split(".")[1];
+			const decodedPayload = JSON.parse(atob(payload));
+			return {
+				nameAdmin: decodedPayload?.NameAdmin || null,
+			};
+		}
+		return { nameAdmin: null};
+	};
+
+	const { nameAdmin } = getnameAdminFromToken();
+
+	const now = new Date();
+	const hour = now.getHours();
+
+	let greeting;
+
+	if (hour < 10) {
+		greeting = "Pagi";
+	} else if (hour < 15) {
+		greeting = "Siang";
+	} else if (hour < 19) {
+		greeting = "Sore";
+	} else {
+		greeting = "Malam";
+	}
+
 	return (
 		<div>
 			<Navigation />
@@ -130,7 +161,7 @@ const BerandaAdmin = () => {
 				<div className="mt-14">
 					<h1 className="text-3xl font-bold font-mono capitalize">Beranda</h1>
 					<h3 className="text-lg font-sans font-semibold mt-3 capitalize">
-						selamat datang, Admin
+						Selamat {greeting} {nameAdmin}
 					</h3>
 				</div>
 				<div className="mt-6">
