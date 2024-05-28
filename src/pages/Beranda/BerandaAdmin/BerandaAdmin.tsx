@@ -134,7 +134,7 @@ const BerandaAdmin = () => {
 				nameAdmin: decodedPayload?.NameAdmin || null,
 			};
 		}
-		return { nameAdmin: null};
+		return { nameAdmin: null };
 	};
 
 	const { nameAdmin } = getnameAdminFromToken();
@@ -153,6 +153,14 @@ const BerandaAdmin = () => {
 	} else {
 		greeting = "Malam";
 	}
+
+	// Function to handle Enter key press in the input field
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			addOrEditTodo();
+		}
+	};
 
 	return (
 		<div>
@@ -249,7 +257,7 @@ const BerandaAdmin = () => {
 								</div>
 							</div>
 							<div className="mt-4">
-								<div className=" bg-white p-4 rounded-md overflow-y-auto">
+								<div className="bg-white p-4 rounded-md overflow-y-auto">
 									<div className="flex justify-between items-center">
 										<h1 className="text-lg font-semibold capitalize">
 											To Do List
@@ -264,6 +272,7 @@ const BerandaAdmin = () => {
 											className="flex-grow p-2 border border-gray-300 rounded-md"
 											value={editDescription}
 											onChange={(e) => setEditDescription(e.target.value)}
+											onKeyDown={handleKeyDown}
 										/>
 										<button
 											className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
@@ -279,7 +288,7 @@ const BerandaAdmin = () => {
 											{todoData?.map((todo) => (
 												<li
 													key={todo.id}
-													className="flex items-center justify-between gap-2"
+													className="flex items-center justify-between space-y-2"
 												>
 													<div className="flex items-center gap-2">
 														<input
@@ -299,9 +308,9 @@ const BerandaAdmin = () => {
 															{todo.description}
 														</span>
 													</div>
-													<button onClick={() => removeTodo(todo.id)}>
+													<button onClick={() => removeTodo(todo.id)} className="">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-800 dark:text-white hover:text-red-700"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															width="24"
@@ -329,7 +338,9 @@ const BerandaAdmin = () => {
 						{/* Info Rekap */}
 						<div className="w-full lg:w-[608px] md:w-full bg-white h-full relative p-6 rounded-md shadow-sm mt-4 lg:mt-0">
 							<div className="">
-								<h1 className="text-lg font-semibold capitalize">Info Rekap</h1>
+								<h1 className="text-lg font-semibold capitalize">
+									Informasi Tugas
+								</h1>
 							</div>
 							<div className="mt-4 p-2">
 								<ol className="relative border-s border-gray-200 dark:border-gray-700">
