@@ -3,8 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Dropdown,
-  DropdownHeader,
-  DropdownItem,
   Navbar,
   NavbarBrand,
   NavbarToggle,

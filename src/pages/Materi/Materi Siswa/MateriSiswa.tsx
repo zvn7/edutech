@@ -115,7 +115,7 @@ const MateriSiswa = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <div className="mt-14">
             <h1 className="text-3xl font-bold">Materi</h1>
-            <div className="flex flex-wrap justify-between mb-2 mt-8">
+            <div className="flex  justify-between mb-2 mt-8">
               <div className="flex items-center w-80">
                 <label
                   htmlFor="default-search"

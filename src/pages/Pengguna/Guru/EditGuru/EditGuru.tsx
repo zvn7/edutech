@@ -74,10 +74,6 @@ const EditGuru = () => {
     );
   }, [formData]);
 
-  const handleLessonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedMapel = [e.target.value];
-    setSelectedMapel(selectedMapel);
-  };
 
   const [loading, setLoading] = useState(false);
 
