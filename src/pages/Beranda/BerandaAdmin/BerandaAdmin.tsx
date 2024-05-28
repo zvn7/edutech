@@ -8,42 +8,36 @@ import {
 	useEditTodo,
 	useEditTodoCheck,
 } from "../../../services/mutation";
-import { editTodo, editTodoCheck } from "../../../services/api";
-import Swal from "sweetalert2";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TodoItem {
 	id: string;
 	text: string;
 	completed: boolean;
+	status: number;
 }
 const BerandaAdmin = () => {
-	// State untuk menyimpan ID tugas yang sedang diedit
-	const [editingId, setEditingId] = useState(null);
-
-	// State untuk menyimpan deskripsi tugas yang sedang diedit
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editDescription, setEditDescription] = useState("");
 	const [todos, setTodos] = useState<TodoItem[]>([]);
-	const [newTodo, setNewTodo] = useState("");
 	const countQueries = useCount();
 	const { data: countData } = countQueries;
 	const todoQueries = useTodo();
 	const { data: todoData } = todoQueries;
-
-	// Fungsi mutasi untuk menambah tugas baru
 	const createTodoMutation = useCreateTodo();
-
-	// Fungsi mutasi untuk mengedit tugas
 	const editTodoMutation = useEditTodo();
-
-	// Fungsi mutasi untuk mengedit tugas
 	const editTodoCheckMutation = useEditTodoCheck();
-
-	// Fungsi mutasi untuk menghapus tugas
 	const deleteTodoMutation = useDeleteTodo();
-
-	// Menggunakan state untuk menyimpan nilai checkbox
 	const [isChecked, setIsChecked] = useState(false);
-	const [checkedItems, setCheckedItems] = useState({});
+	const [checkedItems] = useState<{ [key: string]: boolean }>({});
+	const queryClient = useQueryClient();
+
+	function generateUniqueId(): string {
+		return (
+			Math.random().toString(36).substring(2, 15) +
+			Math.random().toString(36).substring(2, 15)
+		);
+	}
 
 	// Fungsi untuk menambah atau mengedit tugas
 	const addOrEditTodo = async () => {
@@ -53,13 +47,15 @@ const BerandaAdmin = () => {
 					{
 						id: editingId,
 						data: {
+							id: editingId,
+							createdAt: new Date().toISOString(),
 							description: editDescription,
 							status: checkedItems[editingId] ? 1 : 0,
-						}, // Mengambil nilai status dari checkedItems
+						},
 					},
 					{
 						onSuccess: () => {
-							quertClient.invalidateQueries({ queryKey: ["todo"] });
+							queryClient.invalidateQueries({ queryKey: ["todo"] });
 							setEditDescription("");
 							setEditingId(null);
 						},
@@ -68,6 +64,8 @@ const BerandaAdmin = () => {
 			} else {
 				// Jika sedang dalam mode tambah, panggil fungsi createTodoMutation.mutateAsync
 				await createTodoMutation.mutateAsync({
+					id: generateUniqueId(), // You need to implement this function
+					createdAt: new Date().toISOString(),
 					description: editDescription,
 					status: isChecked ? 1 : 0,
 				});
@@ -102,6 +100,9 @@ const BerandaAdmin = () => {
 			await editTodoCheckMutation.mutateAsync({
 				id: id,
 				data: {
+					id: id,
+					createdAt: new Date().toISOString(),
+					description: editDescription,
 					status: newStatus,
 				},
 			});
@@ -323,7 +324,7 @@ const BerandaAdmin = () => {
 											guru.
 										</p>
 										<a
-                      href="/rekap-absensi"
+											href="/rekap-absensi"
 											className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
 										>
 											Lihat Absensi
@@ -348,7 +349,7 @@ const BerandaAdmin = () => {
 											jadwal sesuai arahan dari kesiswaan.
 										</p>
 										<a
-                      href="/jadwal-admin"
+											href="/jadwal-admin"
 											className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
 										>
 											Lihat Jadwal
