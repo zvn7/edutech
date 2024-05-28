@@ -54,7 +54,7 @@ const Koreksi = () => {
 		};
 		fetchData();
 	}, [id]);
-	const shortenLink = (link, maxLength) => {
+	const shortenLink = (link : string, maxLength : number) => {
 		if (link.length > maxLength) {
 			return link.substring(0, maxLength) + "...";
 		} else {
@@ -110,7 +110,7 @@ const Koreksi = () => {
 		setLoading(false);
 	};
 
-	const handleInputChange = (e) => {
+	const handleInputChange = (e : any) => {
 		const { value, name } = e.target;
 
 		if (name === "grade") {
@@ -148,7 +148,7 @@ const Koreksi = () => {
 		});
 	};
 
-	const formatDate = (dateString) => {
+	const formatDate = (dateString : any) => {
 		// Mendapatkan tanggal dari string tanggal
 		const date = new Date(dateString);
 
@@ -163,7 +163,7 @@ const Koreksi = () => {
 		return formattedDate;
 	};
 
-	const handleFileDownload = async (assignmentId, assignmentFileName) => {
+	const handleFileDownload = async (assignmentId : any, assignmentFileName : any) => {
 		if (!formData.fileData) {
 			Swal.fire({
 				icon: "error",

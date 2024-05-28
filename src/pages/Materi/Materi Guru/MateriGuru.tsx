@@ -518,7 +518,6 @@ const MateriGuru = () => {
 								</div>
 								<MateriAdd
 									setShowAddForm={setShowAddForm}
-									handleCloseForms={handleCloseForms}
 								/>
 							</div>
 						</div>
@@ -589,7 +588,6 @@ const MateriGuru = () => {
 								<hr className="my-3" />
 								<MateriAddMobile
 									setisMobileModalOpenAdd={setisMobileModalOpenAdd}
-									handleCloseForms={handleCloseForms}
 								/>
 							</div>
 						</div>
@@ -656,7 +654,6 @@ const MateriGuru = () => {
 								</div>
 								<MateriAddTablet
 									setisTabletModalOpenAdd={setisTabletModalOpenAdd}
-									handleCloseForms={handleCloseForms}
 								/>
 							</div>
 						</div>

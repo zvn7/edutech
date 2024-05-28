@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { useGetLessonByGuru } from "../../../services/queries";
 import axios from "axios";
 import { TextInput } from "flowbite-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface MateriEditProps {
   id: string;
@@ -35,7 +36,8 @@ const MateriEditMobile = ({
   });
 
   const queryMapel = useGetLessonByGuru();
-  const { data: dataMapel } = queryMapel;
+  const { data: dataMapel, refetch: refetchMateri } = queryMapel;
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const fetchMateri = async () => {
@@ -142,7 +144,9 @@ const MateriEditMobile = ({
             lessonName: "",
             fileName: "",
           });
-          setisMobileModalOpenEdit(false); // Tutup formulir setelah berhasil
+          setisMobileModalOpenEdit(false);
+          refetchMateri();
+					queryClient.invalidateQueries("materi");
         }
       });
     } catch (error: any) {
