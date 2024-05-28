@@ -267,48 +267,58 @@ const BerandaSiswa = () => {
 													</Table.HeadCell>
 												</Table.Head>
 												<Table.Body className="divide-y">
-													{((query.data as any[]) || [])
-														.slice(0, 5)
-														.map((attendance) => (
-															<Table.Row
-																key={attendance.id}
-																className="bg-white dark:border-gray-700 dark:bg-gray-800"
-															>
-																<Table.Cell className="font-medium text-gray-900">
-																	{formatDate(attendance.date)}
-																</Table.Cell>
+													{((query.data as unknown as any[]) || []).length >
+													0 ? (
+														((query.data as unknown as any[]) || [])
+															.slice(0, 5)
+															.map((attendance) => (
+																<Table.Row
+																	key={attendance.id}
+																	className="bg-white dark:border-gray-700 dark:bg-gray-800"
+																>
+																	<Table.Cell className="font-medium text-gray-900">
+																		{formatDate(attendance.date)}
+																	</Table.Cell>
 
-																<Table.Cell>
-																	<span
-																		className={`text-base font-medium text-center me-2 px-2.5 py-0.5 rounded capitalize ${(() => {
-																			switch (attendance.status) {
-																				case 1:
-																					return "bg-blue-100 text-blue-800";
-																				case 2:
-																					return "bg-yellow-100 text-yellow-600";
-																				case 3:
-																					return "bg-red-100 text-red-800";
-																				default:
-																					return "";
-																			}
-																		})()}`}
-																	>
-																		{(() => {
-																			switch (attendance.status) {
-																				case 1:
-																					return "Hadir";
-																				case 2:
-																					return "Izin";
-																				case 3:
-																					return "Alfa";
-																				default:
-																					return "";
-																			}
-																		})()}
-																	</span>
-																</Table.Cell>
-															</Table.Row>
-														))}
+																	<Table.Cell>
+																		<span
+																			className={`text-base font-medium text-center me-2 px-2.5 py-0.5 rounded capitalize ${(() => {
+																				switch (attendance.status) {
+																					case 1:
+																						return "bg-blue-100 text-blue-800";
+																					case 2:
+																						return "bg-yellow-100 text-yellow-600";
+																					case 3:
+																						return "bg-red-100 text-red-800";
+																					default:
+																						return "";
+																				}
+																			})()}`}
+																		>
+																			{(() => {
+																				switch (attendance.status) {
+																					case 1:
+																						return "Hadir";
+																					case 2:
+																						return "Izin";
+																					case 3:
+																						return "Alfa";
+																					default:
+																						return "";
+																				}
+																			})()}
+																		</span>
+																	</Table.Cell>
+																</Table.Row>
+															))
+													) : (
+														<td
+															colSpan={6}
+															className="py-4 text-center capitalize"
+														>
+															Data belum tersedia.
+														</td>
+													)}
 												</Table.Body>
 											</Table>
 										)}

@@ -281,7 +281,7 @@ const TugasSiswa = () => {
 									<input
 										type="text"
 										id="table-search"
-										className="block p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-56 p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										value={searchTerm}
 										onChange={handleSearchChange}
 										placeholder="temukan tugas disini..."
