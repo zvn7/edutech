@@ -24,11 +24,6 @@ const Login = () => {
 		setPassword(e.target.value);
 	};
 
-	// const passwordInput = document.getElementById("password");
-	// if (passwordInput) {
-	// 	passwordInput.focus();
-	// }
-
 	const loginMutation = useLogin();
 	const navigate = useNavigate();
 	const onSubmit = async () => {
