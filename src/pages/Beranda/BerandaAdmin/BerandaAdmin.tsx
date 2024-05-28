@@ -8,42 +8,36 @@ import {
 	useEditTodo,
 	useEditTodoCheck,
 } from "../../../services/mutation";
-import { editTodo, editTodoCheck } from "../../../services/api";
-import Swal from "sweetalert2";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TodoItem {
 	id: string;
 	text: string;
 	completed: boolean;
+	status: number;
 }
 const BerandaAdmin = () => {
-	// State untuk menyimpan ID tugas yang sedang diedit
-	const [editingId, setEditingId] = useState(null);
-
-	// State untuk menyimpan deskripsi tugas yang sedang diedit
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editDescription, setEditDescription] = useState("");
 	const [todos, setTodos] = useState<TodoItem[]>([]);
-	const [newTodo, setNewTodo] = useState("");
 	const countQueries = useCount();
 	const { data: countData } = countQueries;
 	const todoQueries = useTodo();
 	const { data: todoData } = todoQueries;
-
-	// Fungsi mutasi untuk menambah tugas baru
 	const createTodoMutation = useCreateTodo();
-
-	// Fungsi mutasi untuk mengedit tugas
 	const editTodoMutation = useEditTodo();
-
-	// Fungsi mutasi untuk mengedit tugas
 	const editTodoCheckMutation = useEditTodoCheck();
-
-	// Fungsi mutasi untuk menghapus tugas
 	const deleteTodoMutation = useDeleteTodo();
-
-	// Menggunakan state untuk menyimpan nilai checkbox
 	const [isChecked, setIsChecked] = useState(false);
-	const [checkedItems, setCheckedItems] = useState({});
+	const [checkedItems] = useState<{ [key: string]: boolean }>({});
+	const queryClient = useQueryClient();
+
+	function generateUniqueId(): string {
+		return (
+			Math.random().toString(36).substring(2, 15) +
+			Math.random().toString(36).substring(2, 15)
+		);
+	}
 
 	// Fungsi untuk menambah atau mengedit tugas
 	const addOrEditTodo = async () => {
@@ -53,13 +47,15 @@ const BerandaAdmin = () => {
 					{
 						id: editingId,
 						data: {
+							id: editingId,
+							createdAt: new Date().toISOString(),
 							description: editDescription,
 							status: checkedItems[editingId] ? 1 : 0,
-						}, // Mengambil nilai status dari checkedItems
+						},
 					},
 					{
 						onSuccess: () => {
-							quertClient.invalidateQueries({ queryKey: ["todo"] });
+							queryClient.invalidateQueries({ queryKey: ["todo"] });
 							setEditDescription("");
 							setEditingId(null);
 						},
@@ -68,6 +64,8 @@ const BerandaAdmin = () => {
 			} else {
 				// Jika sedang dalam mode tambah, panggil fungsi createTodoMutation.mutateAsync
 				await createTodoMutation.mutateAsync({
+					id: generateUniqueId(), // You need to implement this function
+					createdAt: new Date().toISOString(),
 					description: editDescription,
 					status: isChecked ? 1 : 0,
 				});
@@ -102,6 +100,9 @@ const BerandaAdmin = () => {
 			await editTodoCheckMutation.mutateAsync({
 				id: id,
 				data: {
+					id: id,
+					createdAt: new Date().toISOString(),
+					description: editDescription,
 					status: newStatus,
 				},
 			});
@@ -122,6 +123,45 @@ const BerandaAdmin = () => {
 	const activeStudentCount = countData ? countData.activeStudentCount : 0;
 	const activeTeacherCount = countData ? countData.activeTeacherCount : 0;
 
+	const getnameAdminFromToken = (): {
+		nameAdmin: string | null;
+	} => {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const payload = token.split(".")[1];
+			const decodedPayload = JSON.parse(atob(payload));
+			return {
+				nameAdmin: decodedPayload?.NameAdmin || null,
+			};
+		}
+		return { nameAdmin: null };
+	};
+
+	const { nameAdmin } = getnameAdminFromToken();
+
+	const now = new Date();
+	const hour = now.getHours();
+
+	let greeting;
+
+	if (hour < 10) {
+		greeting = "Pagi";
+	} else if (hour < 15) {
+		greeting = "Siang";
+	} else if (hour < 19) {
+		greeting = "Sore";
+	} else {
+		greeting = "Malam";
+	}
+
+	// Function to handle Enter key press in the input field
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			addOrEditTodo();
+		}
+	};
+
 	return (
 		<div>
 			<Navigation />
@@ -129,7 +169,7 @@ const BerandaAdmin = () => {
 				<div className="mt-14">
 					<h1 className="text-3xl font-bold font-mono capitalize">Beranda</h1>
 					<h3 className="text-lg font-sans font-semibold mt-3 capitalize">
-						selamat datang, Admin
+						Selamat {greeting} {nameAdmin}
 					</h3>
 				</div>
 				<div className="mt-6">
@@ -217,7 +257,7 @@ const BerandaAdmin = () => {
 								</div>
 							</div>
 							<div className="mt-4">
-								<div className=" bg-white p-4 rounded-md overflow-y-auto">
+								<div className="bg-white p-4 rounded-md overflow-y-auto">
 									<div className="flex justify-between items-center">
 										<h1 className="text-lg font-semibold capitalize">
 											To Do List
@@ -232,6 +272,7 @@ const BerandaAdmin = () => {
 											className="flex-grow p-2 border border-gray-300 rounded-md"
 											value={editDescription}
 											onChange={(e) => setEditDescription(e.target.value)}
+											onKeyDown={handleKeyDown}
 										/>
 										<button
 											className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
@@ -247,7 +288,7 @@ const BerandaAdmin = () => {
 											{todoData?.map((todo) => (
 												<li
 													key={todo.id}
-													className="flex items-center justify-between gap-2"
+													className="flex items-center justify-between space-y-2"
 												>
 													<div className="flex items-center gap-2">
 														<input
@@ -267,9 +308,9 @@ const BerandaAdmin = () => {
 															{todo.description}
 														</span>
 													</div>
-													<button onClick={() => removeTodo(todo.id)}>
+													<button onClick={() => removeTodo(todo.id)} className="">
 														<svg
-															className="w-5 h-5 text-gray-800 dark:text-white"
+															className="w-5 h-5 text-gray-800 dark:text-white hover:text-red-700"
 															aria-hidden="true"
 															xmlns="http://www.w3.org/2000/svg"
 															width="24"
@@ -297,7 +338,9 @@ const BerandaAdmin = () => {
 						{/* Info Rekap */}
 						<div className="w-full lg:w-[608px] md:w-full bg-white h-full relative p-6 rounded-md shadow-sm mt-4 lg:mt-0">
 							<div className="">
-								<h1 className="text-lg font-semibold capitalize">Info Rekap</h1>
+								<h1 className="text-lg font-semibold capitalize">
+									Informasi Tugas
+								</h1>
 							</div>
 							<div className="mt-4 p-2">
 								<ol className="relative border-s border-gray-200 dark:border-gray-700">
@@ -323,7 +366,7 @@ const BerandaAdmin = () => {
 											guru.
 										</p>
 										<a
-                      href="/rekap-absensi"
+											href="/rekap-absensi"
 											className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
 										>
 											Lihat Absensi
@@ -348,7 +391,7 @@ const BerandaAdmin = () => {
 											jadwal sesuai arahan dari kesiswaan.
 										</p>
 										<a
-                      href="/jadwal-admin"
+											href="/jadwal-admin"
 											className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
 										>
 											Lihat Jadwal

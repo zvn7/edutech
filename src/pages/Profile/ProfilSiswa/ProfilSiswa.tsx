@@ -2,55 +2,55 @@ import Navigation from "../../../component/Navigation/Navigation";
 import { useUserLogin } from "../../../services/queries";
 
 const ProfilSiswa = () => {
-  const profileQuery = useUserLogin();
+	const profileQuery = useUserLogin();
 
-  const getClassName = (className: string) => {
-    switch (className) {
-      case "TKJ":
-        return "Teknik Komputer Jaringan";
-      case "RPL":
-        return "Rekayasa Perangkat Lunak";
-      case "TKR":
-        return "Teknik Kendaraan Ringan";
-      default:
-        return className;
-    }
-  };
+	const getClassName = (className: string) => {
+		switch (className) {
+			case "TKJ":
+				return "Teknik Komputer Jaringan";
+			case "RPL":
+				return "Rekayasa Perangkat Lunak";
+			case "TKR":
+				return "Teknik Kendaraan Ringan";
+			default:
+				return className;
+		}
+	};
 
-  const getGender = (gender: number) => {
-    switch (gender) {
-      case 1:
-        return "Laki- Laki";
-      case 2:
-        return "Perempuan";
-      default:
-        return gender;
-    }
-  };
-  return (
-    <div>
-      <Navigation />
-      <div className="p-4 sm:ml-64">
-        <div className=" mt-14">
-          <div
-            className="flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
-            role="alert"
-          >
-            <svg
-              className="flex-shrink-0 inline w-5 h-5 me-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-            </svg>
-            <div className="text-md">
-              <span className="font-medium text-md">Informasi !</span> Jika ada
-              kesalahan dalam penulisan data diri silahkan hubungi admin.
-            </div>
-          </div>
-        </div>
+	const getGender = (gender: number) => {
+		switch (gender) {
+			case 1:
+				return "Laki- Laki";
+			case 2:
+				return "Perempuan";
+			default:
+				return gender;
+		}
+	};
+	return (
+		<div>
+			<Navigation />
+			<div className="p-4 sm:ml-64">
+				<div className=" mt-14">
+					<div
+						className="flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
+						role="alert"
+					>
+						<svg
+							className="flex-shrink-0 inline w-5 h-5 me-3"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="currentColor"
+							viewBox="0 0 20 20"
+						>
+							<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+						</svg>
+						<div className="text-md">
+							<span className="font-medium text-md">Informasi !</span> Jika ada
+							kesalahan dalam penulisan data diri silahkan hubungi admin.
+						</div>
+					</div>
+				</div>
 				<div className="relative w-full h-[400px] bg-white border border-gray-200 rounded-lg shadow">
 					{profileQuery[0].isLoading && (
 						<div className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 text-center">
