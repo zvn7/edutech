@@ -11,7 +11,7 @@ const Login = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [role, setRole] = useState(0);
-	
+
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
 	};
@@ -24,11 +24,16 @@ const Login = () => {
 		setPassword(e.target.value);
 	};
 
+	const passwordInput = document.getElementById("password");
+	if (passwordInput) {
+		passwordInput.focus();
+	}
+
 	const loginMutation = useLogin();
 	const navigate = useNavigate();
 	const onSubmit = async () => {
 		console.log(loginMutation);
-		
+
 		try {
 			const result = await loginMutation.mutateAsync({
 				username: username,
@@ -117,8 +122,8 @@ const Login = () => {
 								placeholder="Masukkan Nama Pengguna"
 								onKeyDown={(e) => {
 									if (e.key === "Enter") {
-										e.preventDefault(); // Prevent default behavior of form submission
-										document.getElementById("password").focus(); // Focus on password input
+										e.preventDefault();
+										document.getElementById("password")?.focus();
 									}
 								}}
 							/>
