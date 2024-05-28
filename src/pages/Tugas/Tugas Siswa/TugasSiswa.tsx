@@ -62,7 +62,7 @@ const TugasSiswa = () => {
 		setSelectedCard(null);
 	};
 
-	const formatDate = (dateString: any) => {
+	const formatDate = (dateString: any): string => {
 		try {
 			const parsedDate = new Date(dateString);
 			// Periksa apakah parsedDate adalah waktu yang valid
@@ -70,10 +70,10 @@ const TugasSiswa = () => {
 				// Jika parsedDate tidak valid, kembalikan string "Invalid Date"
 				return "Invalid Date";
 			}
-			const options = {
+			const options: Intl.DateTimeFormatOptions = {
 				day: "numeric",
 				month: "long",
-				year: "numeric" as const,
+				year: "numeric",
 			};
 			const dateFormatter = new Intl.DateTimeFormat("id-ID", options);
 			return dateFormatter.format(parsedDate);

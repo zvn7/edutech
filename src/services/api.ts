@@ -328,7 +328,7 @@ export const getAttendancesIds = async () => {
   ).data.map((attendances) => attendances.id);
 };
 
-export const getAttendances = async (id: number) => {
+export const getAttendances = async () => {
   const studentId = getStudentIdFromToken();
   if (!studentId) {
     throw new Error("StudentId not found in token");

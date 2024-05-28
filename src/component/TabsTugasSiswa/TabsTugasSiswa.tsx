@@ -24,10 +24,10 @@ interface TabsTugasSiswaProps {
 	selectedOption: string;
 	handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	register: UseFormRegister<Pengumpulan>;
-	dataSubmissions: {
-		submissionTimeStatus?: string;
-		grade?: string;
-		comment?: string;
+	dataSubmissions?: {
+		submissionTimeStatus?: string | undefined;
+		grade?: number | undefined;
+		comment?: string | undefined;
 	} | null;
 	formatDate: (date: string) => string;
 }
@@ -73,7 +73,6 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 	const getFormattedDate = (date?: string) => {
 		return date ? formatDate(date) : "Tanggal tidak tersedia";
 	};
-
 
 	return (
 		<div>
@@ -215,7 +214,9 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 												<h2 className="text-sm font-semibold text-center text-orange-500">
 													{isLoading
 														? "Memuat File ..."
-														: getFormattedDate(selectedCard?.assignmentDeadline)}
+														: getFormattedDate(
+																selectedCard?.assignmentDeadline
+														  )}
 												</h2>
 											</div>
 										</td>
@@ -289,7 +290,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 										"Sudah mengerjakan"
 											? "opacity-50 cursor-not-allowed"
 											: selectedCard?.assignmentSubmissionStatus ===
-											"Sudah dinilai"
+											  "Sudah dinilai"
 											? "opacity-50 cursor-not-allowed"
 											: ""
 									}`}
@@ -298,7 +299,7 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 										"Sudah mengerjakan"
 											? true
 											: selectedCard?.assignmentSubmissionStatus ===
-											"Sudah dinilai"
+											  "Sudah dinilai"
 											? true
 											: false
 									}
