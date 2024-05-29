@@ -39,67 +39,30 @@ const TambahJadwalAdmin = () => {
 
 	const navigate = useNavigate();
 	const handleCreateJadwalSubmit: SubmitHandler<Jadwal> = (data) => {
-		try {
-			createJadwalMutation.mutate(data, {
-				onSuccess: () => {
-					Swal.fire({
-						icon: "success",
-						title: "Berhasil",
-						text: "Jadwal Pelajaran Berhasil ditambahkan!",
-						confirmButtonText: "Ok",
-					}).then((result) => {
-						if (result.isConfirmed) {
-							reset();
-							navigate("/jadwal-admin");
-						}
-					});
-				},
-
-				onError: (error: any) => {
-					if (
-						error.response &&
-						error.response.data &&
-						error.response.data.errors
-					) {
-						const errorMessage = Object.values(error.response.data.errors)
-							.flat()
-							.join(", ");
-						Swal.fire({
-							icon: "error",
-							title: "Gagal",
-							text: errorMessage,
-							confirmButtonText: "Ok",
-						});
-					} else {
-						Swal.fire({
-							icon: "error",
-							title: "Gagal",
-							text: error.toString(),
-							confirmButtonText: "Ok",
-						});
-					}
-				},
-			});
-		} catch (error: any) {
-			if (error.response && error.response.data && error.response.data.errors) {
-				const errorMessage = Object.values(error.response.data.errors)
-					.flat()
-					.join(", ");
+		createJadwalMutation.mutate(data, {
+			onSuccess: () => {
 				Swal.fire({
-					icon: "error",
-					title: "Gagal",
-					text: errorMessage,
+					icon: "success",
+					title: "Berhasil",
+					text: "Jadwal Pelajaran Berhasil ditambahkan!",
 					confirmButtonText: "Ok",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						reset();
+						navigate("/jadwal-admin");
+					}
 				});
-			} else {
+			},
+
+			onError: (error: any) => {
 				Swal.fire({
 					icon: "error",
 					title: "Gagal",
 					text: error.toString(),
 					confirmButtonText: "Ok",
 				});
-			}
-		}
+			},
+		});
 	};
 
 	const handleBatal = () => {
@@ -267,7 +230,7 @@ const TambahJadwalAdmin = () => {
 									<div className="flex gap-2 items-center">
 										<button
 											type="submit"
-											className="flex w-30 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
+											className="flex w-32 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium  bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
 											disabled={createJadwalMutation.isPending}
 										>
 											{createJadwalMutation.isPending ? (
@@ -298,7 +261,7 @@ const TambahJadwalAdmin = () => {
 										</button>
 
 										<button
-											type="submit"
+											type="button"
 											onClick={handleBatal}
 											className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
 										>
