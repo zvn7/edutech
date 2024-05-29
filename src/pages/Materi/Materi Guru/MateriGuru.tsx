@@ -234,13 +234,13 @@ const MateriGuru = () => {
 		}
 	};
 
-	const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
+	const [selectedLesson, setSelectedLesson] = useState("semua mapel");
 
 	const queryMapel = useGetLessonByGuru();
 	const { data: dataMapel, isLoading } = queryMapel;
 
 	const filteredData: IMateriGuru[] =
-		selectedLesson === "semua mata pelajaran"
+		selectedLesson === "semua mapel"
 			? formData || []
 			: (formData || []).filter(
 					(materi) => materi.lessonName === selectedLesson
@@ -384,7 +384,7 @@ const MateriGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-full p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										placeholder="temukan materi disini...."
 										value={searchTerm}
 										onChange={handleSearchChange}
@@ -396,7 +396,7 @@ const MateriGuru = () => {
 								onChange={handleLessonChange}
 								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
 							>
-								<option selected>semua mata pelajaran</option>
+								<option selected>semua mapel</option>
 								{dataMapel?.map((item) => (
 									<option value={item.lessonName}>{item.lessonName}</option>
 								))}
@@ -516,9 +516,7 @@ const MateriGuru = () => {
 										</svg>
 									</button>
 								</div>
-								<MateriAdd
-									setShowAddForm={setShowAddForm}
-								/>
+								<MateriAdd setShowAddForm={setShowAddForm} />
 							</div>
 						</div>
 					)}

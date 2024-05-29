@@ -370,8 +370,11 @@ const TugasGuru = () => {
 							)}
 						</div>
 
-						<div className="mt-5 flex justify-between gap-4 mb-2">
-							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
+						<div className="flex justify-between gap-4 mt-5">
+							<form
+								className="flex gap-2 items-center"
+								onSubmit={(e) => e.preventDefault()}
+							>
 								<label
 									htmlFor="default-search"
 									className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -389,11 +392,10 @@ const TugasGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-full p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										placeholder="temukan tugas disini...."
 										value={searchTerm}
 										onChange={handleSearchChange}
-										required
 									/>
 								</div>
 							</form>
@@ -402,7 +404,7 @@ const TugasGuru = () => {
 								id="countries"
 								value={selectedLesson}
 								onChange={handleLessonChange}
-								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
+								className="block px-3 py-2 capitalize bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
 							>
 								<option selected>semua tugas</option>
 								{dataMapel?.map((mapel) => (
