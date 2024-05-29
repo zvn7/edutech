@@ -134,7 +134,7 @@ const MateriSiswa = () => {
                   <input
                     type="search"
                     id="default-search"
-                    className="block md:w-80 w-56 p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+                    className="block md:w-80 w-full p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
                     placeholder="temukan materi disini...."
                     value={searchTerm}
                     onChange={handleSearchChange}
@@ -143,7 +143,7 @@ const MateriSiswa = () => {
               </div>
               <select
                 id="subject"
-                className="block  py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm capitalize"
+                className="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm capitalize"
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
