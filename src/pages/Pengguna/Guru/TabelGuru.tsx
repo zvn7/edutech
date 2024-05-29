@@ -135,8 +135,8 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
           </div>
         </div>
         <hr className="ml-3 mr-3 border-gray-200" />
-        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between">
-          <div className="flex gap-2 items-center flex-wrap">
+        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between flex-wrap">
+          <div className="flex gap-2 items-center ">
             <select
               value={pageSize}
               onChange={handlePageSize}
@@ -402,12 +402,6 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                           {item}
                         </span>
                       ))}
-
-                      {/* {selectedGuru?.classNames.map((item) => (
-                        <span className="bg-gray-200 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                          {item}
-                        </span>
-                      ))} */}
                     </td>
                   </tr>
                 </tbody>
