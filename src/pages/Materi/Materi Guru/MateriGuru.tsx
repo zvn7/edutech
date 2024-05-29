@@ -91,7 +91,6 @@ const MateriGuru = () => {
 				if (result.isConfirmed) {
 					// Tutup form tambah jika dikonfirmasi
 					setShowAddForm(false);
-					setShowEditForm(true);
 					setFormUpdate({
 						id: data.id,
 						courseName: data.courseName || "",
@@ -235,13 +234,13 @@ const MateriGuru = () => {
 		}
 	};
 
-	const [selectedLesson, setSelectedLesson] = useState("semua mata pelajaran");
+	const [selectedLesson, setSelectedLesson] = useState("semua mapel");
 
 	const queryMapel = useGetLessonByGuru();
 	const { data: dataMapel, isLoading } = queryMapel;
 
 	const filteredData: IMateriGuru[] =
-		selectedLesson === "semua mata pelajaran"
+		selectedLesson === "semua mapel"
 			? formData || []
 			: (formData || []).filter(
 					(materi) => materi.lessonName === selectedLesson
@@ -285,6 +284,7 @@ const MateriGuru = () => {
 					<div>
 						<div className="flex items-center justify-between mt-16 mb-2">
 							<h1 className="text-3xl font-bold capitalize">Materi</h1>
+
 							{isMobile && (
 								<button
 									type="button"
@@ -365,7 +365,7 @@ const MateriGuru = () => {
 							)}
 						</div>
 
-						<div className="flex justify-between gap-4 mt-5 mb-2">
+						<div className="flex justify-between gap-4 mt-5">
 							<form className="max-w-xs" onSubmit={(e) => e.preventDefault()}>
 								<label
 									htmlFor="default-search"
@@ -384,7 +384,7 @@ const MateriGuru = () => {
 									<input
 										type="search"
 										id="default-search"
-										className="block md:w-80 w-56 p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
+										className="block md:w-80 w-full p-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-gray-200 focus:border-none capitalize"
 										placeholder="temukan materi disini...."
 										value={searchTerm}
 										onChange={handleSearchChange}
@@ -396,13 +396,12 @@ const MateriGuru = () => {
 								onChange={handleLessonChange}
 								className="p-2 capitalize bg-white border border-gray-300 rounded-lg"
 							>
-								<option selected>semua mata pelajaran</option>
+								<option selected>semua mapel</option>
 								{dataMapel?.map((item) => (
 									<option value={item.lessonName}>{item.lessonName}</option>
 								))}
 							</select>
 						</div>
-
 						<div
 							className="overflow-y-auto overflow-clip max-h-[calc(100vh-100px)]"
 							style={{ scrollbarWidth: "none" }}
@@ -517,10 +516,7 @@ const MateriGuru = () => {
 										</svg>
 									</button>
 								</div>
-								<MateriAdd
-									setShowAddForm={setShowAddForm}
-									handleCloseForms={handleCloseForms}
-								/>
+								<MateriAdd setShowAddForm={setShowAddForm} />
 							</div>
 						</div>
 					)}
@@ -590,7 +586,6 @@ const MateriGuru = () => {
 								<hr className="my-3" />
 								<MateriAddMobile
 									setisMobileModalOpenAdd={setisMobileModalOpenAdd}
-									handleCloseForms={handleCloseForms}
 								/>
 							</div>
 						</div>
@@ -657,7 +652,6 @@ const MateriGuru = () => {
 								</div>
 								<MateriAddTablet
 									setisTabletModalOpenAdd={setisTabletModalOpenAdd}
-									handleCloseForms={handleCloseForms}
 								/>
 							</div>
 						</div>

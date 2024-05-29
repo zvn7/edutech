@@ -158,148 +158,146 @@ const MateriAddTablet = ({
     });
   };
 
+  return (
+    <form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
+      <hr className="my-3" />
+      <div className="space-y-3">
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            nama materi
+          </label>
+          <input
+            type="text"
+            {...register(`CourseName`, { required: true })}
+            onChange={handleInputChange}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+            placeholder="Masukkan nama materi"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("Nama materi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              e.target.setCustomValidity("")
+            }
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Mata Pelajaran
+          </label>
+          <select
+            {...register("LessonName")}
+            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-200 focus:border-none block w-full p-2.5 capitalize"
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("Harap pilih mata pelajaran")
+            }
+            onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              e.target.setCustomValidity("")
+            }
+          >
+            <option value="">Pilih Mata Pelajaran</option>
+            {dataMapel &&
+              dataMapel.map((mapel) => (
+                <option key={mapel.lessonId} value={mapel.lessonName}>
+                  {mapel.lessonName}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Deskripsi
+          </label>
+          <textarea
+            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+            id="Description"
+            {...register(`Description`, { required: true })}
+            onChange={handleInputChange}
+            placeholder="Masukkan deskripsi materi disini..."
+            required
+            onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("Deskripsi tidak boleh kosong")
+            }
+            onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              e.target.setCustomValidity("")
+            }
+            rows={4}
+          />
+        </div>
+        {/* Modul */}
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-medium text-blue-700 capitalize"
+          >
+            Modul
+          </label>
+          <div className="flex gap-5">
+            <div
+              className="flex items-center gap-2"
+              onClick={() => handleOptionChange("file")}
+            >
+              <input
+                type="radio"
+                id="file"
+                name="submissionOption"
+                value="file"
+                checked={selectedOption === "file"}
+              />
+              <label htmlFor="file">File</label>
+            </div>
+            <div
+              className="flex items-center gap-2"
+              onClick={() => handleOptionChange("link")}
+            >
+              <input
+                type="radio"
+                id="link"
+                name="submissionOption"
+                value="link"
+                checked={selectedOption === "link"}
+              />
+              <label htmlFor="link">Link</label>
+            </div>
+          </div>
 
-	return (
-		<form onSubmit={handleSubmit(handleCreateMateriSubmit)}>
-			<hr className="my-3" />
-			<div className="space-y-3">
-				<div>
-					<label
-						htmlFor="name"
-						className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-					>
-						nama materi
-					</label>
-					<input
-						type="text"
-						{...register(`CourseName`, { required: true })}
-						onChange={handleInputChange}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-						placeholder="Masukkan nama materi"
-						required
-						onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
-							e.target.setCustomValidity("Nama materi tidak boleh kosong")
-						}
-						onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-							e.target.setCustomValidity("")
-						}
-					/>
-				</div>
-				<div>
-					<label
-						htmlFor="name"
-						className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-					>
-						Mata Pelajaran
-					</label>
-					<select
-						{...register("LessonName")}
-						className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-200 focus:border-none block w-full p-2.5 capitalize"
-						required
-						onInvalid={(e: React.ChangeEvent<HTMLSelectElement>) =>
-							e.target.setCustomValidity("Harap pilih mata pelajaran")
-						}
-						onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-							e.target.setCustomValidity("")
-						}
-					>
-						<option value="">Pilih Mata Pelajaran</option>
-						{dataMapel &&
-							dataMapel.map((mapel) => (
-								<option key={mapel.lessonId} value={mapel.lessonName}>
-									{mapel.lessonName}
-								</option>
-							))}
-					</select>
-				</div>
-				<div>
-					<label
-						htmlFor="name"
-						className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-					>
-						Deskripsi
-					</label>
-					<textarea
-						className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
-						id="Description"
-						{...register(`Description`, { required: true })}
-						onChange={handleInputChange}
-						placeholder="Masukkan deskripsi materi disini..."
-						required
-						onInvalid={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-							e.target.setCustomValidity("Deskripsi tidak boleh kosong")
-						}
-						onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-							e.target.setCustomValidity("")
-						}
-						rows={4}
-					/>
-				</div>
-				{/* Modul */}
-				<div>
-					<label
-						htmlFor="name"
-						className="block mb-2 text-sm font-medium text-blue-700 capitalize"
-					>
-						Modul
-					</label>
-					<div className="flex gap-5">
-						<div
-							className="flex items-center gap-2"
-							onClick={() => handleOptionChange("file")}
-						>
-							<input
-								type="radio"
-								id="file"
-								name="submissionOption"
-								value="file"
-								checked={selectedOption === "file"}
-							/>
-							<label htmlFor="file">File</label>
-						</div>
-						<div
-							className="flex items-center gap-2"
-							onClick={() => handleOptionChange("link")}
-						>
-							<input
-								type="radio"
-								id="link"
-								name="submissionOption"
-								value="link"
-								checked={selectedOption === "link"}
-							/>
-							<label htmlFor="link">Link</label>
-						</div>
-					</div>
-
-					{/* File atau link input */}
-					{selectedOption === "file" && (
-						<div id="fileUpload" className="mt-4">
-							<FileInput
-								id="FileData"
-								{...register("FileData")}
-								onChange={(e) => {
-									handleFileChange(e);
-								}}
-							/>
-							<span className="text-gray-500 capitalize text-xs">
-								* pastikan file yang di upload sudah benar
-							</span>
-						</div>
-					)}
-					{selectedOption === "link" && (
-						<div id="linkInput" className="mt-4">
-							<TextInput
-								id="link"
-								type="text"
-								{...register("LinkCourse")}
-								onChange={handleInputChange}
-								placeholder="Masukkan url atau link yang valid disini"
-							/>
-						</div>
-					)}
-				</div>
-
+          {/* File atau link input */}
+          {selectedOption === "file" && (
+            <div id="fileUpload" className="mt-4">
+              <FileInput
+                id="FileData"
+                {...register("FileData")}
+                onChange={(e) => {
+                  handleFileChange(e);
+                }}
+              />
+              <span className="text-gray-500 capitalize text-xs">
+                * pastikan file yang di upload sudah benar
+              </span>
+            </div>
+          )}
+          {selectedOption === "link" && (
+            <div id="linkInput" className="mt-4">
+              <TextInput
+                id="link"
+                type="text"
+                {...register("LinkCourse")}
+                onChange={handleInputChange}
+                placeholder="Masukkan url atau link yang valid disini"
+              />
+            </div>
+          )}
+        </div>
 
         {/* Tombol submit */}
         <div>
@@ -314,7 +312,7 @@ const MateriAddTablet = ({
                   <div role="status">
                     <svg
                       aria-hidden="true"
-                      className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                      className="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                       viewBox="0 0 100 101"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"

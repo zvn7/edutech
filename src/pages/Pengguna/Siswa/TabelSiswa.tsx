@@ -188,8 +188,8 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
           </div>
         </div>
         <hr className="ml-3 mr-3 border-gray-200" />
-        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between">
-          <div className="flex gap-2 items-center flex-wrap">
+        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between flex-wrap">
+          <div className="flex gap-2 items-center">
             <select
               value={pageSize}
               onChange={handlePageSizeChange}
@@ -265,7 +265,7 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
                 Array.from({ length: pageSize }).map((_, index) => (
                   <tr key={index} className="bg-white border-b animate-pulse">
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-20 mb-4" />
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-4" />
                     </td>
                     <td className="px-6 py-4 font-normal text-gray-900 whitespace-nowrap capitalize">
                       <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5" />
