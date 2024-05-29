@@ -188,8 +188,8 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
           </div>
         </div>
         <hr className="ml-3 mr-3 border-gray-200" />
-        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between">
-          <div className="flex gap-2 items-center flex-wrap">
+        <div className="p-2 ml-2 mr-2 pt-4 mb-3 flex gap-2 justify-between flex-wrap">
+          <div className="flex gap-2 items-center">
             <select
               value={pageSize}
               onChange={handlePageSizeChange}
