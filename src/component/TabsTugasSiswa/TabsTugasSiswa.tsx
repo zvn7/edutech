@@ -230,8 +230,8 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 								<p className="mt-4 font-bold text-md">Pengumpulan Tugas</p>
 								<div className="p-1 mt-3 bg-orange-200 border-2 border-orange-400 rounded-2xl">
 									<h2 className="p-2 text-sm font-semibold text-orange-500">
-										Mengumpulkan ataupun mengubah jawaban setelah deadline
-										berakhir akan dikenai pengurangan nilai
+										Mengumpulkan jawaban setelah deadline berakhir akan mendapat
+										pengurangan nilai
 									</h2>
 								</div>
 								<div className="flex gap-5">
