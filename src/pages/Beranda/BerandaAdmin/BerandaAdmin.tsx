@@ -142,21 +142,12 @@ const BerandaAdmin = () => {
 	const now = new Date();
 	const hour = now.getHours();
 
-	let greeting;
-
-	if (hour < 10) {
-		greeting = "Pagi";
-	} else if (hour < 15) {
-		greeting = "Siang";
-	} else if (hour < 19) {
-		greeting = "Sore";
-	} else {
-		greeting = "Malam";
-	}
+	const greeting =
+		hour < 10 ? "Pagi" : hour < 15 ? "Siang" : hour < 19 ? "Sore" : "Malam";
 
 	// Function to handle Enter key press in the input field
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
+		if (e.key === "Enter") {
 			e.preventDefault();
 			addOrEditTodo();
 		}
@@ -209,8 +200,8 @@ const BerandaAdmin = () => {
 									</div>
 									<div className="flex items-center">
 										<Link to="/pengguna-guru" className="w-full">
-											<button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
-												<span>lihat selengkapnya</span>
+											<button className="text-base w-full p-1 bg-white rounded-md capitalize hover:text-white text-blue-700 hover:bg-blue-700">
+												<span className="">lihat selengkapnya...</span>
 											</button>
 										</Link>
 									</div>
@@ -249,8 +240,8 @@ const BerandaAdmin = () => {
 									</div>
 									<div className="flex items-center">
 										<Link to="/pengguna-siswa" className="w-full">
-											<button className="text-base w-full p-1 bg-white rounded-md capitalize text-gray-700 hover:text-blue-500">
-												<span>lihat selengkapnya</span>
+											<button className="text-base w-full p-1 bg-white rounded-md capitalize hover:text-white text-blue-700 hover:bg-blue-700">
+												<span className="">lihat selengkapnya...</span>
 											</button>
 										</Link>
 									</div>
@@ -275,7 +266,7 @@ const BerandaAdmin = () => {
 											onKeyDown={handleKeyDown}
 										/>
 										<button
-											className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+											className="bg-blue-700 hover:bg-blue-white text-white hover:text-blue-700 hover:bg-white hover:border font-bold py-2 px-4 rounded-md"
 											type="button"
 											onClick={addOrEditTodo}
 										>
@@ -308,7 +299,10 @@ const BerandaAdmin = () => {
 															{todo.description}
 														</span>
 													</div>
-													<button onClick={() => removeTodo(todo.id)} className="">
+													<button
+														onClick={() => removeTodo(todo.id)}
+														className=""
+													>
 														<svg
 															className="w-5 h-5 text-gray-800 dark:text-white hover:text-red-700"
 															aria-hidden="true"

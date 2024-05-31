@@ -12,17 +12,43 @@ const BerandaGuru = () => {
 
 	const teacherCourse = useTeacherinfo();
 	const { data: formData, isLoading } = teacherCourse;
-	const getNameTeacherFromToken = (): string | null => {
+	// const getNameTeacherFromToken = (): string | null => {
+	// 	const token = localStorage.getItem("token");
+	// 	if (token) {
+	// 		const payload = token.split(".")[1];
+	// 		const decodedPayload = JSON.parse(atob(payload));
+	// 		return decodedPayload?.NameTeacher || null;
+	// 	}
+	// 	return null;
+	// };
+
+	const getNameTeacherFromToken = (): {
+		nameTeacher: string | null;
+		gender: string | null;
+	} => {
 		const token = localStorage.getItem("token");
 		if (token) {
 			const payload = token.split(".")[1];
 			const decodedPayload = JSON.parse(atob(payload));
-			return decodedPayload?.NameTeacher || null;
+			const genderText = decodedPayload?.Gender === "1" ? "Bapak" : "Ibu";
+			return {
+				nameTeacher: decodedPayload?.NameTeacher || null,
+				gender: genderText,
+			};
 		}
-		return null;
+		return { nameTeacher: null, gender: null };
 	};
 
-	const nameTeacher = getNameTeacherFromToken();
+	const { nameTeacher, gender } = getNameTeacherFromToken();
+
+	const now = new Date();
+	const hour = now.getHours();
+
+	const greeting =
+		hour < 10 ? "Pagi" : hour < 15 ? "Siang" : hour < 19 ? "Sore" : "Malam";
+
+	// const nameTeacher = getNameTeacherFromToken();
+
 	return (
 		<div>
 			<Navigation />
@@ -30,7 +56,7 @@ const BerandaGuru = () => {
 				<div className=" mt-14">
 					<h1 className="text-3xl font-bold font-mono">Beranda</h1>
 					<h3 className="text-lg font-sans font-semibold mt-3 capitalize">
-						Selamat Pagi Bapak/Ibu {nameTeacher}
+						Selamat {greeting} {gender} {nameTeacher}
 					</h3>
 					<p className="text-stone-500 capitalize">
 						Yuk, berbagi pengetahuan baru hari ini! 📚
