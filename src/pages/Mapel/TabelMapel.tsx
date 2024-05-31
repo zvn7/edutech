@@ -602,7 +602,7 @@ const TabelMapel = () => {
 								htmlFor="category"
 								className="block mb-2 text-sm font-medium text-blue-700 capitalize"
 							>
-								jurusan
+								kelas
 							</label>
 							<select
 								id="category"
@@ -659,7 +659,7 @@ const TabelMapel = () => {
 							</button>
 
 							<button
-								className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded w-full mt-2"
+								className="bg-white border hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded w-full mt-2"
 								onClick={closeModal}
 							>
 								Batal
