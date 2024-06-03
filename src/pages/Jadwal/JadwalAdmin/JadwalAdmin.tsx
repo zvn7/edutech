@@ -6,7 +6,7 @@ const JadwalAdmin = () => {
     <div>
       <Navigation />
       <div>
-        <div className="bg-[#86d9ff] h-40 relative z-10"></div>
+        <div className="bg-custom-gradient h-40 relative z-10"></div>
       </div>
       <div className="p-4 sm:ml-64">
         <div className="w-full">

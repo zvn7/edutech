@@ -89,7 +89,7 @@ const TambahSiswa = () => {
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya], Lanjutkan",
+      confirmButtonText: "Ya, Lanjutkan",
       cancelButtonText: "Tidak",
     }).then((result) => {
       if (result.isConfirmed) {

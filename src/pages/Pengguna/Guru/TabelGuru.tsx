@@ -175,7 +175,7 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
               <th className="px-6 py-3">No</th>
               <th className="px-6 py-3">Nama guru</th>
               <th className="px-6 py-3">mapel</th>
-              <th className="px-6 py-3">jurusan</th>
+              <th className="px-6 py-3">kelas</th>
               <th className="px-6 py-3">aksi</th>
             </thead>
             <tbody>
@@ -372,15 +372,7 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                       )}
                     </td>
                   </tr>
-                  <tr>
-                    <td className="pr-10 py-2 font-medium text-[16px] text-gray-900 capitalize">
-                      alamat
-                    </td>
-                    <td className="px-1 py-2 text-[16px]">:</td>
-                    <td className="px-2 py-2 capitalize text-[16px]">
-                      {selectedGuru?.address}
-                    </td>
-                  </tr>
+
                   <tr>
                     <td className="pr-10 py-2 font-medium text-[16px] text-gray-900 capitalize">
                       Nomor telepon
@@ -402,6 +394,15 @@ const TabelGuru = ({ id }: { id: (string | undefined)[] }) => {
                           {item}
                         </span>
                       ))}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pr-10 py-2 font-medium text-[16px] text-gray-900 capitalize">
+                      alamat
+                    </td>
+                    <td className="px-1 py-2 text-[16px]">:</td>
+                    <td className="px-2 py-2 capitalize text-[16px]">
+                      {selectedGuru?.address}
                     </td>
                   </tr>
                 </tbody>

@@ -256,7 +256,7 @@ const TabelSiswa = ({ id }: { id: (string | undefined)[] }) => {
               <th className="px-6 py-3">No</th>
               <th className="px-6 py-3">Nama Lengkap</th>
               <th className="px-6 py-3">nis</th>
-              <th className="px-6 py-3">Jurusan</th>
+              <th className="px-6 py-3">Kelas</th>
               <th className="px-6 py-3">Tempat, tanggal Lahir</th>
               <th className="px-6 py-3">Aksi</th>
             </thead>
