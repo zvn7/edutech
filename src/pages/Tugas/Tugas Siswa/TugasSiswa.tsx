@@ -16,7 +16,7 @@ const TugasSiswa = () => {
 	const [selectedCard, setSelectedCard] = useState<any>(null);
 	const [isMobileView, setIsMobileView] = useState<boolean>(false);
 	const [selectedOption, setSelectedOption] = useState("file");
-	const [selectedAssignment, setSelectedAssignment] = useState("semua tugas");
+	const [selectedAssignment, setSelectedAssignment] = useState("semua mapel");
 	const assignmentsIdsQuery = useAssignments();
 	const { data: dataTugas, isLoading: isLoadingTugas } = assignmentsIdsQuery;
 	const selectedCardId = selectedCard ? selectedCard.id : "";
@@ -131,10 +131,9 @@ const TugasSiswa = () => {
 	};
 
 	// filter
-	const [selectedLesson, setSelectedLesson] = useState("semua tugas");
 
 	const handleLessonChange = (e: any) => {
-		setSelectedLesson(e.target.value);
+		setSelectedAssignment(e.target.value);
 	};
 
 	const createPengumpulan = useCreatePengumpulan();
@@ -238,7 +237,7 @@ const TugasSiswa = () => {
 	};
 
 	const filteredData =
-		selectedAssignment === "semua tugas"
+		selectedAssignment === "semua mapel"
 			? dataTugas
 			: dataTugas?.filter(
 					({ lessonName }) => lessonName === selectedAssignment
@@ -290,11 +289,11 @@ const TugasSiswa = () => {
 							</div>
 							<select
 								id="subject"
-								value={selectedLesson}
+								value={selectedAssignment}
 								onChange={handleLessonChange}
 								className="block px-3 py-2 capitalize bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
 							>
-								<option selected>semua tugas</option>
+								<option selected>semua mapel</option>
 								{formLesson?.map((item) => (
 									<option key={item?.id} value={item?.lessonName}>
 										{item?.lessonName}
