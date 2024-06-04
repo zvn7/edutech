@@ -17,6 +17,7 @@ import { Kehadiran } from "../types/kehadiran";
 import { Ikelas, Classrooms } from "../types/kelas";
 import { CountTeacher } from "../types/countTeacher";
 import { ToDoList } from "../types/todolist";
+import { appendErrors } from "react-hook-form";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -41,12 +42,16 @@ export const getUserInfo = async () => {
 
 // create mapel
 export const createMapel = async (data: IMapel) => {
-	const response = await axios.post(`${BASE_URL}/Lessons`, data, {
-		headers: {
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
-		},
-	});
-	return response.data;
+	try {
+		const response = await axios.post(`${BASE_URL}/Lessons`, data, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error: any) {
+		throw new Error(error.response.data);
+	}
 };
 
 // get mapel by id
@@ -408,13 +413,17 @@ export const getTeacherinfo = async () => {
 };
 
 export const createMateri = async (data: UploadMateri) => {
-	const response = await axios.post(`${BASE_URL}/Courses/`, data, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
-		},
-	});
-	return response.data;
+	try {
+		const response = await axios.post(`${BASE_URL}/Courses/`, data, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error: any) {
+		throw new Error(error.response.data);
+	}
 };
 
 export const getClassRoomsByTeacherId = async () => {
@@ -479,16 +488,20 @@ export const getGuruById = async (id: string) => {
 
 // create guru
 export const createGuru = async (data: UserGuru) => {
-	const response = await axios.post(
-		`${BASE_URL}/Account/register/teacher`,
-		data,
-		{
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		}
-	);
-	return response.data;
+	try {
+		const response = await axios.post(
+			`${BASE_URL}/Account/register/teacher`,
+			data,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error: any) {
+		throw new Error(error.response.data);
+	}
 };
 
 export const deleteGuru = async (teacherId: string) => {
@@ -531,13 +544,17 @@ export const getAssignmentSubmissions = async (id: string) => {
 
 // create absensi
 export const createAbsensi = async (data: CreateAbsensi) => {
-	const response = await axios.post(`${BASE_URL}/Attendances`, data, {
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
-		},
-	});
-	return response.data;
+	try {
+		const response = await axios.post(`${BASE_URL}/Attendances`, data, {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		return response.data;
+	} catch (error: any) {
+		throw new Error(error.response.data);
+	}
 };
 
 // get list tugas

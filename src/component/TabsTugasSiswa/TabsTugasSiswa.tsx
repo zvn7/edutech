@@ -2,6 +2,7 @@ import { FileInput, TextInput } from "flowbite-react";
 import React, { useState } from "react";
 import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { Pengumpulan } from "../../types/pengumpulan";
+import { format } from "date-fns";
 
 interface TabsTugasSiswaProps {
 	isLoading: boolean;
@@ -43,7 +44,6 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 	handleFileChange,
 	register,
 	dataSubmissions,
-	formatDate,
 }) => {
 	const [activeTab, setActiveTab] = useState("Deskripsi");
 	const [isDownLoading, setIsDownLoading] = useState(false);
@@ -70,8 +70,10 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 		}
 	};
 
-	const getFormattedDate = (date?: string) => {
-		return date ? formatDate(date) : "Tanggal tidak tersedia";
+	const getFormattedDate = (date: any) => {
+		return date
+			? format(new Date(date), "d MMMM yyyy hh:mm a")
+			: "Tanggal tidak tersedia";
 	};
 
 	return (
@@ -210,14 +212,14 @@ const TabsTugasSiswa: React.FC<TabsTugasSiswaProps> = ({
 									<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
 										<td className="px-6 py-4">Batas Pengumpulan</td>
 										<td className="px-6 py-4 float-end">
-											<div className="w-32 p-1 bg-orange-200 border-2 border-orange-400 rounded-2xl">
-												<h2 className="text-sm font-semibold text-center text-orange-500">
+											<div className="w-44 p-1 bg-orange-200 border-2 border-orange-400 rounded-2xl">
+												<p className="text-sm font-semibold text-center text-orange-500">
 													{isLoading
 														? "Memuat File ..."
 														: getFormattedDate(
 																selectedCard?.assignmentDeadline
 														  )}
-												</h2>
+												</p>
 											</div>
 										</td>
 									</tr>

@@ -280,6 +280,7 @@ const MateriAddTablet = ({
                 onChange={(e) => {
                   handleFileChange(e);
                 }}
+                required
               />
               <span className="text-gray-500 capitalize text-xs">
                 * pastikan file yang di upload sudah benar
@@ -294,6 +295,7 @@ const MateriAddTablet = ({
                 {...register("LinkCourse")}
                 onChange={handleInputChange}
                 placeholder="Masukkan url atau link yang valid disini"
+                required
               />
             </div>
           )}
