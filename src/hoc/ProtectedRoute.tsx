@@ -22,7 +22,7 @@ const ProtectedRoute = ({
 	// Periksa apakah peran pengguna memenuhi syarat yang diperlukan untuk mengakses rute ini
 	if (!userRole || userRole !== requiredRole) {
 		// Jika peran pengguna tidak memenuhi syarat, arahkan pengguna kembali ke halaman login
-		return <Navigate to={"/not-found"} />;
+		return <Navigate to={"/noaccess"} />;
 	}
 
 	// Jika peran pengguna memenuhi syarat, izinkan akses ke rute ini

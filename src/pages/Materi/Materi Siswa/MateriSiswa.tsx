@@ -115,8 +115,8 @@ const MateriSiswa = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <div className="mt-14">
             <h1 className="text-3xl font-bold">Materi</h1>
-            <div className="flex  justify-between mb-2 mt-8">
-              <div className="flex items-center w-80">
+            <div className="flex justify-between mb-2 mt-8 gap-4">
+              <div className="flex items-center w-auto">
                 <label
                   htmlFor="default-search"
                   className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -143,7 +143,7 @@ const MateriSiswa = () => {
               </div>
               <select
                 id="subject"
-                className="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm capitalize"
+                className="w-32 md:w-auto lg:w-auto py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm capitalize"
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
