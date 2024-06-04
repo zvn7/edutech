@@ -375,7 +375,6 @@ const MateriEdit = ({ id, setShowEditForm }: MateriEditProps) => {
 					</button>
 					<button
 						onClick={handleBatal}
-						type="button"
 						className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
 					>
 						batal
