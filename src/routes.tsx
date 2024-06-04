@@ -25,7 +25,7 @@ import BerandaAdmin from "./pages/Beranda/BerandaAdmin/BerandaAdmin";
 import BerandaGuru from "./pages/Beranda/BerandaGuru/BerandaGuru";
 import JadwalSiswa from "./pages/Jadwal/JadwalSiswa/JadwalSiswa";
 import ProtectedRoute from "./hoc/ProtectedRoute";
-import NotFound from "./pages/NotFound";
+import NoAccess from "./pages/NoAccess";
 
 const router = createBrowserRouter([
 	{
@@ -33,8 +33,8 @@ const router = createBrowserRouter([
 		element: <Login />,
 	},
 	{
-		path: "/not-found",
-		element: <NotFound />,
+		path: "/noaccess",
+		element: <NoAccess />,
 	},
 	{
 		path: "/beranda-siswa",
