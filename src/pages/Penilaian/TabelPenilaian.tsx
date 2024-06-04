@@ -104,7 +104,7 @@ const TabelPenilaian = () => {
   };
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
         <div className="bg-[#68b3f1] p-3 rounded-2xl flex gap-2 items-center">
           <svg
             className="w-8 h-8 text-white dark:text-white"

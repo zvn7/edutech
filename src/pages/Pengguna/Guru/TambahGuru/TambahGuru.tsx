@@ -200,28 +200,26 @@ const TambahGuru = () => {
     <div>
       <Navigation />
       <div className="p-4 sm:ml-64">
-        <Link to="/pengguna-guru">
-          <button className="mt-14 flex gap-2 items-center">
-            <div className="bg-white p-2 rounded-full shadow-sm hover:bg-slate-300 hover:cursor-pointer">
-              <svg
-                className="w-7 h-7 text-blue-800 hover:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 12h14M5 12l4-4m-4 4 4 4"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold capitalize">kembali</h1>
-          </button>
-        </Link>
+        <button onClick={handleBtal} className="mt-14 flex gap-2 items-center">
+          <div className="bg-white p-2 rounded-full shadow-sm hover:bg-slate-300 hover:cursor-pointer">
+            <svg
+              className="w-7 h-7 text-blue-800 hover:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 12h14M5 12l4-4m-4 4 4 4"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold capitalize">kembali</h1>
+        </button>
 
         <div className="mt-6">
           <section className="bg-white rounded-lg">
@@ -297,7 +295,7 @@ const TambahGuru = () => {
                       value={formData.userName}
                       {...register("userName")}
                       onChange={handleInputChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 capitalize"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                       placeholder="Masukkan username"
                       required
                       onInvalid={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -518,7 +516,6 @@ const TambahGuru = () => {
 
                     <button
                       onClick={handleBtal}
-                      type="submit"
                       className="flex w-20 items-center text-center justify-center  px-5 py-2.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 capitalize"
                     >
                       batal

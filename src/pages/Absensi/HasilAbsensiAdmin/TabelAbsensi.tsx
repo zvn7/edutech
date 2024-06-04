@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useAttendacesCalculate,
   useClassrooms,
@@ -162,6 +162,22 @@ const TabelAbsensi = () => {
       });
   };
 
+  const [colSpan, setColSpan] = useState(10);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setColSpan(4); // colSpan for small screens
+      } else {
+        setColSpan(10); // colSpan for larger screens
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call handler right away so state gets updated with initial window size
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <>
       <div className="flex mt-16">
@@ -360,7 +376,7 @@ const TabelAbsensi = () => {
                     </th>
                     <th
                       colSpan={10}
-                      className="sticky top-0 z-20 px-6 py-3 bg-gray-200 left-[160px] text-center"
+                      className="sticky top-0 z-20 px-6 py-3 bg-gray-200 left-0 md:left-36 lg:left-[160px] text-center"
                     >
                       Tanggal
                     </th>

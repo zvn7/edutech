@@ -74,7 +74,6 @@ const EditGuru = () => {
     );
   }, [formData]);
 
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmitEdit = async (e: any) => {
@@ -150,7 +149,7 @@ const EditGuru = () => {
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya",
+      confirmButtonText: "Ya, lanjutkan",
       cancelButtonText: "Tidak",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -163,38 +162,36 @@ const EditGuru = () => {
     <div>
       <Navigation />
       <div className="p-4 sm:ml-64">
-        <Link to="/pengguna-guru">
-          <button className="mt-14 flex gap-2 items-center">
-            <div className="bg-white p-2 rounded-full shadow-sm hover:bg-slate-300 hover:cursor-pointer">
-              <svg
-                className="w-7 h-7 text-blue-800 hover:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 12h14M5 12l4-4m-4 4 4 4"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold capitalize">kembali</h1>
-          </button>
-        </Link>
+        <button onClick={handleBatal} className="mt-14 flex gap-2 items-center">
+          <div className="bg-white p-2 rounded-full shadow-sm hover:bg-slate-300 hover:cursor-pointer">
+            <svg
+              className="w-7 h-7 text-blue-800 hover:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 12h14M5 12l4-4m-4 4 4 4"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold capitalize">kembali</h1>
+        </button>
 
         <div className="mt-6">
           <section className="bg-white rounded-lg">
             <div className="py-6 px-4">
               <h2 className="mb-4 text-xl font-bold text-gray-900 capitalize">
-                edit data guru
+                edit data guru {formData.nameTeacher}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 {/* nama lengkap & nis */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="nameTeacher"
                     className="block mb-2 text-sm font-medium text-blue-700 capitalize"
@@ -229,7 +226,7 @@ const EditGuru = () => {
                     required
                     readOnly
                   />
-                </div>
+                </div> */}
 
                 {/* mapel & jurusan */}
                 <div>
@@ -259,7 +256,7 @@ const EditGuru = () => {
                 </div>
 
                 {/* tempat & tgl lahir */}
-                <div>
+                {/* <div>
                   <label className="block mb-2 text-sm font-medium text-blue-700 capitalize">
                     tempat lahir
                   </label>
@@ -288,7 +285,7 @@ const EditGuru = () => {
                     required
                     readOnly
                   />
-                </div>
+                </div> */}
 
                 {/* alamat & no tlp */}
 
