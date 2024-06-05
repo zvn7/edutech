@@ -43,7 +43,9 @@ const TabelMapel = () => {
 			? data
 			: data?.filter(({ className }) => className === selectedClass) || [];
 
-	const totalPages = Math.ceil((data ? data.length : 0) / pageSize);
+	const totalPages = Math.ceil(
+		(filteredData ? filteredData.length : 0) / pageSize
+	);
 
 	const goToPreviousPage = () => {
 		setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));

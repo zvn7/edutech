@@ -5,6 +5,7 @@ import { useCreateAbsensi } from "../../../services/mutation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { CreateAbsensi } from "../../../types/absensi";
 import Swal from "sweetalert2";
+import { Result } from "postcss";
 
 const TabelRekapAbsensi = () => {
 	const [selectedDate, setSelectedDate] = useState("");
@@ -62,8 +63,11 @@ const TabelRekapAbsensi = () => {
 				title: "Tanggal tidak valid",
 				text: "Tanggal yang dipilih jatuh pada hari Sabtu atau Minggu, silakan pilih tanggal lain.",
 				confirmButtonText: "Ok",
+			}).then((result) => {
+				if (result.isConfirmed) {
+					setSelectedDate("");
+				}
 			});
-			return; // Exit the function if it's a weekend
 		}
 
 		if (filteredData) {
@@ -231,6 +235,10 @@ const TabelRekapAbsensi = () => {
 										title: "Tanggal tidak valid",
 										text: "Tanggal yang dipilih jatuh pada hari Sabtu atau Minggu, silakan pilih tanggal lain.",
 										confirmButtonText: "Ok",
+									}).then((result) => {
+										if (result.isConfirmed) {
+											setSelectedDate("");
+										}
 									});
 								}
 							}}

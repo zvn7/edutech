@@ -308,7 +308,7 @@ const MateriGuru = () => {
                       d="M5 12h14m-7 7V5"
                     />
                   </svg>
-                  Tugas
+                  Materi
                 </button>
               )}
               {isTablet && (
@@ -334,7 +334,7 @@ const MateriGuru = () => {
                       d="M5 12h14m-7 7V5"
                     />
                   </svg>
-                  Tugas
+                  Materi
                 </button>
               )}
               {!isMobile && !isTablet && (
